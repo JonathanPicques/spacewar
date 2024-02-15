@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'meatgrind'",
+      "cargo": {
+        "args": ["build", "--bin=meatgrind", "--package=meatgrind"],
+        "filter": {
+          "name": "meatgrind",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'meatgrind'",
+      "cargo": {
+        "args": ["test", "--no-run", "--bin=meatgrind", "--package=meatgrind"],
+        "filter": {
+          "name": "meatgrind",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

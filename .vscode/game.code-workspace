@@ -1,0 +1,25 @@
+{
+    "folders": [{"path": ".."}],
+    "settings": {
+        // files
+        "files.exclude": {
+            "**/build": true,
+            "**/target": true,
+            "**/.cache": true,
+        },
+        // editor
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        },
+        "debug.allowBreakpointsEverywhere": true,
+        // rust-analyzer
+        "rust-analyzer.lens.enable": false,
+        "rust-analyzer.imports.prefix": "crate",
+        "rust-analyzer.imports.granularity.group": "module",
+        "rust-analyzer.rename.allowExternalItems": true,
+        "rust-analyzer.inlayHints.typeHints.enable": false,
+        "rust-analyzer.inlayHints.chainingHints.enable": false,
+        "rust-analyzer.inlayHints.parameterHints.enable": false
+    }
+}
