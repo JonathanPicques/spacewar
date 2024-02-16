@@ -4,7 +4,7 @@ use bevy_ggrs::{ggrs::Config, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalInputs, LocalPlayers, PlayerInputs, Session};
 use bevy_matchbox::prelude::*;
 
-use crate::states::State;
+use crate::State;
 
 pub const FPS: usize = 60;
 pub const INPUT_DELAY: usize = 2;
@@ -143,7 +143,7 @@ fn read_inputs(mut commands: Commands, local_players: Res<LocalPlayers>, keyboar
     commands.insert_resource(LocalInputs::<GameConfig>(local_inputs));
 }
 
-pub fn transition_to_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<GameConfig>, local_players: LocalPlayers) {
+pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<GameConfig>, local_players: LocalPlayers) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);

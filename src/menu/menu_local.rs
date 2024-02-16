@@ -2,18 +2,18 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 
-use crate::states::game::{transition_to_game, GameConfig, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
-use crate::states::State;
+use crate::game::{goto_game, GameConfig, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
+use crate::State;
 
-pub trait AddMenuAppExt {
-    fn add_menu(&mut self) -> &mut Self;
+pub trait AddLocalMenuAppExt {
+    fn add_local_menu(&mut self) -> &mut Self;
 }
 
-impl AddMenuAppExt for App {
-    fn add_menu(&mut self) -> &mut Self {
-        self.add_systems(OnEnter(State::Menu), setup)
-            .add_systems(Update, update.run_if(in_state(State::Menu)))
-            .add_systems(OnExit(State::Menu), cleanup)
+impl AddLocalMenuAppExt for App {
+    fn add_local_menu(&mut self) -> &mut Self {
+        self.add_systems(OnEnter(State::MenuLocal), setup)
+            .add_systems(Update, update.run_if(in_state(State::MenuLocal)))
+            .add_systems(OnExit(State::MenuLocal), cleanup)
     }
 }
 
@@ -39,7 +39,7 @@ fn update(commands: Commands, next_state: ResMut<NextState<State>>) {
         .start_synctest_session()
         .expect("Session could not be started");
 
-    transition_to_game(
+    goto_game(
         commands,
         next_state,
         Session::SyncTest(session),
@@ -49,6 +49,6 @@ fn update(commands: Commands, next_state: ResMut<NextState<State>>) {
 
 fn cleanup() {}
 
-pub fn transition_to_menu(mut next_state: ResMut<NextState<State>>) {
-    next_state.set(State::Menu);
+pub fn goto_local_menu(mut next_state: ResMut<NextState<State>>) {
+    next_state.set(State::MenuLocal);
 }

@@ -1,12 +1,26 @@
-pub mod states;
+pub mod game;
+pub mod menu;
 
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use crate::states::game::AddGameAppExt;
-use crate::states::menu::AddMenuAppExt;
-use crate::states::State;
+use crate::game::AddGameAppExt;
+use crate::menu::menu::AddMainMenuAppExt;
+use crate::menu::menu_local::AddLocalMenuAppExt;
+use crate::menu::menu_online::AddOnlineMenuAppExt;
+
+#[derive(Eq, Hash, Clone, Debug, States, Default, PartialEq)]
+pub enum State {
+    #[default]
+    Load,
+    //
+    MenuMain,
+    MenuLocal,
+    MenuOnline,
+    //
+    Game,
+}
 
 #[derive(Resource, AssetCollection)]
 struct FontAssets {}
@@ -24,15 +38,17 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(EguiPlugin);
 
-    app.add_loading_state(
-        LoadingState::new(State::Load)
-            .continue_to_state(State::Menu)
-            .load_collection::<FontAssets>()
-            .load_collection::<AudioAssets>()
-            .load_collection::<TextureAssets>(),
-    )
-    .add_menu()
-    .add_game();
+    app.add_game()
+        .add_main_menu()
+        .add_local_menu()
+        .add_online_menu()
+        .add_loading_state(
+            LoadingState::new(State::Load)
+                .continue_to_state(State::MenuMain)
+                .load_collection::<FontAssets>()
+                .load_collection::<AudioAssets>()
+                .load_collection::<TextureAssets>(),
+        );
 
     app.run();
 }
