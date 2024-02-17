@@ -4,30 +4,36 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'meatgrind'",
+      "name": "Debug executable 'game'",
       "cargo": {
-        "args": ["build", "--bin=meatgrind", "--package=meatgrind"],
+        "args": ["build", "--bin=game", "--package=game"],
         "filter": {
-          "name": "meatgrind",
+          "name": "game",
           "kind": "bin"
         }
       },
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "CARGO_MANIFEST_DIR": "${workspaceFolder}"
+      }
     },
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'meatgrind'",
+      "name": "Debug unit tests in executable 'game'",
       "cargo": {
-        "args": ["test", "--no-run", "--bin=meatgrind", "--package=meatgrind"],
+        "args": ["test", "--no-run", "--bin=game", "--package=game"],
         "filter": {
-          "name": "meatgrind",
+          "name": "game",
           "kind": "bin"
         }
       },
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "CARGO_MANIFEST_DIR": "${workspaceFolder}"
+      }
     }
   ]
 }

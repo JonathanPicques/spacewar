@@ -2,11 +2,7 @@
   "folders": [{ "path": ".." }],
   "settings": {
     // files
-    "files.exclude": {
-      "**/build": true,
-      "**/target": true,
-      "**/.cache": true
-    },
+    "files.exclude": {},
     // editor
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {

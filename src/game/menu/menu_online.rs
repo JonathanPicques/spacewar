@@ -52,7 +52,7 @@ fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>,
                 .expect("Invalid player");
         }
 
-        let channel = socket.take_channel(0).unwrap();
+        let channel = socket.take_channel(0).expect("Channel expected");
         let session = session_builder
             .start_p2p_session(channel)
             .expect("P2P Session could not be started");
