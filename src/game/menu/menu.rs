@@ -17,7 +17,7 @@ impl AddMainMenuAppExt for App {
 }
 
 fn setup(next_state: ResMut<NextState<State>>) {
-    match false {
+    match true {
         true => goto_online_menu(next_state),
         false => goto_local_menu(next_state),
     }

@@ -2,16 +2,23 @@ use bevy::prelude::*;
 use bevy::reflect::TypePath;
 use bevy::utils::HashMap;
 use bevy_asset_loader::prelude::*;
+use bevy_ecs_ldtk::assets::LdtkProject;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum Asset {
     Image(ImageAsset),
+    Tileset(TilesetAsset),
     TextureAtlas(TextureAtlasAsset),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct ImageAsset {
+    path: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct TilesetAsset {
     path: String,
 }
 
@@ -40,6 +47,7 @@ impl DynamicAsset for GameDynamicAsset {
     fn load(&self, asset_server: &AssetServer) -> Vec<UntypedHandle> {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
+            Asset::Tileset(TilesetAsset { path, .. }) => asset_server.load::<LdtkProject>(path).untyped(),
             Asset::TextureAtlas(TextureAtlasAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
         };
 
@@ -63,6 +71,7 @@ impl DynamicAsset for GameDynamicAsset {
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),
+            Asset::Tileset(TilesetAsset { path }) => asset_server.load::<LdtkProject>(path).untyped(),
             Asset::TextureAtlas(TextureAtlasAsset {
                 path,
                 rows,

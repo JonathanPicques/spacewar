@@ -1,25 +1,16 @@
 ({
-    "tiles": Asset (
+    "tileset_texture": Asset (
         Image (
             ImageAsset (
-                path: "sprites/tiles.png",
+                path: "tilesets/tileset.png",
             )
         ),
     ),
-    "sprites": Assets ([
-        TextureAtlas (
-            TextureAtlasAsset (
-                path: "sprites/tiles.png",
-                //
-                rows: 4,
-                columns: 17,
-                offset_x: 0,
-                offset_y: 0,
-                padding_x: 0,
-                padding_y: 0,
-                tile_size_x: 8,
-                tile_size_y: 8,
+    "tileset_project": Asset (
+        Tileset (
+            TilesetAsset (
+                path: "tilesets/tileset.ldtk",
             )
-        )
-    ])
+        ),
+    ),
 })

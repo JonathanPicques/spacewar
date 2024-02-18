@@ -3,20 +3,21 @@ pub mod menu;
 pub mod player;
 
 use bevy::prelude::*;
+use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
 use bevy_ggrs::{ggrs::Config, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 use bevy_matchbox::prelude::*;
 
 use crate::game::core::input::{input_system, GameInput};
 use crate::game::player::{player_system, Player};
-use crate::State;
+use crate::{State, TextureAssets};
 
 pub const FPS: usize = 60;
 pub const INPUT_DELAY: usize = 2;
 pub const NUM_PLAYERS: usize = 2;
 pub const MAX_PREDICTION: usize = 12;
 
-#[derive(Component)]
+#[derive(Copy, Clone, Component)]
 pub struct Game {}
 
 #[derive(Debug)]
@@ -33,30 +34,44 @@ pub trait AddGameAppExt {
 
 impl AddGameAppExt for App {
     fn add_game(&mut self) -> &mut Self {
-        self.add_plugins(GgrsPlugin::<GameConfig>::default())
+        self.add_plugins(LdtkPlugin)
+            .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)
+            //
+            .rollback_resource_with_clone::<LevelSelection>()
             //
             .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(GgrsSchedule, (player_system).chain())
             .add_systems(OnExit(State::Game), cleanup)
+            //
+            .insert_resource(LevelSelection::index(0))
     }
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn((Game {}, Camera2dBundle::default()));
+fn setup(mut commands: Commands, texture_assets: Res<TextureAssets>) {
+    let game = Game {};
+
+    commands.spawn((game, Camera2dBundle::default()));
+    commands.spawn((
+        game,
+        LdtkWorldBundle {
+            ldtk_handle: texture_assets.tileset_project.clone(),
+            ..Default::default()
+        },
+    ));
 
     for handle in 0..NUM_PLAYERS {
-        let transform = Transform::from_translation(Vec3::new((handle * 2) as f32, 1.0, 1.0));
+        let transform = Transform::from_translation(Vec3::new((handle * 10) as f32, 1.0, 1.0));
         commands.spawn((
-            Game {},
+            game,
             Player { handle },
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::RED,
-                    custom_size: Some(Vec2::new(2.0, 2.0)),
+                    custom_size: Some(Vec2::new(12.0, 14.0)),
                     ..Default::default()
                 },
                 transform,

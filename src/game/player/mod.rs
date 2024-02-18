@@ -1,17 +1,21 @@
 use bevy::prelude::*;
+use bevy_ecs_ldtk::LevelSelection;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::PlayerInputs;
 
 use crate::game::core::input::{INPUT_DOWN, INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
 use crate::game::GameConfig;
 
-#[derive(Default, Component)]
+#[derive(Eq, Ord, PartialEq, PartialOrd, Default, Component)]
 pub struct Player {
     pub handle: usize,
 }
 
-pub fn player_system(mut query: Query<(&Player, &mut Transform)>, inputs: Res<PlayerInputs<GameConfig>>) {
-    for (player, mut transform) in query.iter_mut() {
+pub fn player_system(mut query: Query<(&Player, &mut Transform)>, mut commands: Commands, inputs: Res<PlayerInputs<GameConfig>>) {
+    let mut query = query.iter_mut().collect::<Vec<_>>();
+    query.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
+
+    for (player, mut transform) in query {
         let bitflag = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i.input,
             (i, InputStatus::Predicted) => i.input,
@@ -29,6 +33,12 @@ pub fn player_system(mut query: Query<(&Player, &mut Transform)>, inputs: Res<Pl
         }
         if bitflag & INPUT_RIGHT != 0 {
             transform.translation.x += 1.0;
+        }
+
+        if transform.translation.x < 100.0 {
+            commands.insert_resource(LevelSelection::index(0));
+        } else {
+            commands.insert_resource(LevelSelection::index(1));
         }
     }
 }

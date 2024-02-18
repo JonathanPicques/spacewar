@@ -3,6 +3,7 @@ pub mod game;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
+use bevy_ecs_ldtk::assets::LdtkProject;
 use bevy_egui::EguiPlugin;
 
 use crate::game::core::loader::GameDynamicAssetCollection;
@@ -31,21 +32,21 @@ pub struct AudioAssets {}
 
 #[derive(Resource, AssetCollection)]
 pub struct TextureAssets {
-    #[asset(key = "tiles")]
-    pub tiles: Handle<Image>,
-    #[asset(key = "sprites", collection(typed))]
-    pub sprites: Vec<Handle<TextureAtlas>>,
+    #[asset(key = "tileset_texture")]
+    pub tileset_texture: Handle<Image>,
+    #[asset(key = "tileset_project")]
+    pub tileset_project: Handle<LdtkProject>,
 }
+
+type DynamicAssetPlugin = RonAssetPlugin<GameDynamicAssetCollection>;
 
 fn main() {
     let mut app = App::new();
 
     app.add_state::<State>()
-        .add_plugins((
-            DefaultPlugins,
-            RonAssetPlugin::<GameDynamicAssetCollection>::new(&["ron"]),
-        ))
-        .add_plugins(EguiPlugin);
+        .add_plugins(DefaultPlugins)
+        .add_plugins(EguiPlugin)
+        .add_plugins(DynamicAssetPlugin::new(&["ron"]));
 
     app.add_game()
         .add_main_menu()
@@ -62,12 +63,5 @@ fn main() {
                 .load_collection::<TextureAssets>(),
         );
 
-    app.add_systems(OnEnter(State::MenuMain), list_loaded_assets);
-
     app.run();
-}
-
-fn list_loaded_assets(texture_assets: Res<TextureAssets>) {
-    println!("{:?}", texture_assets.tiles);
-    println!("{:?}", texture_assets.sprites);
 }
