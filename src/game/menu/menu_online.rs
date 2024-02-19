@@ -4,10 +4,8 @@ use bevy_ggrs::{LocalPlayers, Session};
 use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
 
-use crate::game::{goto_game, CoreConfig, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
-use crate::State;
-
-const MATCHBOX_ADDR: &str = "ws://127.0.0.1:3536/lobby?next=2";
+use crate::game::conf::{GameConfig, State, FPS, INPUT_DELAY, MATCHBOX_ADDRESS, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::goto_game;
 
 pub trait AddOnlineMenuAppExt {
     fn add_online_menu(&mut self) -> &mut Self;
@@ -22,7 +20,7 @@ impl AddOnlineMenuAppExt for App {
 }
 
 fn setup(mut commands: Commands) {
-    commands.insert_resource(MatchboxSocket::new_ggrs(MATCHBOX_ADDR));
+    commands.insert_resource(MatchboxSocket::new_ggrs(MATCHBOX_ADDRESS));
 }
 
 fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>, next_state: ResMut<NextState<State>>) {
@@ -34,7 +32,7 @@ fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>,
     }
 
     if socket.players().len() >= NUM_PLAYERS {
-        let mut session_builder = SessionBuilder::<CoreConfig>::new()
+        let mut session_builder = SessionBuilder::<GameConfig>::new()
             .with_fps(FPS)
             .expect("Invalid FPS")
             .with_max_prediction_window(MAX_PREDICTION)

@@ -110,9 +110,9 @@ impl DynamicAsset for GameDynamicAsset {
 }
 
 #[derive(Asset, Debug, TypePath, PartialEq, Serialize, Deserialize)]
-pub struct GameDynamicAssetCollection(HashMap<String, GameDynamicAsset>);
+pub struct CoreDynamicAssetCollection(HashMap<String, GameDynamicAsset>);
 
-impl DynamicAssetCollection for GameDynamicAssetCollection {
+impl DynamicAssetCollection for CoreDynamicAssetCollection {
     fn register(&self, dynamic_assets: &mut DynamicAssets) {
         for (key, asset) in self.0.iter() {
             dynamic_assets.register_asset(key, Box::new(asset.clone()));

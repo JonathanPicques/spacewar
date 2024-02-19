@@ -1,21 +1,21 @@
-pub mod core;
+pub mod conf;
 pub mod menu;
 pub mod player;
 
 use bevy::prelude::*;
+use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
+use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
 use bevy_ggrs::{GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 
-use crate::game::core::input::input_system;
-use crate::game::core::CoreConfig;
+use crate::core::loader::CoreDynamicAssetCollection;
+use crate::game::conf::{Assets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::menu::menu::AddMainMenuAppExt;
+use crate::game::menu::menu_local::AddLocalMenuAppExt;
+use crate::game::menu::menu_online::AddOnlineMenuAppExt;
+use crate::game::player::input::input_system;
 use crate::game::player::{player_system, Player};
-use crate::{State, TextureAssets};
-
-pub const FPS: usize = 60;
-pub const INPUT_DELAY: usize = 2;
-pub const NUM_PLAYERS: usize = 2;
-pub const MAX_PREDICTION: usize = 12;
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
@@ -26,8 +26,14 @@ pub trait AddGameAppExt {
 
 impl AddGameAppExt for App {
     fn add_game(&mut self) -> &mut Self {
-        self.add_plugins(LdtkPlugin)
-            .add_plugins(GgrsPlugin::<CoreConfig>::default())
+        self.add_state::<State>()
+            //
+            .add_main_menu()
+            .add_local_menu()
+            .add_online_menu()
+            //
+            .add_plugins(LdtkPlugin)
+            .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)
             //
@@ -41,10 +47,19 @@ impl AddGameAppExt for App {
             .add_systems(OnExit(State::Game), cleanup)
             //
             .insert_resource(LevelSelection::index(0))
+            //
+            .add_loading_state(
+                LoadingState::new(State::Load)
+                    .continue_to_state(State::MenuMain)
+                    .with_dynamic_assets_file::<CoreDynamicAssetCollection>("assets.ron")
+                    .register_dynamic_asset_collection::<CoreDynamicAssetCollection>()
+                    //
+                    .load_collection::<Assets>(),
+            )
     }
 }
 
-fn setup(mut commands: Commands, texture_assets: Res<TextureAssets>) {
+fn setup(mut commands: Commands, texture_assets: Res<Assets>) {
     let game = Game {};
 
     commands.spawn((game, Camera2dBundle::default()));
@@ -76,14 +91,14 @@ fn setup(mut commands: Commands, texture_assets: Res<TextureAssets>) {
 
 fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
     commands.remove_resource::<LocalPlayers>();
-    commands.remove_resource::<Session<CoreConfig>>();
+    commands.remove_resource::<Session<GameConfig>>();
 
     for e in query.iter() {
         commands.entity(e).despawn_recursive();
     }
 }
 
-pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<CoreConfig>, local_players: LocalPlayers) {
+pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<GameConfig>, local_players: LocalPlayers) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);

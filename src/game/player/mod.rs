@@ -1,18 +1,21 @@
+pub mod input;
+
 use bevy::prelude::*;
 use bevy_ecs_ldtk::LevelSelection;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::PlayerInputs;
 use bytemuck::Zeroable;
 
-use crate::game::core::input::{CoreInput, INPUT_DOWN, INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
-use crate::game::CoreConfig;
+use crate::core::input::CoreInput;
+use crate::game::conf::GameConfig;
+use crate::game::player::input::{INPUT_DOWN, INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
 
 #[derive(Eq, Ord, Clone, PartialEq, PartialOrd, Default, Component)]
 pub struct Player {
     pub handle: usize,
 }
 
-pub fn player_system(mut query: Query<(&Player, &mut Transform)>, mut commands: Commands, inputs: Res<PlayerInputs<CoreConfig>>) {
+pub fn player_system(mut query: Query<(&Player, &mut Transform)>, mut commands: Commands, inputs: Res<PlayerInputs<GameConfig>>) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
 
