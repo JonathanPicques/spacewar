@@ -2,7 +2,7 @@ use bevy::{prelude::*, utils::HashMap};
 use bevy_ggrs::{LocalInputs, LocalPlayers};
 use bytemuck::{Pod, Zeroable};
 
-use crate::game::GameConfig;
+use crate::game::CoreConfig;
 
 pub const INPUT_UP: u8 = 1 << 1;
 pub const INPUT_DOWN: u8 = 1 << 2;
@@ -12,11 +12,19 @@ pub const INPUT_JUMP: u8 = 1 << 5;
 
 #[repr(C)]
 #[derive(Eq, Pod, Copy, Clone, Zeroable, PartialEq)]
-pub struct GameInput {
+pub struct CoreInput {
     pub input: u8,
 }
 
-impl GameInput {
+impl CoreInput {
+    pub fn set(&mut self, bit: u8) {
+        self.input |= bit;
+    }
+
+    pub fn is_set(self, bit: u8) -> bool {
+        self.input & bit != 0
+    }
+
     pub fn is_empty(self) -> bool {
         self.input == 0
     }
@@ -44,8 +52,8 @@ pub fn input_system(mut commands: Commands, local_players: Res<LocalPlayers>, ke
             input |= INPUT_JUMP;
         }
 
-        local_inputs.insert(*handle, GameInput { input });
+        local_inputs.insert(*handle, CoreInput { input });
     }
 
-    commands.insert_resource(LocalInputs::<GameConfig>(local_inputs));
+    commands.insert_resource(LocalInputs::<CoreConfig>(local_inputs));
 }

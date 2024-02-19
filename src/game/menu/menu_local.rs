@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 
-use crate::game::{goto_game, GameConfig, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::{goto_game, CoreConfig, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::State;
 
 pub trait AddLocalMenuAppExt {
@@ -20,7 +20,7 @@ impl AddLocalMenuAppExt for App {
 fn setup() {}
 
 fn update(commands: Commands, next_state: ResMut<NextState<State>>) {
-    let mut session_builder = SessionBuilder::<GameConfig>::new()
+    let mut session_builder = SessionBuilder::<CoreConfig>::new()
         .with_fps(FPS)
         .expect("Invalid FPS")
         .with_max_prediction_window(MAX_PREDICTION)

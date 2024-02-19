@@ -4,11 +4,11 @@ pub mod player;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
-use bevy_ggrs::{ggrs::Config, GgrsApp, GgrsPlugin, ReadInputs};
+use bevy_ggrs::{GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
-use bevy_matchbox::prelude::*;
 
-use crate::game::core::input::{input_system, GameInput};
+use crate::game::core::input::input_system;
+use crate::game::core::CoreConfig;
 use crate::game::player::{player_system, Player};
 use crate::{State, TextureAssets};
 
@@ -20,14 +20,6 @@ pub const MAX_PREDICTION: usize = 12;
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
 
-#[derive(Debug)]
-pub struct GameConfig;
-impl Config for GameConfig {
-    type Input = GameInput;
-    type State = u8;
-    type Address = PeerId;
-}
-
 pub trait AddGameAppExt {
     fn add_game(&mut self) -> &mut Self;
 }
@@ -35,12 +27,13 @@ pub trait AddGameAppExt {
 impl AddGameAppExt for App {
     fn add_game(&mut self) -> &mut Self {
         self.add_plugins(LdtkPlugin)
-            .add_plugins(GgrsPlugin::<GameConfig>::default())
+            .add_plugins(GgrsPlugin::<CoreConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)
             //
             .rollback_resource_with_clone::<LevelSelection>()
             //
+            .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
@@ -83,14 +76,14 @@ fn setup(mut commands: Commands, texture_assets: Res<TextureAssets>) {
 
 fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
     commands.remove_resource::<LocalPlayers>();
-    commands.remove_resource::<Session<GameConfig>>();
+    commands.remove_resource::<Session<CoreConfig>>();
 
     for e in query.iter() {
         commands.entity(e).despawn_recursive();
     }
 }
 
-pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<GameConfig>, local_players: LocalPlayers) {
+pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<CoreConfig>, local_players: LocalPlayers) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);
