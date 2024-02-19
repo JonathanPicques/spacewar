@@ -8,8 +8,10 @@ use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
 use bevy_ggrs::{GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
+use clap::Parser;
 
 use crate::core::loader::CoreDynamicAssetCollection;
+use crate::core::utilities::ArgsPlugin;
 use crate::game::conf::{Assets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::game::menu::menu::AddMainMenuAppExt;
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
@@ -19,6 +21,12 @@ use crate::game::player::{player_system, Player};
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
+
+#[derive(Parser, Resource)]
+pub struct GameArgs {
+    #[clap(long, short = 'l', default_value = "false")]
+    local: bool,
+}
 
 pub trait AddGameAppExt {
     fn add_game(&mut self) -> &mut Self;
@@ -33,6 +41,7 @@ impl AddGameAppExt for App {
             .add_online_menu()
             //
             .add_plugins(LdtkPlugin)
+            .add_plugins(ArgsPlugin::<GameArgs>::default())
             .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)

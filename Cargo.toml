@@ -15,6 +15,7 @@ bevy_ecs_tilemap = { version = "0.12.0" }
 bevy_ggrs = { version = "0.14.0" }
 bevy_matchbox = { version = "0.8.0", features = ["ggrs"] }
 bytemuck = { version = "1.14.3" }
+clap = { version = "4.5.1", features = ["derive"] }
 serde = { version = "1.0.196" }
 
 [workspace]
