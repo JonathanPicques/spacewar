@@ -3,6 +3,7 @@ use bevy_asset_loader::asset_collection::AssetCollection;
 use bevy_ecs_ldtk::assets::LdtkProject;
 use bevy_ggrs::ggrs::Config;
 use bevy_matchbox::matchbox_socket::PeerId;
+use clap::Parser;
 
 use crate::core::input::CoreInput;
 
@@ -24,11 +25,26 @@ pub enum State {
     Game,
 }
 
+#[derive(Parser, Resource)]
+pub struct GameArgs {
+    #[clap(long, short = 'l', default_value = "false")]
+    pub local: bool,
+}
+
 #[derive(Resource, AssetCollection)]
-pub struct Assets {
-    #[asset(key = "tileset_texture")]
+pub struct GameAssets {
+    #[asset(key = "player.idle")]
+    pub player_idle: Handle<TextureAtlas>,
+    #[asset(key = "player.walk")]
+    pub player_walk: Handle<TextureAtlas>,
+    #[asset(key = "player.jump")]
+    pub player_jump: Handle<TextureAtlas>,
+    #[asset(key = "player.death")]
+    pub player_death: Handle<TextureAtlas>,
+
+    #[asset(key = "tileset.texture")]
     pub tileset_texture: Handle<Image>,
-    #[asset(key = "tileset_project")]
+    #[asset(key = "tileset.project")]
     pub tileset_project: Handle<LdtkProject>,
 }
 

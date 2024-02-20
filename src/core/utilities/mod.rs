@@ -24,6 +24,6 @@ where
     T: Parser + Resource,
 {
     fn default() -> Self {
-        Self { phantom: Default::default() }
+        Self { phantom: default() }
     }
 }

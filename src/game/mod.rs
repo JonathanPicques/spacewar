@@ -2,17 +2,19 @@ pub mod conf;
 pub mod menu;
 pub mod player;
 
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
 use bevy_ggrs::{GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
-use clap::Parser;
 
+use crate::core::anim::{anim_system, SpriteSheetAnimation};
 use crate::core::loader::CoreDynamicAssetCollection;
 use crate::core::utilities::ArgsPlugin;
-use crate::game::conf::{Assets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::game::menu::menu::AddMainMenuAppExt;
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
 use crate::game::menu::menu_online::AddOnlineMenuAppExt;
@@ -21,12 +23,6 @@ use crate::game::player::{player_system, Player};
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
-
-#[derive(Parser, Resource)]
-pub struct GameArgs {
-    #[clap(long, short = 'l', default_value = "false")]
-    local: bool,
-}
 
 pub trait AddGameAppExt {
     fn add_game(&mut self) -> &mut Self;
@@ -42,17 +38,19 @@ impl AddGameAppExt for App {
             //
             .add_plugins(LdtkPlugin)
             .add_plugins(ArgsPlugin::<GameArgs>::default())
+            //
             .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)
-            //
             .rollback_resource_with_clone::<LevelSelection>()
-            //
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
-            .add_systems(GgrsSchedule, (player_system).chain())
+            .add_systems(
+                GgrsSchedule,
+                ((anim_system, player_system).run_if(in_state(State::Game))).chain(),
+            )
             .add_systems(OnExit(State::Game), cleanup)
             //
             .insert_resource(LevelSelection::index(0))
@@ -63,12 +61,12 @@ impl AddGameAppExt for App {
                     .with_dynamic_assets_file::<CoreDynamicAssetCollection>("assets.ron")
                     .register_dynamic_asset_collection::<CoreDynamicAssetCollection>()
                     //
-                    .load_collection::<Assets>(),
+                    .load_collection::<GameAssets>(),
             )
     }
 }
 
-fn setup(mut commands: Commands, texture_assets: Res<Assets>) {
+fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
     let game = Game {};
 
     commands.spawn((game, Camera2dBundle::default()));
@@ -76,7 +74,7 @@ fn setup(mut commands: Commands, texture_assets: Res<Assets>) {
         game,
         LdtkWorldBundle {
             ldtk_handle: texture_assets.tileset_project.clone(),
-            ..Default::default()
+            ..default()
         },
     ));
 
@@ -85,14 +83,13 @@ fn setup(mut commands: Commands, texture_assets: Res<Assets>) {
         commands.spawn((
             game,
             Player { handle },
-            SpriteBundle {
-                sprite: Sprite {
-                    color: Color::RED,
-                    custom_size: Some(Vec2::new(12.0, 14.0)),
-                    ..Default::default()
-                },
+            SpriteSheetBundle {
                 transform,
-                ..Default::default()
+                texture_atlas: texture_assets.player_idle.clone(),
+                ..default()
+            },
+            SpriteSheetAnimation {
+                timer: Timer::new(Duration::from_secs_f32(0.5), TimerMode::Repeating),
             },
         ));
     }

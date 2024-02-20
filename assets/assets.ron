@@ -1,12 +1,73 @@
 ({
-    "tileset_texture": Asset (
+    "player.idle": Asset (
+        TextureAtlas (
+            TextureAtlasAsset (
+                path: "sprites/player_idle.png",
+                rows: 1,
+                columns: 4,
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 48,
+                tile_size_y: 36
+            )
+        )
+    ),
+    "player.walk": Asset (
+        TextureAtlas (
+            TextureAtlasAsset (
+                path: "sprites/player_walk.png",
+                rows: 1,
+                columns: 11,
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 0,
+                tile_size_y: 0
+            )
+        )
+    ),
+    "player.jump": Asset (
+        TextureAtlas (
+            TextureAtlasAsset (
+                path: "sprites/player_jump.png",
+                rows: 1,
+                columns: 5,
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 36,
+                tile_size_y: 33
+            )
+        )
+    ),
+    "player.death": Asset (
+        TextureAtlas (
+            TextureAtlasAsset (
+                path: "sprites/player_death.png",
+                rows: 1,
+                columns: 10,
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 0,
+                tile_size_y: 0
+            )
+        )
+    ),
+    //
+    "tileset.texture": Asset (
         Image (
             ImageAsset (
                 path: "tilesets/tileset.png",
             )
         ),
     ),
-    "tileset_project": Asset (
+    "tileset.project": Asset (
         Tileset (
             TilesetAsset (
                 path: "tilesets/tileset.ldtk",
