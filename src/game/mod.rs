@@ -13,7 +13,7 @@ use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 
 use crate::core::anim::{anim_system, SpriteSheetAnimation};
 use crate::core::loader::CoreDynamicAssetCollection;
-use crate::core::utilities::ArgsPlugin;
+use crate::core::utilities::args::ArgsPlugin;
 use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::game::menu::menu::AddMainMenuAppExt;
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
@@ -79,7 +79,7 @@ fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
     ));
 
     for handle in 0..NUM_PLAYERS {
-        let transform = Transform::from_translation(Vec3::new((handle * 10) as f32, 1.0, 1.0));
+        let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
         commands.spawn((
             game,
             Player { handle },
@@ -89,7 +89,7 @@ fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
                 ..default()
             },
             SpriteSheetAnimation {
-                timer: Timer::new(Duration::from_secs_f32(0.5), TimerMode::Repeating),
+                timer: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
             },
         ));
     }

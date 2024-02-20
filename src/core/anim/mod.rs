@@ -21,8 +21,7 @@ pub fn anim_system(
 
             sprite_sheet_animation
                 .timer
-                .tick(Duration::from_millis(16));
-
+                .tick(Duration::from_millis(100));
             if sprite_sheet_animation.timer.finished() {
                 texture_atlas_sprite.index = (texture_atlas_sprite.index + 1) % nb_frames;
                 sprite_sheet_animation.timer.reset();
