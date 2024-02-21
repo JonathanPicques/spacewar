@@ -68,8 +68,8 @@
         ),
     ),
     "tileset.project": Asset (
-        Tileset (
-            TilesetAsset (
+        LdtkProject (
+            LdtkProjectAsset (
                 path: "tilesets/tileset.ldtk",
             )
         ),

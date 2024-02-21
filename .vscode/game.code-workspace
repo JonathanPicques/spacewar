@@ -13,7 +13,6 @@
     "rust-analyzer.lens.enable": false,
     "rust-analyzer.imports.prefix": "crate",
     "rust-analyzer.imports.granularity.group": "module",
-    "rust-analyzer.rename.allowExternalItems": true,
     "rust-analyzer.inlayHints.typeHints.enable": false,
     "rust-analyzer.inlayHints.chainingHints.enable": false,
     "rust-analyzer.inlayHints.parameterHints.enable": false

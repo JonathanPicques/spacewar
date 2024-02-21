@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum Asset {
     Image(ImageAsset),
-    Tileset(TilesetAsset),
+    LdtkProject(LdtkProjectAsset),
     TextureAtlas(TextureAtlasAsset),
 }
 
@@ -18,7 +18,7 @@ struct ImageAsset {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct TilesetAsset {
+struct LdtkProjectAsset {
     path: String,
 }
 
@@ -38,22 +38,22 @@ struct TextureAtlasAsset {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-enum GameDynamicAsset {
+enum CoreDynamicAsset {
     Asset(Asset),
     Assets(Vec<Asset>),
 }
 
-impl DynamicAsset for GameDynamicAsset {
+impl DynamicAsset for CoreDynamicAsset {
     fn load(&self, asset_server: &AssetServer) -> Vec<UntypedHandle> {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
-            Asset::Tileset(TilesetAsset { path, .. }) => asset_server.load::<LdtkProject>(path).untyped(),
+            Asset::LdtkProject(LdtkProjectAsset { path, .. }) => asset_server.load::<LdtkProject>(path).untyped(),
             Asset::TextureAtlas(TextureAtlasAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
         };
 
         match self {
-            GameDynamicAsset::Asset(asset) => vec![load_asset(asset.clone())],
-            GameDynamicAsset::Assets(assets) => assets
+            CoreDynamicAsset::Asset(asset) => vec![load_asset(asset.clone())],
+            CoreDynamicAsset::Assets(assets) => assets
                 .iter()
                 .map(|asset| load_asset(asset.clone()))
                 .collect(),
@@ -71,7 +71,7 @@ impl DynamicAsset for GameDynamicAsset {
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),
-            Asset::Tileset(TilesetAsset { path }) => asset_server.load::<LdtkProject>(path).untyped(),
+            Asset::LdtkProject(LdtkProjectAsset { path }) => asset_server.load::<LdtkProject>(path).untyped(),
             Asset::TextureAtlas(TextureAtlasAsset {
                 path,
                 rows,
@@ -96,10 +96,10 @@ impl DynamicAsset for GameDynamicAsset {
                 .untyped(),
         };
         match self {
-            GameDynamicAsset::Asset(asset) => Ok(DynamicAssetType::Single(build_asset(
+            CoreDynamicAsset::Asset(asset) => Ok(DynamicAssetType::Single(build_asset(
                 asset.clone(),
             ))),
-            GameDynamicAsset::Assets(assets) => Ok(DynamicAssetType::Collection(
+            CoreDynamicAsset::Assets(assets) => Ok(DynamicAssetType::Collection(
                 assets
                     .iter()
                     .map(|asset| build_asset(asset.clone()))
@@ -110,7 +110,7 @@ impl DynamicAsset for GameDynamicAsset {
 }
 
 #[derive(Asset, Debug, TypePath, PartialEq, Serialize, Deserialize)]
-pub struct CoreDynamicAssetCollection(HashMap<String, GameDynamicAsset>);
+pub struct CoreDynamicAssetCollection(HashMap<String, CoreDynamicAsset>);
 
 impl DynamicAssetCollection for CoreDynamicAssetCollection {
     fn register(&self, dynamic_assets: &mut DynamicAssets) {

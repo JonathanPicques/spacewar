@@ -6,7 +6,7 @@ pub struct SpriteSheetAnimation {
     pub timer: Timer,
 }
 
-pub fn anim_system(
+pub fn sprite_sheet_animation_system(
     mut query: Query<(
         &Handle<TextureAtlas>,
         &mut TextureAtlasSprite,

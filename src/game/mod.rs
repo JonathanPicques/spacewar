@@ -7,13 +7,15 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
-use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
+use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelIid};
 use bevy_ggrs::{AddRollbackCommandExtension, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 
-use crate::core::anim::{anim_system, SpriteSheetAnimation};
+use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
+use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::loader::CoreDynamicAssetCollection;
 use crate::core::utilities::args::ArgsPlugin;
+use crate::core::utilities::hasher::transform_hasher;
 use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::game::menu::menu::AddMainMenuAppExt;
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
@@ -42,18 +44,29 @@ impl AddGameAppExt for App {
             .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(FPS)
-            .rollback_resource_with_clone::<LevelSelection>()
+            .checksum_resource_with_hash::<LoadedLevels>()
+            .checksum_component::<Transform>(transform_hasher)
+            .checksum_component_with_hash::<Player>()
+            .rollback_resource_with_clone::<LoadedLevels>()
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(
                 GgrsSchedule,
-                ((anim_system, player_system).run_if(in_state(State::Game))).chain(),
+                ((
+                    player_system,
+                    load_levels_system,
+                    sprite_sheet_animation_system,
+                )
+                    .run_if(in_state(State::Game)))
+                .chain(),
             )
             .add_systems(OnExit(State::Game), cleanup)
             //
-            .insert_resource(LevelSelection::index(0))
+            .insert_resource(LoadedLevels::new(LevelIid::new(
+                "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
+            )))
             //
             .add_loading_state(
                 LoadingState::new(State::Load)
