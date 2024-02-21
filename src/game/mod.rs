@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelSelection};
-use bevy_ggrs::{GgrsApp, GgrsPlugin, ReadInputs};
+use bevy_ggrs::{AddRollbackCommandExtension, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 
 use crate::core::anim::{anim_system, SpriteSheetAnimation};
@@ -80,18 +80,20 @@ fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
 
     for handle in 0..NUM_PLAYERS {
         let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
-        commands.spawn((
-            game,
-            Player { handle },
-            SpriteSheetBundle {
-                transform,
-                texture_atlas: texture_assets.player_idle.clone(),
-                ..default()
-            },
-            SpriteSheetAnimation {
-                timer: Timer::new(Duration::from_secs(1), TimerMode::Repeating),
-            },
-        ));
+        commands
+            .spawn((
+                game,
+                Player { handle },
+                SpriteSheetBundle {
+                    transform,
+                    texture_atlas: texture_assets.player_idle.clone(),
+                    ..default()
+                },
+                SpriteSheetAnimation {
+                    timer: Timer::new(Duration::from_millis(150), TimerMode::Repeating),
+                },
+            ))
+            .add_rollback();
     }
 }
 

@@ -3,7 +3,7 @@ pub mod input;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::LevelSelection;
 use bevy_ggrs::ggrs::InputStatus;
-use bevy_ggrs::PlayerInputs;
+use bevy_ggrs::{PlayerInputs, Rollback};
 use bytemuck::Zeroable;
 
 use crate::core::input::CoreInput;
@@ -15,11 +15,11 @@ pub struct Player {
     pub handle: usize,
 }
 
-pub fn player_system(mut query: Query<(&Player, &mut Transform)>, mut commands: Commands, inputs: Res<PlayerInputs<GameConfig>>) {
-    let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
+pub fn player_system(mut commands: Commands, mut all_players: Query<(&Player, &mut Transform), With<Rollback>>, inputs: Res<PlayerInputs<GameConfig>>) {
+    let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
+    all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
 
-    for (player, mut transform) in query {
+    for (player, mut transform) in all_players {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
