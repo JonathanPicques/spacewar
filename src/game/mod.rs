@@ -7,7 +7,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
-use bevy_ecs_ldtk::{LdtkPlugin, LdtkWorldBundle, LevelIid};
+use bevy_ecs_ldtk::{LdtkPlugin, LdtkSettings, LdtkWorldBundle, LevelIid, LevelSpawnBehavior};
 use bevy_ggrs::{AddRollbackCommandExtension, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 
@@ -21,7 +21,7 @@ use crate::game::menu::menu::AddMainMenuAppExt;
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
 use crate::game::menu::menu_online::AddOnlineMenuAppExt;
 use crate::game::player::input::input_system;
-use crate::game::player::{player_system, Player};
+use crate::game::player::{player_level_follow_system, player_system, Player};
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
@@ -39,6 +39,14 @@ impl AddGameAppExt for App {
             .add_online_menu()
             //
             .add_plugins(LdtkPlugin)
+            .insert_resource(LdtkSettings {
+                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation { load_level_neighbors: false },
+                ..default()
+            })
+            .insert_resource(LoadedLevels::new(LevelIid::new(
+                "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
+            )))
+            //
             .add_plugins(ArgsPlugin::<GameArgs>::default())
             //
             .add_plugins(GgrsPlugin::<GameConfig>::default())
@@ -57,16 +65,13 @@ impl AddGameAppExt for App {
                 ((
                     player_system,
                     load_levels_system,
+                    player_level_follow_system,
                     sprite_sheet_animation_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),
             )
             .add_systems(OnExit(State::Game), cleanup)
-            //
-            .insert_resource(LoadedLevels::new(LevelIid::new(
-                "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
-            )))
             //
             .add_loading_state(
                 LoadingState::new(State::Load)
