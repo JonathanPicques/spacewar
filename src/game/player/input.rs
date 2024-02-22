@@ -11,25 +11,45 @@ pub const INPUT_RIGHT: u8 = 1 << 4;
 pub const INPUT_JUMP: u8 = 1 << 5;
 
 pub fn input_system(mut commands: Commands, local_players: Res<LocalPlayers>, keyboard_input: Res<Input<KeyCode>>) {
+    let local_players = &local_players.0;
     let mut local_inputs = HashMap::new();
 
-    for handle in &local_players.0 {
+    for handle in local_players.iter() {
+        let local = local_players.len() > 1;
         let mut input = CoreInput::new();
 
-        if keyboard_input.pressed(KeyCode::Up) {
-            input.set(INPUT_UP);
-        }
-        if keyboard_input.pressed(KeyCode::Left) {
-            input.set(INPUT_LEFT);
-        }
-        if keyboard_input.pressed(KeyCode::Down) {
-            input.set(INPUT_DOWN);
-        }
-        if keyboard_input.pressed(KeyCode::Right) {
-            input.set(INPUT_RIGHT);
-        }
-        if keyboard_input.pressed(KeyCode::Space) {
-            input.set(INPUT_JUMP);
+        if !local || *handle == 0 {
+            if keyboard_input.pressed(KeyCode::Up) {
+                input.set(INPUT_UP);
+            }
+            if keyboard_input.pressed(KeyCode::Left) {
+                input.set(INPUT_LEFT);
+            }
+            if keyboard_input.pressed(KeyCode::Down) {
+                input.set(INPUT_DOWN);
+            }
+            if keyboard_input.pressed(KeyCode::Right) {
+                input.set(INPUT_RIGHT);
+            }
+            if keyboard_input.pressed(KeyCode::Numpad0) {
+                input.set(INPUT_JUMP);
+            }
+        } else {
+            if keyboard_input.pressed(KeyCode::Z) {
+                input.set(INPUT_UP);
+            }
+            if keyboard_input.pressed(KeyCode::Q) {
+                input.set(INPUT_LEFT);
+            }
+            if keyboard_input.pressed(KeyCode::S) {
+                input.set(INPUT_DOWN);
+            }
+            if keyboard_input.pressed(KeyCode::D) {
+                input.set(INPUT_RIGHT);
+            }
+            if keyboard_input.pressed(KeyCode::Space) {
+                input.set(INPUT_JUMP);
+            }
         }
 
         local_inputs.insert(*handle, input);
