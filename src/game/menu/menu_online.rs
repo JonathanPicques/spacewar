@@ -46,7 +46,7 @@ fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>,
                 handles.push(i);
             }
             session_builder = session_builder
-                .add_player(player_type.clone(), i)
+                .add_player(*player_type, i)
                 .expect("Invalid player");
         }
 

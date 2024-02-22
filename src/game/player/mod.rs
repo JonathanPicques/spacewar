@@ -56,7 +56,7 @@ pub fn player_level_follow_system(
 
     let levels = players
         .iter()
-        .map(|player_transform| {
+        .filter_map(|player_transform| {
             {
                 for level in ldtk_project.iter_raw_levels() {
                     let level_bounds = Rect {
@@ -78,10 +78,9 @@ pub fn player_level_follow_system(
                 None
             }
         })
-        .flatten()
         .collect();
 
-    if levels != loaded_levels.levels {
+    if loaded_levels.levels != levels {
         loaded_levels.levels = levels;
     }
 }

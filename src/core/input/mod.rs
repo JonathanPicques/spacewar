@@ -1,14 +1,14 @@
 use bytemuck::{Pod, Zeroable};
 
 #[repr(C)]
-#[derive(Eq, Pod, Copy, Clone, Zeroable, PartialEq)]
+#[derive(Eq, Pod, Copy, Clone, Default, Zeroable, PartialEq)]
 pub struct CoreInput {
     pub input: u8,
 }
 
 impl CoreInput {
     pub fn new() -> Self {
-        Self::zeroed()
+        Self::default()
     }
 }
 
