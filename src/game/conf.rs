@@ -9,9 +9,7 @@ use crate::core::input::CoreInput;
 
 pub const FPS: usize = 60;
 pub const INPUT_DELAY: usize = 2;
-pub const NUM_PLAYERS: usize = 2;
 pub const MAX_PREDICTION: usize = 12;
-pub const MATCHBOX_ADDRESS: &str = "ws://127.0.0.1:3536/lobby?next=2";
 
 #[derive(Eq, Hash, Clone, Debug, States, Default, PartialEq)]
 pub enum State {
@@ -29,6 +27,8 @@ pub enum State {
 pub struct GameArgs {
     #[clap(long, short = 'l', default_value = "false")]
     pub local: bool,
+    #[clap(long, short = 'n', default_value = "2")]
+    pub num_players: usize,
 }
 
 #[derive(Resource, AssetCollection)]

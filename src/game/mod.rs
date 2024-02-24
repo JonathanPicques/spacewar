@@ -17,7 +17,7 @@ use crate::core::loader::CoreDynamicAssetCollection;
 use crate::core::physics::{player_controller_system, PlayerController};
 use crate::core::utilities::args::ArgsPlugin;
 use crate::core::utilities::hash::transform_hasher;
-use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION};
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
 use crate::game::menu::menu_main::AddMainMenuAppExt;
 use crate::game::menu::menu_online::AddOnlineMenuAppExt;
@@ -88,7 +88,7 @@ impl AddGameAppExt for App {
     }
 }
 
-fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
+fn setup(mut commands: Commands, args: Res<GameArgs>, texture_assets: Res<GameAssets>) {
     let game = Game {};
 
     commands.spawn((game, Camera2dBundle::default()));
@@ -100,7 +100,7 @@ fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
         },
     ));
 
-    for handle in 0..NUM_PLAYERS {
+    for handle in 0..args.num_players {
         let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
         commands
             .spawn((

@@ -1,10 +1,11 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
 
-use crate::game::conf::{GameConfig, State, FPS, INPUT_DELAY, MATCHBOX_ADDRESS, MAX_PREDICTION, NUM_PLAYERS};
+use crate::game::conf::{GameArgs, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION};
 use crate::game::goto_game;
 
 pub trait AddOnlineMenuAppExt {
@@ -19,11 +20,22 @@ impl AddOnlineMenuAppExt for App {
     }
 }
 
-fn setup(mut commands: Commands) {
-    commands.insert_resource(MatchboxSocket::new_ggrs(MATCHBOX_ADDRESS));
+fn setup(mut commands: Commands, args: Res<GameArgs>) {
+    let room_url = format!(
+        "ws://127.0.0.1:3536/lobby?next={}",
+        args.num_players
+    );
+
+    commands.insert_resource(MatchboxSocket::new_ggrs(room_url));
 }
 
-fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>, next_state: ResMut<NextState<State>>) {
+fn update(
+    commands: Commands,
+    args: Res<GameArgs>,
+    mut ctx: EguiContexts,
+    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    next_state: ResMut<NextState<State>>,
+) {
     for (peer, new_state) in socket.update_peers() {
         match new_state {
             PeerState::Connected => info!("peer {peer} connected"),
@@ -31,13 +43,31 @@ fn update(commands: Commands, mut socket: ResMut<MatchboxSocket<SingleChannel>>,
         }
     }
 
-    if socket.players().len() >= NUM_PLAYERS {
+    egui::panel::CentralPanel::default().show(ctx.ctx_mut(), |ui| {
+        ui.label(format!(
+            "Waiting for {} other players...",
+            args.num_players - socket.players().len()
+        ));
+        for player in socket.players().iter() {
+            match player {
+                PlayerType::Local => {}
+                PlayerType::Remote(peer_id) => {
+                    ui.label(format!("remote player {}", peer_id));
+                }
+                PlayerType::Spectator(peer_id) => {
+                    ui.label(format!("spectator player {}", peer_id));
+                }
+            }
+        }
+    });
+
+    if socket.players().len() >= args.num_players {
         let mut session_builder = SessionBuilder::<GameConfig>::new()
             .with_fps(FPS)
             .expect("Invalid FPS")
             .with_max_prediction_window(MAX_PREDICTION)
             .expect("Invalid max prediction window")
-            .with_num_players(NUM_PLAYERS)
+            .with_num_players(args.num_players)
             .with_input_delay(INPUT_DELAY);
 
         let mut handles = Vec::new();
