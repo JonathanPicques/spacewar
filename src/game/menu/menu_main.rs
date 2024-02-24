@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts};
 
 use crate::game::conf::State;
 use crate::game::menu::menu_local::goto_local_menu;
@@ -17,17 +18,22 @@ impl AddMainMenuAppExt for App {
     }
 }
 
-fn setup(opts: Res<GameArgs>, next_state: ResMut<NextState<State>>) {
-    match opts.local {
-        true => goto_local_menu(next_state),
-        false => goto_online_menu(next_state),
-    }
-}
+fn setup() {}
 
-fn update() {}
+fn update(mut ctx: EguiContexts, mut args: ResMut<GameArgs>, mut next_state: ResMut<NextState<State>>) {
+    egui::panel::CentralPanel::default().show(ctx.ctx_mut(), |ui| {
+        if ui.button("Local").clicked() {
+            args.local = true;
+            goto_local_menu(&mut next_state);
+        } else if ui.button("Online").clicked() {
+            args.local = false;
+            goto_online_menu(&mut next_state);
+        }
+    });
+}
 
 fn cleanup() {}
 
-pub fn goto_main_menu(mut next_state: ResMut<NextState<State>>) {
+pub fn goto_main_menu(next_state: &mut NextState<State>) {
     next_state.set(State::MenuMain);
 }

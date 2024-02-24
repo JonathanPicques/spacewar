@@ -49,6 +49,6 @@ fn update(commands: Commands, args: Res<GameArgs>, next_state: ResMut<NextState<
 
 fn cleanup() {}
 
-pub fn goto_local_menu(mut next_state: ResMut<NextState<State>>) {
+pub fn goto_local_menu(next_state: &mut NextState<State>) {
     next_state.set(State::MenuLocal);
 }

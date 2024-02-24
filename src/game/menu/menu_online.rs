@@ -96,6 +96,6 @@ fn update(
 
 fn cleanup() {}
 
-pub fn goto_online_menu(mut next_state: ResMut<NextState<State>>) {
+pub fn goto_online_menu(next_state: &mut NextState<State>) {
     next_state.set(State::MenuOnline);
 }
