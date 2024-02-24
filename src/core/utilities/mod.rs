@@ -1,2 +1,3 @@
 pub mod args;
-pub mod hasher;
+pub mod hash;
+pub mod maths;

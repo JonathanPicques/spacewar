@@ -14,8 +14,9 @@ use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
 use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
 use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::loader::CoreDynamicAssetCollection;
+use crate::core::physics::{player_controller_system, PlayerController};
 use crate::core::utilities::args::ArgsPlugin;
-use crate::core::utilities::hasher::transform_hasher;
+use crate::core::utilities::hash::transform_hasher;
 use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION, NUM_PLAYERS};
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
 use crate::game::menu::menu_main::AddMainMenuAppExt;
@@ -55,7 +56,9 @@ impl AddGameAppExt for App {
             .checksum_resource_with_hash::<LoadedLevels>()
             .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<Player>()
+            .checksum_component_with_hash::<PlayerController>()
             .rollback_resource_with_clone::<LoadedLevels>()
+            .rollback_component_with_copy::<PlayerController>()
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
             //
@@ -65,6 +68,7 @@ impl AddGameAppExt for App {
                 ((
                     player_system,
                     load_levels_system,
+                    player_controller_system,
                     player_level_follow_system,
                     sprite_sheet_animation_system,
                 )
@@ -102,6 +106,7 @@ fn setup(mut commands: Commands, texture_assets: Res<GameAssets>) {
             .spawn((
                 game,
                 Player { handle },
+                PlayerController::default(),
                 SpriteSheetBundle {
                     transform,
                     texture_atlas: texture_assets.player_idle.clone(),

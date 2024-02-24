@@ -2,45 +2,72 @@ pub mod input;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::assets::LdtkProject;
-use bevy_ecs_ldtk::ldtk::raw_level_accessor::RawLevelAccessor;
-use bevy_ecs_ldtk::LevelIid;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback};
 use bytemuck::Zeroable;
 
 use crate::core::input::CoreInput;
-use crate::core::levels::LoadedLevels;
+use crate::core::levels::{find_levels_around_positions, LoadedLevels};
+use crate::core::physics::PlayerController;
+use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
 use crate::game::conf::GameConfig;
-use crate::game::player::input::{INPUT_DOWN, INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
+use crate::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
+
+const MAX_SPEED: f32 = 3.0;
+const ACCELERATION: f32 = 7.0;
+const DECELERATION: f32 = 16.0;
+
+const JUMP_STRENGTH: f32 = 6.0;
+
+const GRAVITY_MAX_SPEED: f32 = -12.0;
+const GRAVITY_ACCELERATION: f32 = 20.0;
 
 #[derive(Eq, Ord, Hash, Clone, PartialEq, PartialOrd, Default, Component)]
 pub struct Player {
     pub handle: usize,
 }
 
-pub fn player_system(mut all_players: Query<(&Player, &mut Transform), With<Rollback>>, inputs: Res<PlayerInputs<GameConfig>>) {
+pub fn player_system(mut all_players: Query<(&Player, &mut PlayerController), With<Rollback>>, time: Res<Time>, inputs: Res<PlayerInputs<GameConfig>>) {
     let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
     all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
 
-    for (player, mut transform) in all_players {
+    for (player, mut player_controller) in all_players {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
+        let mut velocity = player_controller.velocity;
 
-        if input.is_set(INPUT_UP) {
-            transform.translation.y += 1.0;
-        }
-        if input.is_set(INPUT_DOWN) {
-            transform.translation.y -= 1.0;
+        if input.is_set(INPUT_JUMP) && player_controller.is_on_floor() {
+            velocity.y = JUMP_STRENGTH;
         }
         if input.is_set(INPUT_LEFT) {
-            transform.translation.x -= 1.0;
+            velocity.x = compute_acceleration(
+                velocity.x,
+                time.delta_seconds(),
+                -MAX_SPEED,
+                ACCELERATION,
+            );
+        } else if input.is_set(INPUT_RIGHT) {
+            velocity.x = compute_acceleration(
+                velocity.x,
+                time.delta_seconds(),
+                MAX_SPEED,
+                ACCELERATION,
+            );
+        } else {
+            velocity.x = compute_deceleration(velocity.x, time.delta_seconds(), DECELERATION);
         }
-        if input.is_set(INPUT_RIGHT) {
-            transform.translation.x += 1.0;
-        }
+
+        velocity.y = compute_acceleration(
+            velocity.y,
+            time.delta_seconds(),
+            GRAVITY_MAX_SPEED,
+            GRAVITY_ACCELERATION,
+        );
+
+        player_controller.velocity = velocity;
     }
 }
 
@@ -50,35 +77,14 @@ pub fn player_level_follow_system(
     ldtk_project_assets: Res<Assets<LdtkProject>>,
     mut loaded_levels: ResMut<LoadedLevels>,
 ) {
-    let ldtk_project = ldtk_project_assets
-        .get(ldtk_projects.single())
-        .expect("LDTk project resource not found");
-
-    let levels = players
-        .iter()
-        .filter_map(|player_transform| {
-            {
-                for level in ldtk_project.iter_raw_levels() {
-                    let level_bounds = Rect {
-                        min: Vec2::new(
-                            level.world_x as f32,
-                            level.world_y as f32,
-                            //
-                        ),
-                        max: Vec2::new(
-                            (level.world_x + level.px_wid) as f32,
-                            (level.world_y + level.px_hei) as f32,
-                        ),
-                    };
-
-                    if level_bounds.contains(player_transform.translation.truncate()) {
-                        return Some(LevelIid::new(level.iid.clone()));
-                    }
-                }
-                None
-            }
-        })
-        .collect();
+    let levels = find_levels_around_positions(
+        players
+            .iter()
+            .map(|p| p.translation.truncate())
+            .collect(),
+        ldtk_projects,
+        ldtk_project_assets,
+    );
 
     if loaded_levels.levels != levels {
         loaded_levels.levels = levels;
