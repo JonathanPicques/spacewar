@@ -22,7 +22,8 @@ impl AddOnlineMenuAppExt for App {
 
 fn setup(mut commands: Commands, args: Res<GameArgs>) {
     let room_url = format!(
-        "ws://127.0.0.1:3536/lobby?next={}",
+        "ws://192.168.1.50:3536/lobby?next={}",
+        // "ws://127.0.0.1:3536/lobby?next={}",
         args.num_players
     );
 
@@ -34,7 +35,7 @@ fn update(
     args: Res<GameArgs>,
     mut ctx: EguiContexts,
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
-    next_state: ResMut<NextState<State>>,
+    mut next_state: ResMut<NextState<State>>,
 ) {
     for (peer, new_state) in socket.update_peers() {
         match new_state {
@@ -87,7 +88,7 @@ fn update(
 
         goto_game(
             commands,
-            next_state,
+            &mut next_state,
             Session::P2P(session),
             LocalPlayers(handles),
         );

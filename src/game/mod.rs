@@ -129,7 +129,7 @@ fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
     }
 }
 
-pub fn goto_game(mut commands: Commands, mut next_state: ResMut<NextState<State>>, session: Session<GameConfig>, local_players: LocalPlayers) {
+pub fn goto_game(mut commands: Commands, next_state: &mut NextState<State>, session: Session<GameConfig>, local_players: LocalPlayers) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);
