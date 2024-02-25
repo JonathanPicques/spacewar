@@ -6,6 +6,7 @@ use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback};
 use bytemuck::Zeroable;
 
+use crate::core::anim::SpriteSheetAnimation;
 use crate::core::input::CoreInput;
 use crate::core::levels::{find_levels_around_positions, LoadedLevels};
 use crate::core::physics::PlayerController;
@@ -27,11 +28,22 @@ pub struct Player {
     pub handle: usize,
 }
 
-pub fn player_system(mut all_players: Query<(&Player, &mut PlayerController), With<Rollback>>, time: Res<Time>, inputs: Res<PlayerInputs<GameConfig>>) {
+pub fn player_system(
+    mut all_players: Query<
+        (
+            &Player,
+            &mut PlayerController,
+            &mut SpriteSheetAnimation,
+        ),
+        With<Rollback>,
+    >,
+    time: Res<Time>,
+    inputs: Res<PlayerInputs<GameConfig>>,
+) {
     let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
     all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
 
-    for (player, mut player_controller) in all_players {
+    for (player, mut player_controller, mut sprite_sheet_animation) in all_players {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
@@ -58,6 +70,19 @@ pub fn player_system(mut all_players: Query<(&Player, &mut PlayerController), Wi
             );
         } else {
             velocity.x = compute_deceleration(velocity.x, time.delta_seconds(), DECELERATION);
+        }
+
+        if player_controller.is_on_floor() {
+            if velocity.x != 0.0 {
+                sprite_sheet_animation.start = 20;
+                sprite_sheet_animation.finish = 29;
+            } else {
+                sprite_sheet_animation.start = 0;
+                sprite_sheet_animation.finish = 3;
+            }
+        } else {
+            sprite_sheet_animation.start = 12;
+            sprite_sheet_animation.finish = 12;
         }
 
         velocity.y = compute_acceleration(

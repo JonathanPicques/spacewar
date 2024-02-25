@@ -109,11 +109,13 @@ fn setup(mut commands: Commands, args: Res<GameArgs>, texture_assets: Res<GameAs
                 PlayerController::default(),
                 SpriteSheetBundle {
                     transform,
-                    texture_atlas: texture_assets.player_idle.clone(),
+                    texture_atlas: texture_assets.player.clone(),
                     ..default()
                 },
                 SpriteSheetAnimation {
-                    timer: Timer::new(Duration::from_millis(150), TimerMode::Repeating),
+                    timer: Timer::new(Duration::from_millis(100), TimerMode::Repeating),
+                    start: 0,
+                    finish: 3,
                 },
             ))
             .add_rollback();

@@ -73,8 +73,8 @@ pub fn player_controller_system(mut query: Query<(&mut Transform, &mut PlayerCon
         player_controller.on_floor = false;
         player_controller.on_ceiling = false;
         transform.translation += player_controller.velocity.extend(0.0);
-        if transform.translation.y <= -200.0 {
-            transform.translation.y = -200.0;
+        if transform.translation.y <= -0.0 {
+            transform.translation.y = -0.0;
             player_controller.on_floor = true;
         }
     }

@@ -33,14 +33,8 @@ pub struct GameArgs {
 
 #[derive(Resource, AssetCollection)]
 pub struct GameAssets {
-    #[asset(key = "player.idle")]
-    pub player_idle: Handle<TextureAtlas>,
-    #[asset(key = "player.walk")]
-    pub player_walk: Handle<TextureAtlas>,
-    #[asset(key = "player.jump")]
-    pub player_jump: Handle<TextureAtlas>,
-    #[asset(key = "player.death")]
-    pub player_death: Handle<TextureAtlas>,
+    #[asset(key = "player")]
+    pub player: Handle<TextureAtlas>,
 
     #[asset(key = "tileset.texture")]
     pub tileset_texture: Handle<Image>,
