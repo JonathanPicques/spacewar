@@ -7,6 +7,7 @@ use bevy_matchbox::MatchboxSocket;
 
 use crate::game::conf::{GameArgs, GameConfig, State};
 use crate::game::game::goto_game;
+use crate::game::menu::menu_main::goto_main_menu;
 
 pub trait AddOnlineMenuAppExt {
     fn add_online_menu(&mut self) -> &mut Self;
@@ -32,8 +33,9 @@ fn setup(mut commands: Commands, args: Res<GameArgs>) {
 
 fn update(
     mut commands: Commands,
+    mut contexts: EguiContexts,
+    //
     args: Res<GameArgs>,
-    mut ctx: EguiContexts,
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
     mut next_state: ResMut<NextState<State>>,
 ) {
@@ -44,7 +46,11 @@ fn update(
         }
     }
 
-    egui::panel::CentralPanel::default().show(ctx.ctx_mut(), |ui| {
+    egui::panel::CentralPanel::default().show(contexts.ctx_mut(), |ui| {
+        if ui.button("Back").clicked() {
+            goto_main_menu(&mut next_state);
+            return;
+        }
         ui.label(format!(
             "Waiting for {} other players...",
             args.num_players - socket.players().len()
@@ -95,7 +101,9 @@ fn update(
     }
 }
 
-fn cleanup() {}
+fn cleanup(mut commands: Commands) {
+    commands.remove_resource::<MatchboxSocket<SingleChannel>>();
+}
 
 pub fn goto_online_menu(next_state: &mut NextState<State>) {
     next_state.set(State::MenuOnline);

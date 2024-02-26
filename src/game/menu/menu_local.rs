@@ -20,7 +20,12 @@ impl AddLocalMenuAppExt for App {
 
 fn setup() {}
 
-fn update(mut commands: Commands, args: Res<GameArgs>, mut next_state: ResMut<NextState<State>>) {
+fn update(
+    mut commands: Commands,
+    //
+    args: Res<GameArgs>,
+    mut next_state: ResMut<NextState<State>>,
+) {
     let mut session_builder = SessionBuilder::<GameConfig>::new()
         .with_fps(args.fps)
         .expect("Invalid FPS")

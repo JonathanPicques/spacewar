@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::LdtkWorldBundle;
+use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
@@ -13,6 +14,7 @@ use crate::core::physics::{player_controller_system, PlayerController};
 use crate::game::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::game::game::player::input::input_system;
 use crate::game::game::player::{player_level_follow_system, player_system, Player};
+use crate::game::menu::menu_main::goto_main_menu;
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -25,6 +27,9 @@ impl AddGameAppExt for App {
             .rollback_component_with_clone::<Player>()
             //
             .add_systems(OnEnter(State::Game), setup)
+            .add_systems(Update, update.run_if(in_state(State::Game)))
+            .add_systems(OnExit(State::Game), cleanup)
+            //
             .add_systems(
                 GgrsSchedule,
                 ((
@@ -38,14 +43,18 @@ impl AddGameAppExt for App {
                     .run_if(in_state(State::Game)))
                 .chain(),
             )
-            .add_systems(OnExit(State::Game), cleanup)
     }
 }
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
 
-fn setup(mut commands: Commands, args: Res<GameArgs>, texture_assets: Res<GameAssets>) {
+fn setup(
+    mut commands: Commands,
+    //
+    args: Res<GameArgs>,
+    texture_assets: Res<GameAssets>,
+) {
     let game = Game {};
 
     commands.spawn((game, Camera2dBundle::default()));
@@ -77,6 +86,18 @@ fn setup(mut commands: Commands, args: Res<GameArgs>, texture_assets: Res<GameAs
             ))
             .add_rollback();
     }
+}
+
+fn update(
+    mut contexts: EguiContexts,
+    //
+    mut next_state: ResMut<NextState<State>>,
+) {
+    egui::Window::new("Menu").show(contexts.ctx_mut(), |ui| {
+        if ui.button("Back").clicked() {
+            goto_main_menu(&mut next_state);
+        }
+    });
 }
 
 fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {

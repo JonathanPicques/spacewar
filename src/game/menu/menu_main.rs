@@ -20,8 +20,13 @@ impl AddMainMenuAppExt for App {
 
 fn setup() {}
 
-fn update(mut ctx: EguiContexts, mut args: ResMut<GameArgs>, mut next_state: ResMut<NextState<State>>) {
-    egui::panel::CentralPanel::default().show(ctx.ctx_mut(), |ui| {
+fn update(
+    mut contexts: EguiContexts,
+    //
+    mut args: ResMut<GameArgs>,
+    mut next_state: ResMut<NextState<State>>,
+) {
+    egui::panel::CentralPanel::default().show(contexts.ctx_mut(), |ui| {
         if ui.button("Local").clicked() {
             args.local = true;
             goto_local_menu(&mut next_state);
