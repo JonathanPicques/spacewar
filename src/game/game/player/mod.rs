@@ -1,7 +1,7 @@
 pub mod input;
 
 use bevy::prelude::*;
-use bevy_ecs_ldtk::assets::LdtkProject;
+use bevy_ecs_ldtk::prelude::*;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback};
 use bytemuck::Zeroable;
@@ -12,7 +12,7 @@ use crate::core::levels::{find_levels_around_positions, LoadedLevels};
 use crate::core::physics::PlayerController;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
 use crate::game::conf::GameConfig;
-use crate::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
+use crate::game::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
 
 const MAX_SPEED: f32 = 3.0;
 const ACCELERATION: f32 = 7.0;

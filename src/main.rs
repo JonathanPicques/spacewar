@@ -1,10 +1,8 @@
-use bevy::prelude::*;
-
-use crate::game::AddGameAppExt;
+use crate::game::game_main;
 
 pub mod core;
 pub mod game;
 
 fn main() {
-    App::new().add_game().run();
+    game_main();
 }

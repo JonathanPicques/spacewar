@@ -3,7 +3,8 @@ use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 
 use crate::game::conf::{GameArgs, State};
-use crate::game::{goto_game, GameConfig};
+use crate::game::game::goto_game;
+use crate::game::GameConfig;
 
 pub trait AddLocalMenuAppExt {
     fn add_local_menu(&mut self) -> &mut Self;

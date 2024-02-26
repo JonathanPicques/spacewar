@@ -6,7 +6,7 @@ use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
 
 use crate::game::conf::{GameArgs, GameConfig, State};
-use crate::game::goto_game;
+use crate::game::game::goto_game;
 
 pub trait AddOnlineMenuAppExt {
     fn add_online_menu(&mut self) -> &mut Self;

@@ -1,8 +1,8 @@
 use bevy::prelude::*;
-use bevy_asset_loader::asset_collection::AssetCollection;
-use bevy_ecs_ldtk::assets::LdtkProject;
+use bevy_asset_loader::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 use bevy_ggrs::ggrs::Config;
-use bevy_matchbox::matchbox_socket::PeerId;
+use bevy_matchbox::prelude::*;
 use clap::Parser;
 
 use crate::core::input::CoreInput;
