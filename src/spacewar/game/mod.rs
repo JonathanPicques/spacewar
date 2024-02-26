@@ -7,7 +7,7 @@ use bevy_ecs_ldtk::{LdtkWorldBundle, LevelIid};
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
-use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
+use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
 use crate::core::ggrs::AddGgrsCoreAppExt;
 use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::physics::{player_controller_system, PlayerController};
@@ -38,7 +38,7 @@ impl AddGameAppExt for App {
                     //
                     load_levels_system,
                     player_controller_system,
-                    sprite_sheet_animation_system,
+                    sprite_sheet_animator_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),
@@ -53,7 +53,7 @@ fn setup(
     mut commands: Commands,
     //
     args: Res<GameArgs>,
-    texture_assets: Res<GameAssets>,
+    game_assets: Res<GameAssets>,
 ) {
     commands.insert_resource(LoadedLevels::new(LevelIid::new(
         "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
@@ -69,7 +69,7 @@ fn setup(
     commands.spawn((
         Game {},
         LdtkWorldBundle {
-            ldtk_handle: texture_assets.tileset_project.clone(),
+            ldtk_handle: game_assets.tileset_project.clone(),
             ..default()
         },
     ));
@@ -83,13 +83,12 @@ fn setup(
                 PlayerController::default(),
                 SpriteSheetBundle {
                     transform,
-                    texture_atlas: texture_assets.player.clone(),
+                    texture_atlas: game_assets.player.clone(),
                     ..default()
                 },
-                SpriteSheetAnimation {
+                SpriteSheetAnimator {
                     timer: Timer::new(Duration::from_millis(100), TimerMode::Repeating),
-                    start: 0,
-                    finish: 3,
+                    animation: game_assets.player_idle_anim.clone(),
                 },
             ))
             .add_rollback();
@@ -108,7 +107,11 @@ fn update(
     });
 }
 
-fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
+fn cleanup(
+    mut commands: Commands,
+    //
+    query: Query<Entity, With<Game>>,
+) {
     commands.remove_resource::<LoadedLevels>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
@@ -118,7 +121,13 @@ fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
     }
 }
 
-pub fn goto_game(commands: &mut Commands, next_state: &mut NextState<State>, session: Session<GameConfig>, local_players: LocalPlayers) {
+pub fn goto_game(
+    commands: &mut Commands,
+    next_state: &mut NextState<State>,
+    //
+    session: Session<GameConfig>,
+    local_players: LocalPlayers,
+) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);

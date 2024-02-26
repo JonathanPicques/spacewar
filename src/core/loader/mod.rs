@@ -5,11 +5,14 @@ use bevy_asset_loader::prelude::*;
 use bevy_ecs_ldtk::assets::LdtkProject;
 use serde::{Deserialize, Serialize};
 
+use crate::core::anim::SpriteSheetAnimation;
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum Asset {
     Image(ImageAsset),
     LdtkProject(LdtkProjectAsset),
     TextureAtlas(TextureAtlasAsset),
+    SpriteSheetAnimation(SpriteSheetAnimationAsset),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -38,6 +41,12 @@ struct TextureAtlasAsset {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct SpriteSheetAnimationAsset {
+    start: usize,
+    finish: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum CoreDynamicAsset {
     Asset(Asset),
     Assets(Vec<Asset>),
@@ -47,8 +56,12 @@ impl DynamicAsset for CoreDynamicAsset {
     fn load(&self, asset_server: &AssetServer) -> Vec<UntypedHandle> {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
+
             Asset::LdtkProject(LdtkProjectAsset { path, .. }) => asset_server.load::<LdtkProject>(path).untyped(),
             Asset::TextureAtlas(TextureAtlasAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
+            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish }) => asset_server
+                .add(SpriteSheetAnimation { start, finish })
+                .untyped(),
         };
 
         match self {
@@ -93,6 +106,9 @@ impl DynamicAsset for CoreDynamicAsset {
                     Some(Vec2::new(padding_x, padding_y)),
                     Some(Vec2::new(offset_x, offset_y)),
                 ))
+                .untyped(),
+            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish }) => asset_server
+                .add(SpriteSheetAnimation { start, finish })
                 .untyped(),
         };
         match self {

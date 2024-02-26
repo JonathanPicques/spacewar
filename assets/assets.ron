@@ -16,6 +16,33 @@
             )
         )
     ),
+    "player_anim.idle": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                name: "idle",
+                start: 0,
+                finish: 3
+            )
+        )
+    ),
+    "player_anim.walk": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                name: "walk",
+                start: 20,
+                finish: 29
+            )
+        )
+    ),
+    "player_anim.jump": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                name: "jump",
+                start: 12,
+                finish: 12
+            )
+        )
+    ),
     //
     "tileset.texture": Asset (
         Image (

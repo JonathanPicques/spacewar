@@ -5,6 +5,7 @@ use bevy_ggrs::ggrs::Config;
 use bevy_matchbox::prelude::*;
 use clap::Parser;
 
+use crate::core::anim::SpriteSheetAnimation;
 use crate::core::input::CoreInput;
 
 #[derive(Eq, Hash, Clone, Debug, States, Default, PartialEq)]
@@ -39,6 +40,12 @@ pub struct GameArgs {
 pub struct GameAssets {
     #[asset(key = "player")]
     pub player: Handle<TextureAtlas>,
+    #[asset(key = "player_anim.idle")]
+    pub player_idle_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_anim.walk")]
+    pub player_walk_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_anim.jump")]
+    pub player_jump_anim: Handle<SpriteSheetAnimation>,
 
     #[asset(key = "tileset.texture")]
     pub tileset_texture: Handle<Image>,

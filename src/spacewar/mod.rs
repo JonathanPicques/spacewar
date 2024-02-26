@@ -9,6 +9,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_egui::EguiPlugin;
 use clap::Parser;
 
+use crate::core::anim::SpriteSheetAnimation;
 use crate::core::loader::CoreDynamicAssetCollection;
 use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::spacewar::game::AddGameAppExt;
@@ -40,6 +41,7 @@ pub fn spacewar() {
         //
         .add_plugins(EguiPlugin)
         .add_plugins(DynamicAssetPlugin::new(&["ron"]))
+        .init_asset::<SpriteSheetAnimation>()
         //
         .add_plugins(LdtkPlugin)
         .insert_resource(LdtkSettings {

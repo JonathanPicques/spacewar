@@ -8,12 +8,12 @@ use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback};
 use bytemuck::Zeroable;
 
-use crate::core::anim::SpriteSheetAnimation;
+use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
 use crate::core::levels::{find_levels_around_positions, LoadedLevels};
 use crate::core::physics::PlayerController;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
-use crate::spacewar::conf::GameConfig;
+use crate::spacewar::conf::{GameAssets, GameConfig};
 use crate::spacewar::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
 
 const MAX_SPEED: f32 = 2.0;
@@ -44,12 +44,13 @@ pub fn player_system(
             &mut Player,
             &mut PlayerController,
             &mut TextureAtlasSprite,
-            &mut SpriteSheetAnimation,
+            &mut SpriteSheetAnimator,
         ),
         With<Rollback>,
     >,
     time: Res<Time>,
     inputs: Res<PlayerInputs<GameConfig>>,
+    game_assets: Res<GameAssets>,
 ) {
     let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
     all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
@@ -85,15 +86,12 @@ pub fn player_system(
 
         if player_controller.is_on_floor() {
             if velocity.x != 0.0 {
-                sprite_sheet_animation.start = 20;
-                sprite_sheet_animation.finish = 29;
+                sprite_sheet_animation.animation = game_assets.player_walk_anim.clone();
             } else {
-                sprite_sheet_animation.start = 0;
-                sprite_sheet_animation.finish = 3;
+                sprite_sheet_animation.animation = game_assets.player_idle_anim.clone();
             }
         } else {
-            sprite_sheet_animation.start = 12;
-            sprite_sheet_animation.finish = 12;
+            sprite_sheet_animation.animation = game_assets.player_jump_anim.clone();
         }
 
         velocity.y = compute_acceleration(
