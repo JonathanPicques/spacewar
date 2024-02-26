@@ -7,12 +7,6 @@ pub struct CoreInput {
 }
 
 impl CoreInput {
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
-impl CoreInput {
     pub fn set(&mut self, bit: u8) {
         self.input |= bit;
     }

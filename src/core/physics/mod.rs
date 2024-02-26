@@ -76,6 +76,7 @@ pub fn player_controller_system(mut query: Query<(&mut Transform, &mut PlayerCon
         if transform.translation.y <= -0.0 {
             transform.translation.y = -0.0;
             player_controller.on_floor = true;
+            player_controller.velocity.y = 0.0;
         }
     }
 }

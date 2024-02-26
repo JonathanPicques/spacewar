@@ -16,7 +16,7 @@ pub fn input_system(mut commands: Commands, local_players: Res<LocalPlayers>, ke
 
     for handle in local_players.iter() {
         let local = local_players.len() > 1;
-        let mut input = CoreInput::new();
+        let mut input = CoreInput::default();
 
         if !local || *handle == 0 {
             if keyboard_input.pressed(KeyCode::Up) {
