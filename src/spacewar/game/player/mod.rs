@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_ggrs::ggrs::InputStatus;
-use bevy_ggrs::{PlayerInputs, Rollback};
+use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
 
 use crate::core::anim::SpriteSheetAnimator;
@@ -13,6 +13,7 @@ use crate::core::input::CoreInput;
 use crate::core::levels::{find_levels_around_positions, LoadedLevels};
 use crate::core::physics::PlayerController;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
+use crate::core::utilities::sorting::cmp_rollack;
 use crate::spacewar::conf::{GameAssets, GameConfig};
 use crate::spacewar::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
 
@@ -39,8 +40,9 @@ pub struct Player {
 }
 
 pub fn player_system(
-    mut all_players: Query<
+    mut query: Query<
         (
+            &Rollback,
             &mut Player,
             &mut PlayerController,
             &mut TextureAtlasSprite,
@@ -48,14 +50,16 @@ pub fn player_system(
         ),
         With<Rollback>,
     >,
+    //
     time: Res<Time>,
+    order: Res<RollbackOrdered>,
     inputs: Res<PlayerInputs<GameConfig>>,
     game_assets: Res<GameAssets>,
 ) {
-    let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
-    all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
+    let mut query = query.iter_mut().collect::<Vec<_>>();
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (mut player, mut player_controller, mut player_sprite, mut sprite_sheet_animation) in all_players {
+    for (_, mut player, mut player_controller, mut player_sprite, mut sprite_sheet_animation) in query {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,

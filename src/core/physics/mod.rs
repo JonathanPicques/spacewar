@@ -1,6 +1,9 @@
 use std::hash::{Hash, Hasher};
 
 use bevy::prelude::*;
+use bevy_ggrs::{Rollback, RollbackOrdered};
+
+use crate::core::utilities::sorting::cmp_rollack;
 
 #[derive(Copy, Clone, Debug)]
 pub enum Distance {
@@ -67,8 +70,15 @@ impl Default for PlayerController {
     }
 }
 
-pub fn player_controller_system(mut query: Query<(&mut Transform, &mut PlayerController)>) {
-    for (mut transform, mut player_controller) in query.iter_mut() {
+pub fn player_controller_system(
+    mut query: Query<(&Rollback, &mut Transform, &mut PlayerController)>,
+    //
+    order: Res<RollbackOrdered>,
+) {
+    let mut query = query.iter_mut().collect::<Vec<_>>();
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (_, mut transform, mut player_controller) in query {
         player_controller.on_wall = false;
         player_controller.on_floor = false;
         player_controller.on_ceiling = false;

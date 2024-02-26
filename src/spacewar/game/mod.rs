@@ -117,7 +117,7 @@ fn cleanup(
     commands.remove_resource::<Session<GameConfig>>();
 
     // https://github.com/gschup/bevy_ggrs/issues/93
-    commands.insert_resource(Time::new_with(GgrsTime::default()));
+    commands.insert_resource(Time::new_with(GgrsTime));
 
     for e in query.iter() {
         commands.entity(e).despawn_recursive();
