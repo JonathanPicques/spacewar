@@ -7,10 +7,6 @@ use clap::Parser;
 
 use crate::core::input::CoreInput;
 
-pub const FPS: usize = 60;
-pub const INPUT_DELAY: usize = 2;
-pub const MAX_PREDICTION: usize = 12;
-
 #[derive(Eq, Hash, Clone, Debug, States, Default, PartialEq)]
 pub enum State {
     #[default]
@@ -25,10 +21,18 @@ pub enum State {
 
 #[derive(Parser, Resource)]
 pub struct GameArgs {
-    #[clap(long, short = 'l', default_value = "false")]
+    #[clap(long, default_value = "60")]
+    pub fps: usize,
+    #[clap(long, default_value = "false")]
     pub local: bool,
-    #[clap(long, short = 'n', default_value = "2")]
+    #[clap(long, default_value = "2")]
     pub num_players: usize,
+    #[clap(long, default_value = "2")]
+    pub input_delay: usize,
+    #[clap(long, default_value = "2")]
+    pub max_prediction: usize,
+    #[clap(long, default_value = "0")]
+    pub check_distance: usize,
 }
 
 #[derive(Resource, AssetCollection)]

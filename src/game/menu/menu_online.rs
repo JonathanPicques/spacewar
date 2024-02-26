@@ -5,7 +5,7 @@ use bevy_ggrs::{LocalPlayers, Session};
 use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
 
-use crate::game::conf::{GameArgs, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION};
+use crate::game::conf::{GameArgs, GameConfig, State};
 use crate::game::goto_game;
 
 pub trait AddOnlineMenuAppExt {
@@ -31,7 +31,7 @@ fn setup(mut commands: Commands, args: Res<GameArgs>) {
 }
 
 fn update(
-    commands: Commands,
+    mut commands: Commands,
     args: Res<GameArgs>,
     mut ctx: EguiContexts,
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
@@ -64,12 +64,12 @@ fn update(
 
     if socket.players().len() >= args.num_players {
         let mut session_builder = SessionBuilder::<GameConfig>::new()
-            .with_fps(FPS)
+            .with_fps(args.fps)
             .expect("Invalid FPS")
-            .with_max_prediction_window(MAX_PREDICTION)
+            .with_max_prediction_window(args.max_prediction)
             .expect("Invalid max prediction window")
             .with_num_players(args.num_players)
-            .with_input_delay(INPUT_DELAY);
+            .with_input_delay(args.input_delay);
 
         let mut handles = Vec::new();
         for (i, player_type) in socket.players().iter().enumerate() {
@@ -87,7 +87,7 @@ fn update(
             .expect("P2P Session could not be started");
 
         goto_game(
-            commands,
+            &mut commands,
             &mut next_state,
             Session::P2P(session),
             LocalPlayers(handles),

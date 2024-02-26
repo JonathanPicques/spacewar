@@ -7,22 +7,26 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_asset_loader::loading_state::config::ConfigureLoadingState;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
+use bevy_common_assets::ron::RonAssetPlugin;
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkSettings, LdtkWorldBundle, LevelIid, LevelSpawnBehavior};
+use bevy_egui::EguiPlugin;
 use bevy_ggrs::{AddRollbackCommandExtension, GgrsApp, GgrsPlugin, ReadInputs};
 use bevy_ggrs::{GgrsSchedule, LocalPlayers, Session};
+use clap::Parser;
 
 use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
 use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::loader::CoreDynamicAssetCollection;
 use crate::core::physics::{player_controller_system, PlayerController};
-use crate::core::utilities::args::ArgsPlugin;
 use crate::core::utilities::hash::transform_hasher;
-use crate::game::conf::{GameArgs, GameAssets, GameConfig, State, FPS, INPUT_DELAY, MAX_PREDICTION};
+use crate::game::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::game::menu::menu_local::AddLocalMenuAppExt;
 use crate::game::menu::menu_main::AddMainMenuAppExt;
 use crate::game::menu::menu_online::AddOnlineMenuAppExt;
 use crate::game::player::input::input_system;
 use crate::game::player::{player_level_follow_system, player_system, Player};
+
+type DynamicAssetPlugin = RonAssetPlugin<CoreDynamicAssetCollection>;
 
 #[derive(Copy, Clone, Component)]
 pub struct Game {}
@@ -33,11 +37,27 @@ pub trait AddGameAppExt {
 
 impl AddGameAppExt for App {
     fn add_game(&mut self) -> &mut Self {
-        self.add_state::<State>()
+        let args = GameArgs::parse();
+        let args_fps = args.fps;
+
+        self
             //
-            .add_main_menu()
-            .add_local_menu()
-            .add_online_menu()
+            .add_plugins(
+                DefaultPlugins
+                    .set(ImagePlugin::default_nearest())
+                    .set(WindowPlugin {
+                        primary_window: Some(Window {
+                            fit_canvas_to_parent: true,
+                            prevent_default_event_handling: false,
+                            ..default()
+                        }),
+                        ..default()
+                    }),
+            )
+            .insert_resource(Msaa::Off)
+            //
+            .add_plugins(EguiPlugin)
+            .add_plugins(DynamicAssetPlugin::new(&["ron"]))
             //
             .add_plugins(LdtkPlugin)
             .insert_resource(LdtkSettings {
@@ -48,11 +68,11 @@ impl AddGameAppExt for App {
                 "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
             )))
             //
-            .add_plugins(ArgsPlugin::<GameArgs>::default())
+            .insert_resource(args)
             //
             .add_plugins(GgrsPlugin::<GameConfig>::default())
             .add_systems(ReadInputs, input_system)
-            .set_rollback_schedule_fps(FPS)
+            .set_rollback_schedule_fps(args_fps)
             .checksum_resource_with_hash::<LoadedLevels>()
             .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<Player>()
@@ -61,6 +81,12 @@ impl AddGameAppExt for App {
             .rollback_component_with_copy::<PlayerController>()
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
+            //
+            .add_state::<State>()
+            //
+            .add_main_menu()
+            .add_local_menu()
+            .add_online_menu()
             //
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(
@@ -131,7 +157,7 @@ fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
     }
 }
 
-pub fn goto_game(mut commands: Commands, next_state: &mut NextState<State>, session: Session<GameConfig>, local_players: LocalPlayers) {
+pub fn goto_game(commands: &mut Commands, next_state: &mut NextState<State>, session: Session<GameConfig>, local_players: LocalPlayers) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
     next_state.set(State::Game);
