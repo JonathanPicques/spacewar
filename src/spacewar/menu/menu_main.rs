@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
-use crate::game::conf::State;
-use crate::game::menu::menu_local::goto_local_menu;
-use crate::game::menu::menu_online::goto_online_menu;
-use crate::game::GameArgs;
+use crate::spacewar::conf::State;
+use crate::spacewar::menu::menu_local::goto_local_menu;
+use crate::spacewar::menu::menu_online::goto_online_menu;
+use crate::spacewar::GameArgs;
 
 pub trait AddMainMenuAppExt {
     fn add_main_menu(&mut self) -> &mut Self;

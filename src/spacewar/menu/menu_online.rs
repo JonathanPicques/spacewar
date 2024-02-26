@@ -5,9 +5,9 @@ use bevy_ggrs::{LocalPlayers, Session};
 use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
 
-use crate::game::conf::{GameArgs, GameConfig, State};
-use crate::game::game::goto_game;
-use crate::game::menu::menu_main::goto_main_menu;
+use crate::spacewar::conf::{GameArgs, GameConfig, State};
+use crate::spacewar::game::goto_game;
+use crate::spacewar::menu::menu_main::goto_main_menu;
 
 pub trait AddOnlineMenuAppExt {
     fn add_online_menu(&mut self) -> &mut Self;

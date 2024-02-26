@@ -3,18 +3,18 @@ pub mod player;
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_ecs_ldtk::LdtkWorldBundle;
+use bevy_ecs_ldtk::{LdtkWorldBundle, LevelIid};
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animation_system, SpriteSheetAnimation};
 use crate::core::ggrs::AddGgrsCoreAppExt;
-use crate::core::levels::load_levels_system;
+use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::physics::{player_controller_system, PlayerController};
-use crate::game::conf::{GameArgs, GameAssets, GameConfig, State};
-use crate::game::game::player::input::input_system;
-use crate::game::game::player::{player_level_follow_system, player_system, Player};
-use crate::game::menu::menu_main::goto_main_menu;
+use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
+use crate::spacewar::game::player::input::input_system;
+use crate::spacewar::game::player::{player_level_follow_system, player_system, Player};
+use crate::spacewar::menu::menu_main::goto_main_menu;
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -55,11 +55,19 @@ fn setup(
     args: Res<GameArgs>,
     texture_assets: Res<GameAssets>,
 ) {
-    let game = Game {};
+    commands.insert_resource(LoadedLevels::new(LevelIid::new(
+        "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
+    )));
 
-    commands.spawn((game, Camera2dBundle::default()));
     commands.spawn((
-        game,
+        Game {},
+        Camera2dBundle {
+            global_transform: GlobalTransform::from_scale(Vec3::splat(2.0)),
+            ..default()
+        },
+    ));
+    commands.spawn((
+        Game {},
         LdtkWorldBundle {
             ldtk_handle: texture_assets.tileset_project.clone(),
             ..default()
@@ -70,7 +78,7 @@ fn setup(
         let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
         commands
             .spawn((
-                game,
+                Game {},
                 Player { handle },
                 PlayerController::default(),
                 SpriteSheetBundle {
@@ -101,6 +109,7 @@ fn update(
 }
 
 fn cleanup(mut commands: Commands, query: Query<Entity, With<Game>>) {
+    commands.remove_resource::<LoadedLevels>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
 

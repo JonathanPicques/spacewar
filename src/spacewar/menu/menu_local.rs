@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 
-use crate::game::conf::{GameArgs, State};
-use crate::game::game::goto_game;
-use crate::game::GameConfig;
+use crate::spacewar::conf::{GameArgs, State};
+use crate::spacewar::game::goto_game;
+use crate::spacewar::GameConfig;
 
 pub trait AddLocalMenuAppExt {
     fn add_local_menu(&mut self) -> &mut Self;

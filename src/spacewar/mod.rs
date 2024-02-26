@@ -9,17 +9,16 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_egui::EguiPlugin;
 use clap::Parser;
 
-use crate::core::levels::LoadedLevels;
 use crate::core::loader::CoreDynamicAssetCollection;
-use crate::game::conf::{GameArgs, GameAssets, GameConfig, State};
-use crate::game::game::AddGameAppExt;
-use crate::game::menu::menu_local::AddLocalMenuAppExt;
-use crate::game::menu::menu_main::AddMainMenuAppExt;
-use crate::game::menu::menu_online::AddOnlineMenuAppExt;
+use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
+use crate::spacewar::game::AddGameAppExt;
+use crate::spacewar::menu::menu_local::AddLocalMenuAppExt;
+use crate::spacewar::menu::menu_main::AddMainMenuAppExt;
+use crate::spacewar::menu::menu_online::AddOnlineMenuAppExt;
 
 type DynamicAssetPlugin = RonAssetPlugin<CoreDynamicAssetCollection>;
 
-pub fn game_main() {
+pub fn spacewar() {
     let mut app = App::new();
     let args = GameArgs::parse();
     let args_fps = args.fps;
@@ -47,9 +46,6 @@ pub fn game_main() {
             level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation { load_level_neighbors: false },
             ..default()
         })
-        .insert_resource(LoadedLevels::new(LevelIid::new(
-            "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
-        )))
         //
         .insert_resource(args)
         //
