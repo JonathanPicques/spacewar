@@ -62,7 +62,7 @@ fn setup(
     commands.spawn((
         Game {},
         Camera2dBundle {
-            global_transform: GlobalTransform::from_scale(Vec3::splat(2.0)),
+            transform: Transform::from_scale(Vec3::splat(0.5)),
             ..default()
         },
     ));
@@ -79,7 +79,7 @@ fn setup(
         commands
             .spawn((
                 Game {},
-                Player { handle },
+                Player { handle, ..default() },
                 PlayerController::default(),
                 SpriteSheetBundle {
                     transform,

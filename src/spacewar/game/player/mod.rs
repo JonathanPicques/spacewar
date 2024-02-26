@@ -1,5 +1,7 @@
 pub mod input;
 
+use std::cmp::Ordering;
+
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_ggrs::ggrs::InputStatus;
@@ -14,7 +16,7 @@ use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
 use crate::spacewar::conf::GameConfig;
 use crate::spacewar::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
 
-const MAX_SPEED: f32 = 3.0;
+const MAX_SPEED: f32 = 2.0;
 const ACCELERATION: f32 = 7.0;
 const DECELERATION: f32 = 16.0;
 
@@ -23,16 +25,25 @@ const JUMP_STRENGTH: f32 = 6.0;
 const GRAVITY_MAX_SPEED: f32 = -12.0;
 const GRAVITY_ACCELERATION: f32 = 20.0;
 
+#[derive(Eq, Ord, Hash, Clone, PartialEq, PartialOrd, Default)]
+pub enum Direction {
+    #[default]
+    Left,
+    Right,
+}
+
 #[derive(Eq, Ord, Hash, Clone, PartialEq, PartialOrd, Default, Component)]
 pub struct Player {
     pub handle: usize,
+    pub direction: Direction,
 }
 
 pub fn player_system(
     mut all_players: Query<
         (
-            &Player,
+            &mut Player,
             &mut PlayerController,
+            &mut TextureAtlasSprite,
             &mut SpriteSheetAnimation,
         ),
         With<Rollback>,
@@ -43,7 +54,7 @@ pub fn player_system(
     let mut all_players = all_players.iter_mut().collect::<Vec<_>>();
     all_players.sort_by(|(player_a, ..), (player_b, ..)| player_a.cmp(player_b));
 
-    for (player, mut player_controller, mut sprite_sheet_animation) in all_players {
+    for (mut player, mut player_controller, mut player_sprite, mut sprite_sheet_animation) in all_players {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
@@ -91,6 +102,17 @@ pub fn player_system(
             GRAVITY_MAX_SPEED,
             GRAVITY_ACCELERATION,
         );
+
+        player.direction = match 0.0_f32.total_cmp(&velocity.x) {
+            Ordering::Less => Direction::Left,
+            Ordering::Equal => player.direction.clone(),
+            Ordering::Greater => Direction::Right,
+        };
+
+        player_sprite.flip_x = match player.direction {
+            Direction::Left => false,
+            Direction::Right => true,
+        };
 
         player_controller.velocity = velocity;
     }
