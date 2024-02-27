@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "icon": {
+        "id": "server"
+      },
+      "type": "shell",
+      "label": "Matchbox Server",
+      "command": "~/.cargo/bin/matchbox_server",
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Cargo run 1",
+      "command": "cargo run",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Cargo run 2",
+      "command": "cargo run",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Cargo watch 1",
+      "command": "cargo run -c -x run",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Cargo watch 2",
+      "command": "cargo run -c -x run",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "icon": {
+        "id": "array"
+      },
+      "label": "Run",
+      "dependsOn": ["Matchbox Server", "Cargo run 1", "Cargo run 2"],
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "array"
+      },
+      "label": "Watch",
+      "dependsOn": ["Matchbox Server", "Cargo watch 1", "Cargo watch 2"],
+      "problemMatcher": []
+    }
+  ]
+}
