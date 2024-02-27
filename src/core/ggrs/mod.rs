@@ -23,10 +23,10 @@ impl AddGgrsCoreAppExt for App {
             .set_rollback_schedule_fps(fps)
             //
             .checksum_resource_with_hash::<LoadedLevels>()
-            //
             .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<PlayerController>()
             //
+            .rollback_resource_with_clone::<LoadedLevels>()
             .rollback_component_with_copy::<PlayerController>()
             .rollback_component_with_clone::<Transform>()
     }

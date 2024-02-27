@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkWorldBundle, LevelIid};
+use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
@@ -98,10 +99,23 @@ fn setup(
 fn update(
     mut contexts: EguiContexts,
     //
+    checksum: Res<Checksum>,
+    mut game_args: ResMut<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
 ) {
-    egui::Window::new("Menu").show(contexts.ctx_mut(), |ui| {
-        if ui.button("Back").clicked() {
+    egui::Window::new("Debugger").show(contexts.ctx_mut(), |ui| {
+        CollapsingHeader::new("Input")
+            .default_open(true)
+            .show(ui, |ui| {
+                ui.checkbox(&mut game_args.randomize_input, "Randomize input");
+            });
+        CollapsingHeader::new("Checksum")
+            .default_open(true)
+            .show(ui, |ui| {
+                ui.label(format!("{}", checksum.0));
+            });
+
+        if ui.button("Back to main menu").clicked() {
             goto_main_menu(&mut next_state);
         }
     });

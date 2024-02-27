@@ -47,7 +47,7 @@ fn update(
     }
 
     egui::panel::CentralPanel::default().show(contexts.ctx_mut(), |ui| {
-        if ui.button("Back").clicked() {
+        if ui.button("Back to main menu").clicked() {
             goto_main_menu(&mut next_state);
             return;
         }
@@ -101,8 +101,9 @@ fn update(
     }
 }
 
-fn cleanup(mut commands: Commands) {
-    commands.remove_resource::<MatchboxSocket<SingleChannel>>();
+fn cleanup(/*mut commands: Commands*/) {
+    // FIXME
+    // commands.remove_resource::<MatchboxSocket<SingleChannel>>();
 }
 
 pub fn goto_online_menu(next_state: &mut NextState<State>) {

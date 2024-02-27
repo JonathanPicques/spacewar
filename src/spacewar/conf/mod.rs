@@ -34,6 +34,9 @@ pub struct GameArgs {
     pub max_prediction: usize,
     #[clap(long, default_value = "0")]
     pub check_distance: usize,
+
+    #[clap(long, default_value = "false")]
+    pub randomize_input: bool,
 }
 
 #[derive(Resource, AssetCollection)]
