@@ -44,6 +44,7 @@ impl Default for PhysicsContext {
 }
 
 impl PhysicsContext {
+    #[allow(clippy::let_unit_value)]
     pub(crate) fn step(&mut self) {
         let event_handler = ();
         let physics_hooks = ();

@@ -52,6 +52,7 @@ pub fn physics_sync_system(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn physics_create_handles_system(
     query: Query<
         (

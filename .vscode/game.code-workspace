@@ -11,6 +11,7 @@
     "debug.allowBreakpointsEverywhere": true,
     // rust-analyzer
     "rust-analyzer.lens.enable": false,
+    "rust-analyzer.check.command": "clippy",
     "rust-analyzer.imports.prefix": "crate",
     "rust-analyzer.imports.granularity.group": "module",
     "rust-analyzer.inlayHints.typeHints.enable": false,

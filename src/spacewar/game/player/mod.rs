@@ -10,7 +10,7 @@ use bytemuck::Zeroable;
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
-use crate::core::levels::{find_levels_around_positions, LoadedLevels};
+use crate::core::levels::{find_levels_around_positions, LoadNeighbours, LoadedLevels};
 use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
 use crate::core::utilities::sorting::cmp_rollack;
@@ -134,8 +134,10 @@ pub fn player_level_follow_system(
             .iter()
             .map(|p| p.translation.truncate())
             .collect(),
-        ldtk_projects,
-        ldtk_project_assets,
+        LoadNeighbours::All,
+        //
+        &ldtk_projects,
+        &ldtk_project_assets,
     );
 
     if loaded_levels.levels != levels {
