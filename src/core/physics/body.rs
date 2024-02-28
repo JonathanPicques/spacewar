@@ -9,7 +9,7 @@ pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
     pub(crate) fn build(&self) -> RigidBody {
-        RigidBodyBuilder::kinematic_velocity_based()
+        RigidBodyBuilder::kinematic_position_based()
             .translation(vector![0.0, 0.0])
             .build()
     }

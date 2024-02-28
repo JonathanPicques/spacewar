@@ -2,8 +2,11 @@ use bevy::prelude::*;
 use rapier2d::math::Real;
 use rapier2d::prelude::*;
 
+use crate::core::body::PhysicsBodyHandle;
+use crate::core::collider::PhysicsColliderHandle;
 use crate::core::physics::body::PhysicsBody;
 use crate::core::physics::collider::PhysicsCollider;
+use crate::core::PhysicsCharacterController;
 
 #[derive(Clone, Resource)]
 pub struct PhysicsContext {
@@ -63,11 +66,64 @@ impl PhysicsContext {
     }
 
     pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider) -> (RigidBodyHandle, ColliderHandle) {
+        if self.bodies.is_empty() {
+            let width = 150.0;
+            let height = 10.0;
+            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -20.0]);
+            let floor_handle = self.bodies.insert(floor_body);
+            let floor_collider = ColliderBuilder::cuboid(width, height);
+
+            self.colliders
+                .insert_with_parent(floor_collider, floor_handle, &mut self.bodies);
+        }
+
         let body_handle = self.bodies.insert(body.build());
         let collider_handle = self
             .colliders
             .insert_with_parent(collider.build(), body_handle, &mut self.bodies);
 
         (body_handle, collider_handle)
+    }
+
+    pub(crate) fn move_controller(
+        &mut self,
+        body_handle: &PhysicsBodyHandle,
+        collider_handle: &PhysicsColliderHandle,
+        physics_controller: &mut PhysicsCharacterController,
+    ) {
+        let movement = {
+            let body = self
+                .bodies
+                .get(body_handle.0)
+                .expect("Body not found");
+            let collider = self
+                .colliders
+                .get(collider_handle.0)
+                .expect("Collider not found");
+            let position = body.position();
+            let collider_shape = collider.shape();
+            let rapier_controller = physics_controller.rapier_controller;
+
+            rapier_controller.move_shape(
+                self.integration_parameters.dt,
+                &self.bodies,
+                &self.colliders,
+                &self.query_pipeline,
+                collider_shape,
+                position,
+                vector![
+                    physics_controller.velocity.x,
+                    physics_controller.velocity.y
+                ],
+                QueryFilter::default().exclude_rigid_body(body_handle.0),
+                |_| {},
+            )
+        };
+
+        let body = self.bodies.get_mut(body_handle.0).unwrap();
+        let position = body.position();
+
+        body.set_next_kinematic_translation(position.translation.vector + movement.translation);
+        physics_controller.on_floor = movement.grounded;
     }
 }

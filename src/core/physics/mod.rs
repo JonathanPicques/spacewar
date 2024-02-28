@@ -16,19 +16,12 @@ pub use crate::core::physics::context::PhysicsContext;
 pub use crate::core::physics::controller::PhysicsCharacterController;
 
 pub fn physics_system(
-    mut query: Query<
-        (
-            &Rollback,
-            &PhysicsBody,
-            &PhysicsCollider,
-            &mut Transform,
-            &mut PhysicsCharacterController,
-        ),
-        (
-            With<PhysicsBodyHandle>,
-            With<PhysicsColliderHandle>,
-        ),
-    >,
+    mut query: Query<(
+        &Rollback,
+        &PhysicsBodyHandle,
+        &PhysicsColliderHandle,
+        &mut PhysicsCharacterController,
+    )>,
     //
     order: Res<RollbackOrdered>,
     mut physics_context: ResMut<PhysicsContext>,
@@ -36,17 +29,27 @@ pub fn physics_system(
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, _, _, mut transform, mut controller) in query {
-        transform.translation += controller.velocity.extend(0.0);
-        controller.on_floor = false;
-
-        if transform.translation.y <= -0.0 {
-            transform.translation.y = -0.0;
-            controller.on_floor = true;
-            controller.velocity.y = 0.0;
-        }
+    for (_, body_handle, collider_handle, mut controller) in query {
+        physics_context.move_controller(body_handle, collider_handle, &mut controller);
     }
     physics_context.step();
+}
+
+pub fn physics_sync_system(
+    mut query: Query<(&Rollback, &PhysicsBodyHandle, &mut Transform)>,
+    //
+    order: Res<RollbackOrdered>,
+    physics_context: Res<PhysicsContext>,
+) {
+    let mut query = query.iter_mut().collect::<Vec<_>>();
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (_, body, mut transform) in query {
+        if let Some(body) = physics_context.bodies.get(body.0) {
+            transform.translation.x = body.position().translation.x;
+            transform.translation.y = body.position().translation.y;
+        }
+    }
 }
 
 pub fn physics_create_handles_system(

@@ -89,6 +89,7 @@ pub fn player_system(
         }
 
         if controller.is_on_floor() {
+            velocity.y = 0.0;
             if velocity.x != 0.0 {
                 animator.animation = game_assets.player_walk_anim.clone();
             } else {

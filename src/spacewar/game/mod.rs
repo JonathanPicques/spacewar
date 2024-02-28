@@ -40,8 +40,9 @@ impl AddGameAppExt for App {
                     load_levels_system,
                     sprite_sheet_animator_system,
                     //
-                    physics_system,
                     physics_create_handles_system,
+                    physics_system,
+                    physics_sync_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),
@@ -86,7 +87,7 @@ fn setup(
                 Player { handle, ..default() },
                 //
                 PhysicsBody::default(),
-                PhysicsCollider::default(),
+                PhysicsCollider { width: 10.0, height: 16.0 },
                 PhysicsCharacterController::default(),
                 //
                 SpriteSheetBundle {
