@@ -68,14 +68,23 @@ impl PhysicsContext {
 
     pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
         if self.bodies.is_empty() {
-            let width = 150.0;
+            let width = 250.0;
             let height = 10.0;
-            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -20.0]);
+            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -40.0]);
             let floor_handle = self.bodies.insert(floor_body);
             let floor_collider = ColliderBuilder::cuboid(width, height);
 
             self.colliders
                 .insert_with_parent(floor_collider, floor_handle, &mut self.bodies);
+
+            let width = 50.0;
+            let height = 50.0;
+            let box_body = RigidBodyBuilder::fixed().translation(vector![150.0, -10.0]);
+            let box_handle = self.bodies.insert(box_body);
+            let box_collider = ColliderBuilder::cuboid(width, height);
+
+            self.colliders
+                .insert_with_parent(box_collider, box_handle, &mut self.bodies);
         }
 
         let body_handle = self.bodies.insert(body.build(transform));
@@ -92,7 +101,7 @@ impl PhysicsContext {
         collider_handle: &PhysicsColliderHandle,
         physics_controller: &mut PhysicsCharacterController,
     ) {
-        let movement = {
+        let (movement, collisions) = {
             let body = self
                 .bodies
                 .get(body_handle.0)
@@ -105,7 +114,8 @@ impl PhysicsContext {
             let collider_shape = collider.shape();
             let rapier_controller = physics_controller.rapier_controller;
 
-            rapier_controller.move_shape(
+            let mut collisions = vec![];
+            let movement = rapier_controller.move_shape(
                 self.integration_parameters.dt,
                 &self.bodies,
                 &self.colliders,
@@ -117,8 +127,12 @@ impl PhysicsContext {
                     physics_controller.velocity.y
                 ],
                 QueryFilter::default().exclude_rigid_body(body_handle.0),
-                |_| {},
-            )
+                |collision| {
+                    collisions.push(collision);
+                },
+            );
+
+            (movement, collisions)
         };
 
         let body = self.bodies.get_mut(body_handle.0).unwrap();
@@ -126,5 +140,6 @@ impl PhysicsContext {
 
         body.set_next_kinematic_translation(position.translation.vector + movement.translation);
         physics_controller.on_floor = movement.grounded;
+        physics_controller.collisions = collisions;
     }
 }

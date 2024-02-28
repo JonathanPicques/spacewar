@@ -1,11 +1,12 @@
 use bevy::prelude::*;
-use rapier2d::control::KinematicCharacterController;
+use rapier2d::control::{CharacterCollision, KinematicCharacterController};
 
 #[derive(Clone, Default, Component)]
 pub struct PhysicsCharacterController {
     pub velocity: Vec2,
     //
     pub(crate) on_floor: bool,
+    pub(crate) collisions: Vec<CharacterCollision>,
     pub(crate) rapier_controller: KinematicCharacterController,
 }
 
