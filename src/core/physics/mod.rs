@@ -54,7 +54,13 @@ pub fn physics_sync_system(
 
 pub fn physics_create_handles_system(
     query: Query<
-        (Entity, &Rollback, &PhysicsBody, &PhysicsCollider),
+        (
+            Entity,
+            &Rollback,
+            &Transform,
+            &PhysicsBody,
+            &PhysicsCollider,
+        ),
         (
             Without<PhysicsBodyHandle>,
             Without<PhysicsColliderHandle>,
@@ -68,8 +74,8 @@ pub fn physics_create_handles_system(
     let mut query = query.iter().collect::<Vec<_>>();
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (e, _, body, collider) in query {
-        let (body_handle, collider_handle) = physics_context.insert_body(body, collider);
+    for (e, _, transform, body, collider) in query {
+        let (body_handle, collider_handle) = physics_context.insert_body(body, collider, transform);
 
         commands.entity(e).insert((
             PhysicsBodyHandle(body_handle),

@@ -65,7 +65,7 @@ impl PhysicsContext {
         );
     }
 
-    pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider) -> (RigidBodyHandle, ColliderHandle) {
+    pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
         if self.bodies.is_empty() {
             let width = 150.0;
             let height = 10.0;
@@ -77,7 +77,7 @@ impl PhysicsContext {
                 .insert_with_parent(floor_collider, floor_handle, &mut self.bodies);
         }
 
-        let body_handle = self.bodies.insert(body.build());
+        let body_handle = self.bodies.insert(body.build(transform));
         let collider_handle = self
             .colliders
             .insert_with_parent(collider.build(), body_handle, &mut self.bodies);

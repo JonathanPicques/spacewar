@@ -89,7 +89,9 @@ pub fn player_system(
         }
 
         if controller.is_on_floor() {
-            velocity.y = 0.0;
+            if !input.is_set(INPUT_JUMP) {
+                velocity.y = 0.0; // stick to floor
+            }
             if velocity.x != 0.0 {
                 animator.animation = game_assets.player_walk_anim.clone();
             } else {

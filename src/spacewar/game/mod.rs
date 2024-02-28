@@ -59,10 +59,10 @@ fn setup(
     args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
-    commands.insert_resource(PhysicsContext::default());
     commands.insert_resource(LoadedLevels::new(LevelIid::new(
         "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
     )));
+    commands.insert_resource(PhysicsContext::default());
 
     commands.spawn((
         Game {},
