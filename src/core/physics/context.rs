@@ -70,7 +70,7 @@ impl PhysicsContext {
         if self.bodies.is_empty() {
             let width = 250.0;
             let height = 10.0;
-            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -40.0]);
+            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -30.0]);
             let floor_handle = self.bodies.insert(floor_body);
             let floor_collider = ColliderBuilder::cuboid(width, height);
 
@@ -79,7 +79,7 @@ impl PhysicsContext {
 
             let width = 50.0;
             let height = 50.0;
-            let box_body = RigidBodyBuilder::fixed().translation(vector![150.0, -10.0]);
+            let box_body = RigidBodyBuilder::fixed().translation(vector![150.0, 10.0]);
             let box_handle = self.bodies.insert(box_body);
             let box_collider = ColliderBuilder::cuboid(width, height);
 

@@ -52,6 +52,28 @@ pub fn physics_sync_system(
     }
 }
 
+pub fn physics_debug_system(mut gizmos: Gizmos, physics_context: Res<PhysicsContext>) {
+    for (_, collider) in physics_context.colliders.iter() {
+        if let Some(cuboid) = collider.shape().as_cuboid() {
+            gizmos.rect_2d(
+                Transform::from_translation(Vec3::new(
+                    collider.translation().x,
+                    collider.translation().y,
+                    0.0,
+                ))
+                .translation
+                .truncate(),
+                0.0,
+                Vec2::new(
+                    cuboid.half_extents.x * 2.0,
+                    cuboid.half_extents.y * 2.0,
+                ),
+                Color::GREEN,
+            );
+        }
+    }
+}
+
 #[allow(clippy::type_complexity)]
 pub fn physics_create_handles_system(
     query: Query<

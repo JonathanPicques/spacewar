@@ -3,6 +3,7 @@ pub mod player;
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy::sprite::Anchor;
 use bevy_ecs_ldtk::{LdtkWorldBundle, LevelIid};
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
@@ -28,7 +29,10 @@ impl AddGameAppExt for App {
             .rollback_component_with_clone::<Player>()
             //
             .add_systems(OnEnter(State::Game), setup)
-            .add_systems(Update, update.run_if(in_state(State::Game)))
+            .add_systems(
+                Update,
+                (update, physics_debug_system).run_if(in_state(State::Game)),
+            )
             .add_systems(OnExit(State::Game), cleanup)
             //
             .add_systems(
@@ -91,6 +95,10 @@ fn setup(
                 PhysicsCharacterController::default(),
                 //
                 SpriteSheetBundle {
+                    sprite: TextureAtlasSprite {
+                        anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
+                        ..default()
+                    },
                     transform,
                     texture_atlas: game_assets.player.clone(),
                     ..default()
