@@ -34,7 +34,7 @@
       },
       "type": "shell",
       "label": "Cargo watch 1",
-      "command": "cargo run -c -x run",
+      "command": "cargo watch -c -x run",
       "problemMatcher": ["$rustc"]
     },
     {
@@ -43,7 +43,7 @@
       },
       "type": "shell",
       "label": "Cargo watch 2",
-      "command": "cargo run -c -x run",
+      "command": "cargo watch -c -x run",
       "problemMatcher": ["$rustc"]
     },
     {

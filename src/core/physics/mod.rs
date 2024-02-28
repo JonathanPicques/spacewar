@@ -1,92 +1,76 @@
-use std::hash::{Hash, Hasher};
+pub mod body;
+pub mod collider;
+pub mod context;
+pub mod controller;
 
 use bevy::prelude::*;
 use bevy_ggrs::{Rollback, RollbackOrdered};
 
+use crate::core::physics::body::PhysicsBodyHandle;
+use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::utilities::sorting::cmp_rollack;
 
-#[derive(Copy, Clone, Debug)]
-pub enum Distance {
-    Relative(f32),
-    Absolute(f32),
-}
+pub use crate::core::physics::body::PhysicsBody;
+pub use crate::core::physics::collider::PhysicsCollider;
+pub use crate::core::physics::context::PhysicsContext;
+pub use crate::core::physics::controller::PhysicsCharacterController;
 
-#[derive(Copy, Clone, Debug, Component)]
-pub struct PlayerController {
-    pub up: Vec2,
-    pub autostep: Option<Distance>,
-    pub snap_to_ground: Option<Distance>,
-    pub min_slope_slide_angle: f32,
-    pub max_slope_slide_angle: f32,
-    //
-    pub velocity: Vec2,
-    //
-    on_wall: bool,
-    on_floor: bool,
-    on_ceiling: bool,
-}
-
-impl PlayerController {
-    pub fn is_on_wall(&self) -> bool {
-        self.on_wall
-    }
-
-    pub fn is_on_floor(&self) -> bool {
-        self.on_floor
-    }
-
-    pub fn is_on_ceiling(&self) -> bool {
-        self.on_ceiling
-    }
-}
-
-impl Hash for PlayerController {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        assert!(
-            self.velocity.is_finite(),
-            "Hashing is not stable for NaN f32 values."
-        );
-
-        self.velocity.x.to_bits().hash(state);
-        self.velocity.y.to_bits().hash(state);
-    }
-}
-
-impl Default for PlayerController {
-    fn default() -> Self {
-        Self {
-            up: Vec2::Y,
-            autostep: None,
-            snap_to_ground: None,
-            min_slope_slide_angle: 5.0_f32.to_radians(),
-            max_slope_slide_angle: 45.0_f32.to_radians(),
-            //
-            velocity: Vec2::ZERO,
-            //
-            on_wall: false,
-            on_floor: false,
-            on_ceiling: false,
-        }
-    }
-}
-
-pub fn player_controller_system(
-    mut query: Query<(&Rollback, &mut Transform, &mut PlayerController)>,
+pub fn physics_system(
+    mut query: Query<
+        (
+            &Rollback,
+            &PhysicsBody,
+            &PhysicsCollider,
+            &mut Transform,
+            &mut PhysicsCharacterController,
+        ),
+        (
+            With<PhysicsBodyHandle>,
+            With<PhysicsColliderHandle>,
+        ),
+    >,
     //
     order: Res<RollbackOrdered>,
+    mut physics_context: ResMut<PhysicsContext>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, mut transform, mut player_controller) in query {
-        player_controller.on_wall = false;
-        player_controller.on_floor = false;
-        player_controller.on_ceiling = false;
-        transform.translation += player_controller.velocity.extend(0.0);
+    for (_, _, _, mut transform, mut controller) in query {
+        transform.translation += controller.velocity.extend(0.0);
+        controller.on_floor = false;
+
         if transform.translation.y <= -0.0 {
             transform.translation.y = -0.0;
-            player_controller.on_floor = true;
-            player_controller.velocity.y = 0.0;
+            controller.on_floor = true;
+            controller.velocity.y = 0.0;
         }
+    }
+    physics_context.step();
+}
+
+pub fn physics_create_handles_system(
+    query: Query<
+        (Entity, &Rollback, &PhysicsBody, &PhysicsCollider),
+        (
+            Without<PhysicsBodyHandle>,
+            Without<PhysicsColliderHandle>,
+        ),
+    >,
+    mut commands: Commands,
+    //
+    order: Res<RollbackOrdered>,
+    mut physics_context: ResMut<PhysicsContext>,
+) {
+    let mut query = query.iter().collect::<Vec<_>>();
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (e, _, body, collider) in query {
+        let (body_handle, collider_handle) = physics_context.insert_body(body, collider);
+
+        commands.entity(e).insert((
+            PhysicsBodyHandle(body_handle),
+            PhysicsColliderHandle(collider_handle),
+        ));
     }
 }

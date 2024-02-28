@@ -9,9 +9,9 @@ use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
-use crate::core::ggrs::AddGgrsCoreAppExt;
 use crate::core::levels::{load_levels_system, LoadedLevels};
-use crate::core::physics::{player_controller_system, PlayerController};
+use crate::core::physics::*;
+use crate::core::AddCoreAppExt;
 use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::spacewar::game::player::input::input_system;
 use crate::spacewar::game::player::{player_level_follow_system, player_system, Player};
@@ -23,7 +23,7 @@ pub trait AddGameAppExt {
 
 impl AddGameAppExt for App {
     fn add_game(&mut self, fps: usize) -> &mut Self {
-        self.add_ggrs::<GameConfig, _>(fps, input_system)
+        self.add_core::<GameConfig, _>(fps, input_system)
             .checksum_component_with_hash::<Player>()
             .rollback_component_with_clone::<Player>()
             //
@@ -38,8 +38,10 @@ impl AddGameAppExt for App {
                     player_level_follow_system,
                     //
                     load_levels_system,
-                    player_controller_system,
                     sprite_sheet_animator_system,
+                    //
+                    physics_system,
+                    physics_create_handles_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),
@@ -56,6 +58,7 @@ fn setup(
     args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
+    commands.insert_resource(PhysicsContext::default());
     commands.insert_resource(LoadedLevels::new(LevelIid::new(
         "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
     )));
@@ -81,7 +84,11 @@ fn setup(
             .spawn((
                 Game {},
                 Player { handle, ..default() },
-                PlayerController::default(),
+                //
+                PhysicsBody::default(),
+                PhysicsCollider::default(),
+                PhysicsCharacterController::default(),
+                //
                 SpriteSheetBundle {
                     transform,
                     texture_atlas: game_assets.player.clone(),
@@ -128,6 +135,7 @@ fn cleanup(
 ) {
     commands.remove_resource::<LoadedLevels>();
     commands.remove_resource::<LocalPlayers>();
+    commands.remove_resource::<PhysicsContext>();
     commands.remove_resource::<Session<GameConfig>>();
 
     // https://github.com/gschup/bevy_ggrs/issues/93

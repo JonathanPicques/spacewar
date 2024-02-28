@@ -11,7 +11,7 @@ use bytemuck::Zeroable;
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
 use crate::core::levels::{find_levels_around_positions, LoadedLevels};
-use crate::core::physics::PlayerController;
+use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
 use crate::core::utilities::sorting::cmp_rollack;
 use crate::spacewar::conf::{GameAssets, GameConfig};
@@ -44,9 +44,9 @@ pub fn player_system(
         (
             &Rollback,
             &mut Player,
-            &mut PlayerController,
             &mut TextureAtlasSprite,
             &mut SpriteSheetAnimator,
+            &mut PhysicsCharacterController,
         ),
         With<Rollback>,
     >,
@@ -59,15 +59,15 @@ pub fn player_system(
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, mut player, mut player_controller, mut player_sprite, mut sprite_sheet_animation) in query {
+    for (_, mut player, mut sprite, mut animator, mut controller) in query {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
-        let mut velocity = player_controller.velocity;
+        let mut velocity = controller.velocity;
 
-        if input.is_set(INPUT_JUMP) && player_controller.is_on_floor() {
+        if input.is_set(INPUT_JUMP) && controller.is_on_floor() {
             velocity.y = JUMP_STRENGTH;
         }
         if input.is_set(INPUT_LEFT) {
@@ -88,14 +88,14 @@ pub fn player_system(
             velocity.x = compute_deceleration(velocity.x, time.delta_seconds(), DECELERATION);
         }
 
-        if player_controller.is_on_floor() {
+        if controller.is_on_floor() {
             if velocity.x != 0.0 {
-                sprite_sheet_animation.animation = game_assets.player_walk_anim.clone();
+                animator.animation = game_assets.player_walk_anim.clone();
             } else {
-                sprite_sheet_animation.animation = game_assets.player_idle_anim.clone();
+                animator.animation = game_assets.player_idle_anim.clone();
             }
         } else {
-            sprite_sheet_animation.animation = game_assets.player_jump_anim.clone();
+            animator.animation = game_assets.player_jump_anim.clone();
         }
 
         velocity.y = compute_acceleration(
@@ -111,12 +111,12 @@ pub fn player_system(
             Ordering::Greater => Direction::Right,
         };
 
-        player_sprite.flip_x = match player.direction {
+        sprite.flip_x = match player.direction {
             Direction::Left => false,
             Direction::Right => true,
         };
 
-        player_controller.velocity = velocity;
+        controller.velocity = velocity;
     }
 }
 
