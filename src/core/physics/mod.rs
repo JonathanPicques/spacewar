@@ -63,7 +63,7 @@ pub fn physics_debug_system(mut gizmos: Gizmos, physics_context: Res<PhysicsCont
                 ))
                 .translation
                 .truncate(),
-                0.0,
+                collider.rotation().angle(),
                 Vec2::new(
                     cuboid.half_extents.x * 2.0,
                     cuboid.half_extents.y * 2.0,
