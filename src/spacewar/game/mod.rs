@@ -90,7 +90,7 @@ fn setup(
                 .with_rotation(0.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(0.0, -30.0, 0.0)),
             PhysicsBody::Fixed,
-            PhysicsCollider { width: 250.0, height: 10.0 },
+            PhysicsCollider { width: 25.0, height: 1.0 },
         ))
         .add_rollback();
     commands
@@ -100,7 +100,7 @@ fn setup(
                 .with_rotation(0.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(150.0, 10.0, 0.0)),
             PhysicsBody::Fixed,
-            PhysicsCollider { width: 50.0, height: 50.0 },
+            PhysicsCollider { width: 5.0, height: 5.0 },
         ))
         .add_rollback();
     commands
@@ -110,7 +110,7 @@ fn setup(
                 .with_rotation(20.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(150.0, -35.0, 0.0)),
             PhysicsBody::Fixed,
-            PhysicsCollider { width: 50.0, height: 50.0 },
+            PhysicsCollider { width: 5.0, height: 5.0 },
         ))
         .add_rollback();
     commands
@@ -120,7 +120,7 @@ fn setup(
                 .with_rotation((-20.0).to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(-100.0, -35.0, 0.0)),
             PhysicsBody::Fixed,
-            PhysicsCollider { width: 50.0, height: 50.0 },
+            PhysicsCollider { width: 5.0, height: 5.0 },
         ))
         .add_rollback();
 
@@ -132,7 +132,7 @@ fn setup(
                 Player { handle, ..default() },
                 //
                 PhysicsBody::KinematicPositionBased,
-                PhysicsCollider { width: 10.0, height: 16.0 },
+                PhysicsCollider { width: 0.8, height: 1.8 },
                 PhysicsCharacterController::default(),
                 //
                 SpriteSheetBundle {

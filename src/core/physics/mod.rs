@@ -18,6 +18,7 @@ pub use crate::core::physics::controller::PhysicsCharacterController;
 
 #[derive(Clone, Resource)]
 pub struct Physics {
+    pub scale: f32,
     pub gravity: Vector<Real>,
     //
     pub bodies: RigidBodySet,
@@ -35,6 +36,7 @@ pub struct Physics {
 impl Default for Physics {
     fn default() -> Self {
         Self {
+            scale: 9.0,
             gravity: vector![0.0, -9.81],
             integration_parameters: default(),
             //
@@ -75,7 +77,7 @@ impl Physics {
     }
 
     pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
-        let body_handle = self.bodies.insert(body.build(transform));
+        let body_handle = self.bodies.insert(body.build(self, transform));
         let collider_handle = self
             .colliders
             .insert_with_parent(collider.build(), body_handle, &mut self.bodies);
@@ -110,10 +112,7 @@ impl Physics {
                 &self.query_pipeline,
                 collider_shape,
                 position,
-                vector![
-                    physics_controller.velocity.x,
-                    physics_controller.velocity.y
-                ],
+                (physics_controller.velocity / self.scale).to_physics(),
                 QueryFilter::default().exclude_rigid_body(body_handle.0),
                 |collision| {
                     collisions.push(collision);
@@ -166,10 +165,7 @@ pub fn physics_sync_system(
 
     for (_, body, mut transform) in query {
         if let Some(body) = physics.bodies.get(body.0) {
-            transform.translation = body
-                .position()
-                .to_bevy()
-                .extend(transform.translation.z);
+            transform.translation = (body.position().to_bevy() * physics.scale).extend(transform.translation.z);
         }
     }
 }
@@ -178,9 +174,9 @@ pub fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
     for (_, collider) in physics.colliders.iter() {
         if let Some(cuboid) = collider.shape().as_cuboid() {
             gizmos.rect_2d(
-                collider.translation().to_bevy(),
+                collider.translation().to_bevy() * physics.scale,
                 collider.rotation().angle(),
-                cuboid.half_extents.to_bevy() * 2.0,
+                cuboid.half_extents.to_bevy() * 2.0 * physics.scale,
                 Color::GREEN,
             );
         }
