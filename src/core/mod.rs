@@ -35,7 +35,7 @@ impl AddCoreAppExt for App {
             .checksum_component::<Transform>(transform_hasher)
             //
             .rollback_resource_with_clone::<LoadedLevels>()
-            .rollback_resource_with_clone::<PhysicsContext>()
+            .rollback_resource_with_clone::<Physics>()
             //
             .rollback_component_with_clone::<Transform>()
             .rollback_component_with_clone::<PhysicsBody>()

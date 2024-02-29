@@ -63,10 +63,10 @@ fn setup(
     args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
+    commands.insert_resource(Physics::default());
     commands.insert_resource(LoadedLevels::new(LevelIid::new(
         "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
     )));
-    commands.insert_resource(PhysicsContext::default());
 
     commands.spawn((
         Game {},
@@ -142,9 +142,9 @@ fn cleanup(
     //
     query: Query<Entity, With<Game>>,
 ) {
+    commands.remove_resource::<Physics>();
     commands.remove_resource::<LoadedLevels>();
     commands.remove_resource::<LocalPlayers>();
-    commands.remove_resource::<PhysicsContext>();
     commands.remove_resource::<Session<GameConfig>>();
 
     // https://github.com/gschup/bevy_ggrs/issues/93
