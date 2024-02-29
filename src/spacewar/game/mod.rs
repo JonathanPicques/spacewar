@@ -82,6 +82,46 @@ fn setup(
             ..default()
         },
     ));
+    commands
+        .spawn((
+            Game {},
+            Transform::default()
+                .with_rotation(Quat::from_rotation_z(0.0_f32.to_radians()))
+                .with_translation(Vec3::new(0.0, -30.0, 0.0)),
+            PhysicsBody::Fixed,
+            PhysicsCollider { width: 250.0, height: 10.0 },
+        ))
+        .add_rollback();
+    commands
+        .spawn((
+            Game {},
+            Transform::default()
+                .with_rotation(Quat::from_rotation_z(0.0_f32.to_radians()))
+                .with_translation(Vec3::new(150.0, 10.0, 0.0)),
+            PhysicsBody::Fixed,
+            PhysicsCollider { width: 50.0, height: 50.0 },
+        ))
+        .add_rollback();
+    commands
+        .spawn((
+            Game {},
+            Transform::default()
+                .with_rotation(Quat::from_rotation_z(20.0_f32.to_radians()))
+                .with_translation(Vec3::new(150.0, -35.0, 0.0)),
+            PhysicsBody::Fixed,
+            PhysicsCollider { width: 50.0, height: 50.0 },
+        ))
+        .add_rollback();
+    commands
+        .spawn((
+            Game {},
+            Transform::default()
+                .with_rotation(Quat::from_rotation_z(-20.0_f32.to_radians()))
+                .with_translation(Vec3::new(-100.0, -35.0, 0.0)),
+            PhysicsBody::Fixed,
+            PhysicsCollider { width: 50.0, height: 50.0 },
+        ))
+        .add_rollback();
 
     for handle in 0..args.num_players {
         let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
@@ -90,7 +130,7 @@ fn setup(
                 Game {},
                 Player { handle, ..default() },
                 //
-                PhysicsBody::default(),
+                PhysicsBody::KinematicPositionBased,
                 PhysicsCollider { width: 10.0, height: 16.0 },
                 PhysicsCharacterController::default(),
                 //

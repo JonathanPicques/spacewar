@@ -74,26 +74,6 @@ impl Physics {
     }
 
     pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
-        if self.bodies.is_empty() {
-            let width = 250.0;
-            let height = 10.0;
-            let floor_body = RigidBodyBuilder::fixed().translation(vector![0.0, -30.0]);
-            let floor_handle = self.bodies.insert(floor_body);
-            let floor_collider = ColliderBuilder::cuboid(width, height);
-
-            self.colliders
-                .insert_with_parent(floor_collider, floor_handle, &mut self.bodies);
-
-            let width = 50.0;
-            let height = 50.0;
-            let box_body = RigidBodyBuilder::fixed().translation(vector![150.0, 10.0]);
-            let box_handle = self.bodies.insert(box_body);
-            let box_collider = ColliderBuilder::cuboid(width, height);
-
-            self.colliders
-                .insert_with_parent(box_collider, box_handle, &mut self.bodies);
-        }
-
         let body_handle = self.bodies.insert(body.build(transform));
         let collider_handle = self
             .colliders
