@@ -12,8 +12,8 @@ use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
 use crate::core::levels::{find_levels_around_positions, LoadNeighbours, LoadedLevels};
 use crate::core::physics::PhysicsCharacterController;
-use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
-use crate::core::utilities::sorting::cmp_rollack;
+use crate::core::utilities::cmp::cmp_rollack;
+use crate::core::utilities::maths::*;
 use crate::spacewar::conf::{GameAssets, GameConfig};
 use crate::spacewar::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
 

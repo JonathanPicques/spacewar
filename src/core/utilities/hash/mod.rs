@@ -2,6 +2,8 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 
 use bevy::prelude::*;
 
+/// Computes a hash for [`Transform`].
+/// This is useful to make it so [`Transform`] contributes to the checksum of a [`bevy_ggrs`] frame.
 pub fn transform_hasher(transform: &Transform) -> u64 {
     let mut hasher = DefaultHasher::new();
     let translation = transform.translation;

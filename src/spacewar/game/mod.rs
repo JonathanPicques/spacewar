@@ -12,6 +12,7 @@ use bevy_ggrs::{prelude::*, LocalPlayers};
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
 use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::physics::*;
+use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::spacewar::game::player::input::input_system;
@@ -86,7 +87,7 @@ fn setup(
         .spawn((
             Game {},
             Transform::default()
-                .with_rotation(Quat::from_rotation_z(0.0_f32.to_radians()))
+                .with_rotation(0.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(0.0, -30.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 250.0, height: 10.0 },
@@ -96,7 +97,7 @@ fn setup(
         .spawn((
             Game {},
             Transform::default()
-                .with_rotation(Quat::from_rotation_z(0.0_f32.to_radians()))
+                .with_rotation(0.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(150.0, 10.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 50.0, height: 50.0 },
@@ -106,7 +107,7 @@ fn setup(
         .spawn((
             Game {},
             Transform::default()
-                .with_rotation(Quat::from_rotation_z(20.0_f32.to_radians()))
+                .with_rotation(20.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(150.0, -35.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 50.0, height: 50.0 },
@@ -116,7 +117,7 @@ fn setup(
         .spawn((
             Game {},
             Transform::default()
-                .with_rotation(Quat::from_rotation_z(-20.0_f32.to_radians()))
+                .with_rotation((-20.0).to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(-100.0, -35.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 50.0, height: 50.0 },

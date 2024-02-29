@@ -9,7 +9,8 @@ use rapier2d::prelude::*;
 
 use crate::core::physics::body::PhysicsBodyHandle;
 use crate::core::physics::collider::PhysicsColliderHandle;
-use crate::core::utilities::sorting::cmp_rollack;
+use crate::core::utilities::cmp::cmp_rollack;
+use crate::core::utilities::maths::*;
 
 pub use crate::core::physics::body::PhysicsBody;
 pub use crate::core::physics::collider::PhysicsCollider;
@@ -165,8 +166,10 @@ pub fn physics_sync_system(
 
     for (_, body, mut transform) in query {
         if let Some(body) = physics.bodies.get(body.0) {
-            transform.translation.x = body.position().translation.x;
-            transform.translation.y = body.position().translation.y;
+            transform.translation = body
+                .position()
+                .to_bevy()
+                .extend(transform.translation.z);
         }
     }
 }
@@ -175,12 +178,9 @@ pub fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
     for (_, collider) in physics.colliders.iter() {
         if let Some(cuboid) = collider.shape().as_cuboid() {
             gizmos.rect_2d(
-                Vec2::new(collider.translation().x, collider.translation().y),
+                collider.translation().to_bevy(),
                 collider.rotation().angle(),
-                Vec2::new(
-                    cuboid.half_extents.x * 2.0,
-                    cuboid.half_extents.y * 2.0,
-                ),
+                cuboid.half_extents.to_bevy() * 2.0,
                 Color::GREEN,
             );
         }
