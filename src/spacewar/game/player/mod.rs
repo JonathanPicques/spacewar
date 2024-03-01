@@ -42,7 +42,7 @@ pub fn player_system(
         (
             &Rollback,
             &mut Player,
-            &mut TextureAtlasSprite,
+            &mut Sprite,
             &mut SpriteSheetAnimator,
             &mut PhysicsCharacterController,
         ),

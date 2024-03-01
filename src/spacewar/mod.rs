@@ -52,8 +52,11 @@ pub struct GameArgs {
 
 #[derive(Resource, AssetCollection)]
 pub struct GameAssets {
-    #[asset(key = "player")]
-    pub player: Handle<TextureAtlas>,
+    #[asset(key = "player_texture")]
+    pub player_texture: Handle<Image>,
+    #[asset(key = "player_texture_atlas_layout")]
+    pub player_texture_atlas_layout: Handle<TextureAtlasLayout>,
+
     #[asset(key = "player_anim.idle")]
     pub player_idle_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_anim.walk")]
@@ -79,16 +82,12 @@ pub fn spacewar() {
     let args = GameArgs::parse();
     let args_fps = args.fps;
 
-    app.add_state::<State>()
+    app.init_state::<State>()
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        fit_canvas_to_parent: true,
-                        prevent_default_event_handling: false,
-                        ..default()
-                    }),
+                    primary_window: Some(Window { prevent_default_event_handling: false, ..default() }),
                     ..default()
                 }),
         )

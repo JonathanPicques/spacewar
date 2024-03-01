@@ -122,12 +122,16 @@ fn setup(
             PhysicsCharacterController::default(),
             //
             SpriteSheetBundle {
-                sprite: TextureAtlasSprite {
+                atlas: TextureAtlas {
+                    index: 0,
+                    layout: game_assets.player_texture_atlas_layout.clone(),
+                },
+                sprite: Sprite {
                     anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
                     ..default()
                 },
+                texture: game_assets.player_texture.clone(),
                 transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
-                texture_atlas: game_assets.player.clone(),
                 ..default()
             },
             SpriteSheetAnimator {

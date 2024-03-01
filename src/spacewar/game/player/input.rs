@@ -15,7 +15,7 @@ pub fn input_system(
     //
     game_ars: Res<GameArgs>,
     local_players: Res<LocalPlayers>,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     let local_players = &local_players.0;
     let mut local_inputs = HashMap::new();
@@ -27,35 +27,35 @@ pub fn input_system(
         if game_ars.randomize_input {
             input.set(Box::into_raw(Box::new(0xDEAD)) as u8);
         } else if !local || *handle == 0 {
-            if keyboard_input.pressed(KeyCode::Up) {
+            if keyboard_input.pressed(KeyCode::ArrowUp) {
                 input.set(INPUT_UP);
             }
-            if keyboard_input.pressed(KeyCode::Left) {
+            if keyboard_input.pressed(KeyCode::ArrowLeft) {
                 input.set(INPUT_LEFT);
             }
-            if keyboard_input.pressed(KeyCode::Down) {
+            if keyboard_input.pressed(KeyCode::ArrowDown) {
                 input.set(INPUT_DOWN);
             }
-            if keyboard_input.pressed(KeyCode::Right) {
+            if keyboard_input.pressed(KeyCode::ArrowRight) {
                 input.set(INPUT_RIGHT);
             }
             if keyboard_input.pressed(KeyCode::ControlRight) {
                 input.set(INPUT_SHOOT);
             }
         } else {
-            if keyboard_input.pressed(KeyCode::Z) {
+            if keyboard_input.pressed(KeyCode::KeyZ) {
                 input.set(INPUT_UP);
             }
-            if keyboard_input.pressed(KeyCode::Q) {
+            if keyboard_input.pressed(KeyCode::KeyQ) {
                 input.set(INPUT_LEFT);
             }
-            if keyboard_input.pressed(KeyCode::S) {
+            if keyboard_input.pressed(KeyCode::KeyS) {
                 input.set(INPUT_DOWN);
             }
-            if keyboard_input.pressed(KeyCode::D) {
+            if keyboard_input.pressed(KeyCode::KeyD) {
                 input.set(INPUT_RIGHT);
             }
-            if keyboard_input.pressed(KeyCode::E) {
+            if keyboard_input.pressed(KeyCode::KeyE) {
                 input.set(INPUT_SHOOT);
             }
         }

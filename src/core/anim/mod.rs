@@ -14,22 +14,22 @@ pub struct SpriteSheetAnimation {
 }
 
 pub fn sprite_sheet_animator_system(
-    mut query: Query<(&mut TextureAtlasSprite, &mut SpriteSheetAnimator)>,
+    mut query: Query<(&mut TextureAtlas, &mut SpriteSheetAnimator)>,
     //
     time: Res<Time<GgrsTime>>,
     animations: Res<Assets<SpriteSheetAnimation>>,
 ) {
-    for (mut sprite, mut animator) in query.iter_mut() {
+    for (mut atlas, mut animator) in query.iter_mut() {
         let animation = animations
             .get(animator.animation.id())
             .expect("Animation not found");
 
         animator.timer.tick(time.delta());
         if animator.timer.finished() {
-            if (sprite.index < animation.start) || (sprite.index >= animation.finish) {
-                sprite.index = animation.start;
+            if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
+                atlas.index = animation.start;
             } else {
-                sprite.index += 1;
+                atlas.index += 1;
             }
 
             animator.timer.reset();

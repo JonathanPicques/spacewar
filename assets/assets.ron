@@ -1,9 +1,14 @@
 ({
-    "player": Asset (
-        TextureAtlas (
-            TextureAtlasAsset (
-                path: "sprites/player.png",
-                //
+    "player_texture": Asset (
+        Image (
+            ImageAsset (
+                path: "sprites/player.png"
+            )
+        )
+    ),
+    "player_texture_atlas_layout": Asset (
+        TextureAtlasLayout (
+            TextureAtlasLayoutAsset (
                 rows: 4,
                 columns: 10,
                 //
@@ -16,6 +21,7 @@
             )
         )
     ),
+    //
     "player_anim.idle": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (

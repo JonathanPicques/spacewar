@@ -9,7 +9,7 @@ use crate::core::anim::SpriteSheetAnimation;
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum Asset {
     Image(ImageAsset),
-    TextureAtlas(TextureAtlasAsset),
+    TextureAtlasLayout(TextureAtlasLayoutAsset),
     SpriteSheetAnimation(SpriteSheetAnimationAsset),
 }
 
@@ -19,9 +19,7 @@ struct ImageAsset {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct TextureAtlasAsset {
-    path: String,
-    //
+struct TextureAtlasLayoutAsset {
     rows: usize,
     columns: usize,
     tile_size_x: f32,
@@ -49,7 +47,9 @@ impl DynamicAsset for CoreDynamicAsset {
     fn load(&self, asset_server: &AssetServer) -> Vec<UntypedHandle> {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
-            Asset::TextureAtlas(TextureAtlasAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
+            Asset::TextureAtlasLayout(TextureAtlasLayoutAsset { .. }) => asset_server
+                .add(TextureAtlasLayout::new_empty(Vec2::ONE))
+                .untyped(),
             Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish }) => asset_server
                 .add(SpriteSheetAnimation { start, finish })
                 .untyped(),
@@ -69,14 +69,13 @@ impl DynamicAsset for CoreDynamicAsset {
         let asset_server = cell
             .get_resource::<AssetServer>()
             .expect("Failed to get asset server");
-        let mut texture_atlases = cell
-            .get_resource_mut::<Assets<TextureAtlas>>()
+        let mut texture_atlas_layouts = cell
+            .get_resource_mut::<Assets<TextureAtlasLayout>>()
             .expect("Failed to get Assets<TextureAtlas>");
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),
-            Asset::TextureAtlas(TextureAtlasAsset {
-                path,
+            Asset::TextureAtlasLayout(TextureAtlasLayoutAsset {
                 rows,
                 columns,
                 offset_x,
@@ -85,11 +84,8 @@ impl DynamicAsset for CoreDynamicAsset {
                 padding_y,
                 tile_size_x,
                 tile_size_y,
-            }) => texture_atlases
-                .add(TextureAtlas::from_grid(
-                    asset_server
-                        .get_handle(path)
-                        .expect("Invalid asset handle"),
+            }) => texture_atlas_layouts
+                .add(TextureAtlasLayout::from_grid(
                     Vec2::new(tile_size_x, tile_size_y),
                     columns,
                     rows,
