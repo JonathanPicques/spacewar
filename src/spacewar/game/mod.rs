@@ -90,7 +90,7 @@ fn setup(
                 .with_rotation(0.0.to_bevy(Angle::Degrees))
                 .with_translation(Vec3::new(0.0, -30.0, 0.0)),
             PhysicsBody::Fixed,
-            PhysicsCollider { width: 25.0, height: 1.0 },
+            PhysicsCollider { width: 35.0, height: 1.0 },
         ))
         .add_rollback();
     commands
@@ -108,7 +108,7 @@ fn setup(
             Game {},
             Transform::default()
                 .with_rotation(20.0.to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(150.0, -35.0, 0.0)),
+                .with_translation(Vec3::new(150.0, -30.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 5.0, height: 5.0 },
         ))
@@ -118,7 +118,17 @@ fn setup(
             Game {},
             Transform::default()
                 .with_rotation((-20.0).to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(-100.0, -35.0, 0.0)),
+                .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
+            PhysicsBody::Fixed,
+            PhysicsCollider { width: 5.0, height: 5.0 },
+        ))
+        .add_rollback();
+    commands
+        .spawn((
+            Game {},
+            Transform::default()
+                .with_rotation((20.0).to_bevy(Angle::Degrees))
+                .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
             PhysicsBody::Fixed,
             PhysicsCollider { width: 5.0, height: 5.0 },
         ))

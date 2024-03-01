@@ -65,9 +65,10 @@ pub fn player_system(
             (i, InputStatus::Predicted) => i,
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
+        let on_floor = controller.is_on_floor() || (controller.wall.left && controller.wall.right);
         let mut velocity = controller.velocity;
 
-        if input.is_set(INPUT_UP) && controller.is_on_floor() {
+        if input.is_set(INPUT_UP) && on_floor {
             velocity.y = JUMP_STRENGTH;
         }
         if input.is_set(INPUT_LEFT) {
@@ -88,7 +89,7 @@ pub fn player_system(
             velocity.x = compute_deceleration(velocity.x, time.delta_seconds(), DECELERATION);
         }
 
-        if controller.is_on_floor() {
+        if on_floor {
             if !input.is_set(INPUT_UP) {
                 velocity.y = 0.0; // stick to floor
             }

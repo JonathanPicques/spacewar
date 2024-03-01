@@ -89,7 +89,7 @@ impl Physics {
         &mut self,
         body_handle: &PhysicsBodyHandle,
         collider_handle: &PhysicsColliderHandle,
-        physics_controller: &mut PhysicsCharacterController,
+        character_controller: &mut PhysicsCharacterController,
     ) {
         let (movement, collisions) = {
             let body = self
@@ -102,7 +102,7 @@ impl Physics {
                 .expect("Collider not found");
             let position = body.position();
             let collider_shape = collider.shape();
-            let rapier_controller = physics_controller.rapier_controller;
+            let rapier_controller = character_controller.rapier_controller;
 
             let mut collisions = vec![];
             let movement = rapier_controller.move_shape(
@@ -112,7 +112,7 @@ impl Physics {
                 &self.query_pipeline,
                 collider_shape,
                 position,
-                (physics_controller.velocity / self.scale).to_physics(),
+                (character_controller.velocity / self.scale).to_physics(),
                 QueryFilter::default().exclude_rigid_body(body_handle.0),
                 |collision| {
                     collisions.push(collision);
@@ -129,8 +129,7 @@ impl Physics {
         let position = body.position();
 
         body.set_next_kinematic_translation(position.translation.vector + movement.translation);
-        physics_controller.on_floor = movement.grounded;
-        physics_controller.collisions = collisions;
+        character_controller.update_with_movement(movement, collisions);
     }
 }
 
@@ -148,8 +147,12 @@ pub fn physics_system(
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, body_handle, collider_handle, mut controller) in query {
-        physics.move_controller(body_handle, collider_handle, &mut controller);
+    for (_, body_handle, collider_handle, mut character_controller) in query {
+        physics.move_controller(
+            body_handle,
+            collider_handle,
+            &mut character_controller,
+        );
     }
     physics.step();
 }
