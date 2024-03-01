@@ -12,6 +12,7 @@ use bevy_ggrs::{prelude::*, LocalPlayers};
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
 use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::physics::*;
+use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
@@ -83,83 +84,70 @@ fn setup(
             ..default()
         },
     ));
-    commands
-        .spawn((
-            Game {},
-            Transform::default()
-                .with_rotation(0.0.to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(0.0, -30.0, 0.0)),
-            PhysicsBody::Fixed,
-            PhysicsCollider { width: 35.0, height: 1.0 },
-        ))
-        .add_rollback();
-    commands
-        .spawn((
-            Game {},
-            Transform::default()
-                .with_rotation(0.0.to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(150.0, 10.0, 0.0)),
-            PhysicsBody::Fixed,
-            PhysicsCollider { width: 5.0, height: 5.0 },
-        ))
-        .add_rollback();
-    commands
-        .spawn((
-            Game {},
-            Transform::default()
-                .with_rotation(20.0.to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(150.0, -30.0, 0.0)),
-            PhysicsBody::Fixed,
-            PhysicsCollider { width: 5.0, height: 5.0 },
-        ))
-        .add_rollback();
-    commands
-        .spawn((
-            Game {},
-            Transform::default()
-                .with_rotation((-20.0).to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
-            PhysicsBody::Fixed,
-            PhysicsCollider { width: 5.0, height: 5.0 },
-        ))
-        .add_rollback();
-    commands
-        .spawn((
-            Game {},
-            Transform::default()
-                .with_rotation((20.0).to_bevy(Angle::Degrees))
-                .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
-            PhysicsBody::Fixed,
-            PhysicsCollider { width: 5.0, height: 5.0 },
-        ))
-        .add_rollback();
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation(0.0.to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(0.0, -30.0, 0.0)),
+        PhysicsBody::Fixed,
+        PhysicsCollider { width: 35.0, height: 1.0 },
+    ));
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation(0.0.to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(150.0, 10.0, 0.0)),
+        PhysicsBody::Fixed,
+        PhysicsCollider { width: 5.0, height: 5.0 },
+    ));
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation(20.0.to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(150.0, -30.0, 0.0)),
+        PhysicsBody::Fixed,
+        PhysicsCollider { width: 5.0, height: 5.0 },
+    ));
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation((-20.0).to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
+        PhysicsBody::Fixed,
+        PhysicsCollider { width: 5.0, height: 5.0 },
+    ));
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation((20.0).to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
+        PhysicsBody::Fixed,
+        PhysicsCollider { width: 5.0, height: 5.0 },
+    ));
 
     for handle in 0..args.num_players {
-        let transform = Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0));
-        commands
-            .spawn((
-                Game {},
-                Player { handle, ..default() },
-                //
-                PhysicsBody::KinematicPositionBased,
-                PhysicsCollider { width: 0.8, height: 1.8 },
-                PhysicsCharacterController::default(),
-                //
-                SpriteSheetBundle {
-                    sprite: TextureAtlasSprite {
-                        anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
-                        ..default()
-                    },
-                    transform,
-                    texture_atlas: game_assets.player.clone(),
+        commands.spawn_with_rollback((
+            Game {},
+            Player { handle, ..default() },
+            //
+            PhysicsBody::KinematicPositionBased,
+            PhysicsCollider { width: 0.8, height: 1.8 },
+            PhysicsCharacterController::default(),
+            //
+            SpriteSheetBundle {
+                sprite: TextureAtlasSprite {
+                    anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
                     ..default()
                 },
-                SpriteSheetAnimator {
-                    timer: Timer::new(Duration::from_millis(100), TimerMode::Repeating),
-                    animation: game_assets.player_idle_anim.clone(),
-                },
-            ))
-            .add_rollback();
+                transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
+                texture_atlas: game_assets.player.clone(),
+                ..default()
+            },
+            SpriteSheetAnimator {
+                timer: Timer::new(Duration::from_millis(100), TimerMode::Repeating),
+                animation: game_assets.player_idle_anim.clone(),
+            },
+        ));
     }
 }
 

@@ -60,28 +60,28 @@ pub fn compute_acceleration(value: f32, delta: f32, max_speed: f32, acceleration
  * Vectors
  */
 
-pub trait IntoBevyVecExt {
+pub trait ToBevyVecExt {
     fn to_bevy(&self) -> Vec2;
 }
-pub trait IntoPhysicsVecExt {
+pub trait ToPhysicsVecExt {
     fn to_physics(&self) -> Vector<Real>;
 }
 
-impl IntoBevyVecExt for Vector<Real> {
+impl ToBevyVecExt for Vector<Real> {
     /// Creates a [`Vec2`] from this [`Vector`].
     #[inline]
     fn to_bevy(&self) -> Vec2 {
         Vec2::new(self.x, self.y)
     }
 }
-impl IntoBevyVecExt for Isometry<Real> {
+impl ToBevyVecExt for Isometry<Real> {
     /// Creates a [`Vec2`] from this [`Translation`].
     #[inline]
     fn to_bevy(&self) -> Vec2 {
         Vec2::new(self.translation.x, self.translation.y)
     }
 }
-impl IntoBevyVecExt for Translation<Real> {
+impl ToBevyVecExt for Translation<Real> {
     /// Creates a [`Vec2`] from this [`Translation`].
     #[inline]
     fn to_bevy(&self) -> Vec2 {
@@ -89,7 +89,7 @@ impl IntoBevyVecExt for Translation<Real> {
     }
 }
 
-impl IntoPhysicsVecExt for Vec2 {
+impl ToPhysicsVecExt for Vec2 {
     /// Creates a [`Vector`] from this [`Vec2`].
     #[inline]
     fn to_physics(&self) -> Vector<Real> {
@@ -97,7 +97,7 @@ impl IntoPhysicsVecExt for Vec2 {
     }
 }
 
-impl IntoPhysicsVecExt for Vec3 {
+impl ToPhysicsVecExt for Vec3 {
     /// Creates a [`Vector`] from this [`Vec3`].
     #[inline]
     fn to_physics(&self) -> Vector<Real> {
@@ -113,11 +113,11 @@ pub enum Angle {
     Radians,
     Degrees,
 }
-pub trait IntoBevyQuatExt {
+pub trait ToBevyQuatExt {
     fn to_bevy(self, angle: Angle) -> Quat;
 }
 
-impl<T> IntoBevyQuatExt for T
+impl<T> ToBevyQuatExt for T
 where
     T: Into<f32>,
 {
