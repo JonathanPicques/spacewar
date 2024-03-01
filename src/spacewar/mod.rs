@@ -4,7 +4,6 @@ pub mod menu;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
-use bevy_ecs_ldtk::prelude::*;
 use bevy_egui::EguiPlugin;
 use bevy_ggrs::ggrs::Config;
 use bevy_matchbox::matchbox_socket::PeerId;
@@ -64,11 +63,6 @@ pub struct GameAssets {
 
     #[asset(key = "bullet")]
     pub bullet: Handle<Image>,
-
-    #[asset(key = "tileset.texture")]
-    pub tileset_texture: Handle<Image>,
-    #[asset(key = "tileset.project")]
-    pub tileset_project: Handle<LdtkProject>,
 }
 
 #[derive(Debug)]
@@ -103,12 +97,6 @@ pub fn spacewar() {
         .add_plugins(EguiPlugin)
         .add_plugins(DynamicAssetPlugin::new(&["ron"]))
         .init_asset::<SpriteSheetAnimation>()
-        //
-        .add_plugins(LdtkPlugin)
-        .insert_resource(LdtkSettings {
-            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation { load_level_neighbors: false },
-            ..default()
-        })
         //
         .insert_resource(args)
         //

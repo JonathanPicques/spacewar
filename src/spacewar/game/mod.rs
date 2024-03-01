@@ -4,19 +4,17 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
-use bevy_ecs_ldtk::{LdtkWorldBundle, LevelIid};
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
-use crate::core::levels::{load_levels_system, LoadedLevels};
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::game::player::input::input_system;
-use crate::spacewar::game::player::{player_level_follow_system, player_system, Player};
+use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
 
@@ -41,9 +39,7 @@ impl AddGameAppExt for App {
                 GgrsSchedule,
                 ((
                     player_system,
-                    player_level_follow_system,
                     //
-                    load_levels_system,
                     sprite_sheet_animator_system,
                     //
                     physics_create_handles_system,
@@ -66,9 +62,6 @@ fn setup(
     game_assets: Res<GameAssets>,
 ) {
     commands.insert_resource(Physics::default());
-    commands.insert_resource(LoadedLevels::new(LevelIid::new(
-        "a2a50ff0-66b0-11ec-9cd7-c721746049b9",
-    )));
 
     commands.spawn((
         Game {},
@@ -77,13 +70,7 @@ fn setup(
             ..default()
         },
     ));
-    commands.spawn((
-        Game {},
-        LdtkWorldBundle {
-            ldtk_handle: game_assets.tileset_project.clone(),
-            ..default()
-        },
-    ));
+
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
@@ -182,7 +169,6 @@ fn cleanup(
     query: Query<Entity, With<Game>>,
 ) {
     commands.remove_resource::<Physics>();
-    commands.remove_resource::<LoadedLevels>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
 

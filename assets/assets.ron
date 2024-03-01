@@ -51,19 +51,4 @@
             )
         ),
     ),
-    //
-    "tileset.texture": Asset (
-        Image (
-            ImageAsset (
-                path: "tilesets/tileset.png",
-            )
-        ),
-    ),
-    "tileset.project": Asset (
-        LdtkProject (
-            LdtkProjectAsset (
-                path: "tilesets/tileset.ldtk",
-            )
-        ),
-    ),
 })

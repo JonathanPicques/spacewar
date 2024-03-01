@@ -893,37 +893,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_ecs_ldtk"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "834276ae2204268fc26aa43cdc7b53b4432520975fc090dc8b6d711e52da268c"
-dependencies = [
- "bevy",
- "bevy_ecs_ldtk_macros",
- "bevy_ecs_tilemap",
- "derive-getters",
- "derive_more",
- "hex",
- "paste",
- "path-clean",
- "regex",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "bevy_ecs_ldtk_macros"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64a5e99aa79110c76277025c0b077822871303fa51712332e818bb004ce3b873"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "bevy_ecs_macros"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -933,17 +902,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.51",
-]
-
-[[package]]
-name = "bevy_ecs_tilemap"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "767e622c07330b7581b109f232690ae5ccf18a91aa6b01d19beaeb20ddf797bc"
-dependencies = [
- "bevy",
- "log",
- "regex",
 ]
 
 [[package]]
@@ -2214,17 +2172,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "derive-getters"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a2c35ab6e03642397cdda1dd58abbc05d418aef8e36297f336d5aba060fe8df"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "derive_more"
 version = "0.99.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2747,8 +2694,6 @@ dependencies = [
  "bevy",
  "bevy_asset_loader",
  "bevy_common_assets 0.9.0",
- "bevy_ecs_ldtk",
- "bevy_ecs_tilemap",
  "bevy_egui",
  "bevy_ggrs",
  "bevy_matchbox",
@@ -4199,12 +4144,6 @@ name = "paste"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
-
-[[package]]
-name = "path-clean"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17359afc20d7ab31fdb42bb844c8b3bb1dabd7dcf7e68428492da7f16966fcef"
 
 [[package]]
 name = "path-slash"

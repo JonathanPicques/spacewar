@@ -1,6 +1,5 @@
 pub mod anim;
 pub mod input;
-pub mod levels;
 pub mod loader;
 pub mod physics;
 pub mod utilities;
@@ -11,7 +10,6 @@ use bevy_ggrs::prelude::*;
 
 use crate::core::body::PhysicsBodyHandle;
 use crate::core::collider::PhysicsColliderHandle;
-use crate::core::levels::LoadedLevels;
 use crate::core::physics::*;
 use crate::core::utilities::hash::transform_hasher;
 
@@ -31,10 +29,8 @@ impl AddCoreAppExt for App {
             //
             .set_rollback_schedule_fps(fps)
             //
-            .checksum_resource_with_hash::<LoadedLevels>()
             .checksum_component::<Transform>(transform_hasher)
             //
-            .rollback_resource_with_clone::<LoadedLevels>()
             .rollback_resource_with_clone::<Physics>()
             //
             .rollback_component_with_clone::<Transform>()
