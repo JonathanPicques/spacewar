@@ -8,7 +8,7 @@ pub const INPUT_UP: u8 = 1 << 1;
 pub const INPUT_DOWN: u8 = 1 << 2;
 pub const INPUT_LEFT: u8 = 1 << 3;
 pub const INPUT_RIGHT: u8 = 1 << 4;
-pub const INPUT_JUMP: u8 = 1 << 5;
+pub const INPUT_SHOOT: u8 = 1 << 5;
 
 pub fn input_system(
     mut commands: Commands,
@@ -39,8 +39,8 @@ pub fn input_system(
             if keyboard_input.pressed(KeyCode::Right) {
                 input.set(INPUT_RIGHT);
             }
-            if keyboard_input.pressed(KeyCode::Numpad0) {
-                input.set(INPUT_JUMP);
+            if keyboard_input.pressed(KeyCode::ControlRight) {
+                input.set(INPUT_SHOOT);
             }
         } else {
             if keyboard_input.pressed(KeyCode::Z) {
@@ -55,8 +55,8 @@ pub fn input_system(
             if keyboard_input.pressed(KeyCode::D) {
                 input.set(INPUT_RIGHT);
             }
-            if keyboard_input.pressed(KeyCode::Space) {
-                input.set(INPUT_JUMP);
+            if keyboard_input.pressed(KeyCode::E) {
+                input.set(INPUT_SHOOT);
             }
         }
 

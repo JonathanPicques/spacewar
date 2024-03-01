@@ -15,7 +15,7 @@ use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::maths::*;
 use crate::spacewar::conf::{GameAssets, GameConfig};
-use crate::spacewar::game::player::input::{INPUT_JUMP, INPUT_LEFT, INPUT_RIGHT};
+use crate::spacewar::game::player::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
 
 const MAX_SPEED: f32 = 2.0;
 const ACCELERATION: f32 = 7.0;
@@ -67,7 +67,7 @@ pub fn player_system(
         };
         let mut velocity = controller.velocity;
 
-        if input.is_set(INPUT_JUMP) && controller.is_on_floor() {
+        if input.is_set(INPUT_UP) && controller.is_on_floor() {
             velocity.y = JUMP_STRENGTH;
         }
         if input.is_set(INPUT_LEFT) {
@@ -89,7 +89,7 @@ pub fn player_system(
         }
 
         if controller.is_on_floor() {
-            if !input.is_set(INPUT_JUMP) {
+            if !input.is_set(INPUT_UP) {
                 velocity.y = 0.0; // stick to floor
             }
             if velocity.x != 0.0 {
