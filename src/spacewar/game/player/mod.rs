@@ -14,8 +14,8 @@ use crate::core::levels::{find_levels_around_positions, LoadNeighbours, LoadedLe
 use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::maths::*;
-use crate::spacewar::conf::{GameAssets, GameConfig};
 use crate::spacewar::game::player::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
+use crate::spacewar::{GameAssets, GameConfig};
 
 const MAX_SPEED: f32 = 2.0;
 const ACCELERATION: f32 = 7.0;

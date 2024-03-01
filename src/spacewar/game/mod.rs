@@ -15,10 +15,10 @@ use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
-use crate::spacewar::conf::{GameArgs, GameAssets, GameConfig, State};
 use crate::spacewar::game::player::input::input_system;
 use crate::spacewar::game::player::{player_level_follow_system, player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
+use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;

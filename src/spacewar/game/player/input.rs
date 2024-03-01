@@ -2,7 +2,7 @@ use bevy::{prelude::*, utils::HashMap};
 use bevy_ggrs::{LocalInputs, LocalPlayers};
 
 use crate::core::input::CoreInput;
-use crate::spacewar::conf::{GameArgs, GameConfig};
+use crate::spacewar::{GameArgs, GameConfig};
 
 pub const INPUT_UP: u8 = 1 << 1;
 pub const INPUT_DOWN: u8 = 1 << 2;
