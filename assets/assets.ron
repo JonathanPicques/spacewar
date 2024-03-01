@@ -44,6 +44,14 @@
         )
     ),
     //
+    "bullet": Asset (
+        Image (
+            ImageAsset (
+                path: "sprites/bullet.png",
+            )
+        ),
+    ),
+    //
     "tileset.texture": Asset (
         Image (
             ImageAsset (

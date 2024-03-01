@@ -50,6 +50,9 @@ pub struct GameAssets {
     #[asset(key = "player_anim.jump")]
     pub player_jump_anim: Handle<SpriteSheetAnimation>,
 
+    #[asset(key = "bullet")]
+    pub bullet: Handle<Image>,
+
     #[asset(key = "tileset.texture")]
     pub tileset_texture: Handle<Image>,
     #[asset(key = "tileset.project")]
