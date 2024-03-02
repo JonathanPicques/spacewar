@@ -41,10 +41,10 @@ pub struct GameArgs {
     pub num_players: usize,
     #[clap(long, default_value = "2")]
     pub input_delay: usize,
-    #[clap(long, default_value = "2")]
-    pub max_prediction: usize,
     #[clap(long, default_value = "0")]
     pub check_distance: usize,
+    #[clap(long, default_value = "2")]
+    pub max_prediction: usize,
 
     #[clap(long, default_value = "false")]
     pub randomize_input: bool,
