@@ -1,19 +1,18 @@
 use bevy::prelude::*;
 use rapier2d::prelude::*;
 
-#[derive(Clone, Default, Component)]
-pub struct PhysicsCollider {
-    pub width: f32,
-    pub height: f32,
+#[derive(Clone, Component)]
+pub enum PhysicsCollider {
+    Cuboid { width: f32, height: f32 },
 }
 
 #[derive(Clone, Component)]
-pub struct PhysicsColliderHandle(pub(crate) ColliderHandle);
+pub(crate) struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {
     pub(crate) fn build(&self) -> Collider {
-        ColliderBuilder::cuboid(self.width, self.height)
-            .restitution(0.7)
-            .build()
+        match self {
+            Self::Cuboid { width, height } => ColliderBuilder::cuboid(*width, *height).build(),
+        }
     }
 }

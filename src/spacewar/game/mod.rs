@@ -75,7 +75,7 @@ fn setup(
             .with_rotation(0.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(0.0, -30.0, 0.0)),
         PhysicsBody::Fixed,
-        PhysicsCollider { width: 35.0, height: 1.0 },
+        PhysicsCollider::Cuboid { width: 35.0, height: 1.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -83,7 +83,7 @@ fn setup(
             .with_rotation(0.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(150.0, 10.0, 0.0)),
         PhysicsBody::Fixed,
-        PhysicsCollider { width: 5.0, height: 5.0 },
+        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -91,7 +91,7 @@ fn setup(
             .with_rotation(20.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(150.0, -30.0, 0.0)),
         PhysicsBody::Fixed,
-        PhysicsCollider { width: 5.0, height: 5.0 },
+        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -99,7 +99,7 @@ fn setup(
             .with_rotation((-20.0).to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
         PhysicsBody::Fixed,
-        PhysicsCollider { width: 5.0, height: 5.0 },
+        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -107,7 +107,7 @@ fn setup(
             .with_rotation((20.0).to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
         PhysicsBody::Fixed,
-        PhysicsCollider { width: 5.0, height: 5.0 },
+        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
 
     for handle in 0..args.num_players {
@@ -116,7 +116,7 @@ fn setup(
             Player { handle, ..default() },
             //
             PhysicsBody::KinematicPositionBased,
-            PhysicsCollider { width: 0.8, height: 1.8 },
+            PhysicsCollider::Cuboid { width: 0.8, height: 1.8 },
             PhysicsCharacterController::default(),
             //
             SpriteSheetBundle {

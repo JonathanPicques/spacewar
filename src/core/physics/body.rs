@@ -13,7 +13,7 @@ pub enum PhysicsBody {
 }
 
 #[derive(Clone, Component)]
-pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
+pub(crate) struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
     pub(crate) fn build(&self, physics: &Physics, transform: &Transform) -> RigidBody {
