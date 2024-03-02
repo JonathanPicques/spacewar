@@ -9,6 +9,8 @@ use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
+use crate::core::physics::body::PhysicsBodyOptions;
+use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
@@ -108,6 +110,18 @@ fn setup(
             .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
+    ));
+
+    commands.spawn_with_rollback((
+        Game {},
+        Transform::default()
+            .with_rotation((20.0).to_bevy(Angle::Degrees))
+            .with_translation(Vec3::new(0.0, 55.0, 0.0)),
+        PhysicsBody::Dynamic,
+        PhysicsBodyOptions { gravity_scale: 1.0, ..default() },
+        //
+        PhysicsCollider::Cuboid { width: 1.0, height: 1.0 },
+        PhysicsColliderOptions { restitution: 1.0, ..default() },
     ));
 
     for handle in 0..args.num_players {

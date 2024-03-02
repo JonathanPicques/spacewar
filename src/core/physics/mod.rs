@@ -8,6 +8,8 @@ use bevy_ggrs::{Rollback, RollbackOrdered};
 use rapier2d::math::Real;
 use rapier2d::prelude::*;
 
+use crate::core::body::PhysicsBodyOptions;
+use crate::core::collider::PhysicsColliderOptions;
 use crate::core::physics::body::PhysicsBodyHandle;
 use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::utilities::cmp::cmp_rollack;
@@ -136,6 +138,8 @@ impl Physics {
 
 //
 
+type Upserted<T> = Or<(Added<T>, Changed<T>)>;
+
 #[allow(clippy::type_complexity)]
 fn physics_system(
     mut query: Query<(
@@ -175,6 +179,57 @@ fn physics_sync_system(
         if let Some(body) = physics.bodies.get(body.0) {
             transform.translation = (body.position().to_bevy() * physics.scale).extend(transform.translation.z);
         }
+    }
+}
+
+#[allow(clippy::type_complexity)]
+fn physics_update_system(
+    body_query: Query<
+        (
+            &Rollback,
+            &PhysicsBody,
+            &PhysicsBodyHandle,
+            &PhysicsBodyOptions,
+        ),
+        Upserted<PhysicsBodyOptions>,
+    >,
+    collider_query: Query<
+        (
+            &Rollback,
+            &PhysicsCollider,
+            &PhysicsColliderHandle,
+            &PhysicsColliderOptions,
+        ),
+        Upserted<PhysicsColliderOptions>,
+    >,
+    //
+    order: Res<RollbackOrdered>,
+    mut physics: ResMut<Physics>,
+) {
+    let mut body_query = body_query.iter().collect::<Vec<_>>();
+    let mut collider_query = collider_query.iter().collect::<Vec<_>>();
+
+    body_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    collider_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (_, body, body_handle, body_options) in body_query {
+        body.apply_options(
+            physics
+                .bodies
+                .get_mut(body_handle.0)
+                .expect("Body not found"),
+            body_options,
+            true,
+        );
+    }
+    for (_, collider, collider_handle, collider_options) in collider_query {
+        collider.apply_options(
+            physics
+                .colliders
+                .get_mut(collider_handle.0)
+                .expect("Collider not found"),
+            collider_options,
+        );
     }
 }
 
@@ -231,9 +286,10 @@ fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
 
 pub fn physics_systems() -> SystemConfigs {
     (
-        physics_system.after(physics_sync_system),
-        physics_sync_system.after(physics_create_handles_system),
         physics_create_handles_system,
+        physics_update_system.after(physics_create_handles_system),
+        physics_sync_system.after(physics_update_system),
+        physics_system.after(physics_sync_system),
     )
         .into_configs()
 }
