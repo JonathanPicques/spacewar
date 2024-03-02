@@ -21,11 +21,10 @@ impl AddOnlineMenuAppExt for App {
     }
 }
 
-fn setup(mut commands: Commands, args: Res<GameArgs>) {
+fn setup(mut commands: Commands, game_args: Res<GameArgs>) {
     let room_url = format!(
-        "ws://192.168.1.50:3536/lobby?next={}",
-        // "ws://127.0.0.1:3536/lobby?next={}",
-        args.num_players
+        "{}/lobby?next={}",
+        game_args.matchbox_address, game_args.num_players
     );
 
     commands.insert_resource(MatchboxSocket::new_ggrs(room_url));
@@ -35,7 +34,7 @@ fn update(
     mut commands: Commands,
     mut contexts: EguiContexts,
     //
-    args: Res<GameArgs>,
+    game_args: Res<GameArgs>,
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
     mut next_state: ResMut<NextState<State>>,
 ) {
@@ -53,7 +52,7 @@ fn update(
         }
         ui.label(format!(
             "Waiting for {} other players...",
-            args.num_players - socket.players().len()
+            game_args.num_players - socket.players().len()
         ));
         for player in socket.players().iter() {
             match player {
@@ -68,14 +67,14 @@ fn update(
         }
     });
 
-    if socket.players().len() >= args.num_players {
+    if socket.players().len() >= game_args.num_players {
         let mut session_builder = SessionBuilder::<GameConfig>::new()
-            .with_fps(args.fps)
+            .with_fps(game_args.fps)
             .expect("Invalid FPS")
-            .with_max_prediction_window(args.max_prediction)
+            .with_max_prediction_window(game_args.max_prediction)
             .expect("Invalid max prediction window")
-            .with_num_players(args.num_players)
-            .with_input_delay(args.input_delay);
+            .with_num_players(game_args.num_players)
+            .with_input_delay(game_args.input_delay);
 
         let mut handles = Vec::new();
         for (i, player_type) in socket.players().iter().enumerate() {

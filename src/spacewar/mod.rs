@@ -45,9 +45,10 @@ pub struct GameArgs {
     pub check_distance: usize,
     #[clap(long, default_value = "2")]
     pub max_prediction: usize,
-
     #[clap(long, default_value = "false")]
     pub randomize_input: bool,
+    #[clap(long, default_value = "ws://127.0.0.1:3536")]
+    pub matchbox_address: String,
 }
 
 #[derive(Resource, AssetCollection)]

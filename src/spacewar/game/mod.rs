@@ -58,7 +58,7 @@ pub struct Game {}
 fn setup(
     mut commands: Commands,
     //
-    args: Res<GameArgs>,
+    game_args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
     commands.insert_resource(Physics::default());
@@ -124,7 +124,7 @@ fn setup(
         PhysicsColliderOptions { restitution: 1.0, ..default() },
     ));
 
-    for handle in 0..args.num_players {
+    for handle in 0..game_args.num_players {
         commands.spawn_with_rollback((
             Game {},
             Player { handle, ..default() },

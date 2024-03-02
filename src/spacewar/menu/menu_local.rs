@@ -23,19 +23,19 @@ fn setup() {}
 fn update(
     mut commands: Commands,
     //
-    args: Res<GameArgs>,
+    game_args: Res<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
 ) {
     let mut session_builder = SessionBuilder::<GameConfig>::new()
-        .with_fps(args.fps)
+        .with_fps(game_args.fps)
         .expect("Invalid FPS")
-        .with_max_prediction_window(args.max_prediction)
+        .with_max_prediction_window(game_args.max_prediction)
         .expect("Invalid prediction window")
-        .with_num_players(args.num_players)
-        .with_input_delay(args.input_delay)
-        .with_check_distance(args.check_distance);
+        .with_num_players(game_args.num_players)
+        .with_input_delay(game_args.input_delay)
+        .with_check_distance(game_args.check_distance);
 
-    for handle in 0..args.num_players {
+    for handle in 0..game_args.num_players {
         session_builder = session_builder
             .add_player(PlayerType::Local, handle)
             .expect("Could not add local player");
@@ -49,7 +49,7 @@ fn update(
         &mut commands,
         &mut next_state,
         Session::SyncTest(session),
-        LocalPlayers((0..args.num_players).collect()),
+        LocalPlayers((0..game_args.num_players).collect()),
     );
 }
 

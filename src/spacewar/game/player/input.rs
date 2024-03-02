@@ -13,7 +13,7 @@ pub const INPUT_SHOOT: u8 = 1 << 5;
 pub fn input_system(
     mut commands: Commands,
     //
-    game_ars: Res<GameArgs>,
+    game_args: Res<GameArgs>,
     local_players: Res<LocalPlayers>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
@@ -24,7 +24,7 @@ pub fn input_system(
         let local = local_players.len() > 1;
         let mut input = CoreInput::default();
 
-        if game_ars.randomize_input {
+        if game_args.randomize_input {
             input.set(Box::into_raw(Box::new(0xDEAD)) as u8);
         } else if !local || *handle == 0 {
             if keyboard_input.pressed(KeyCode::ArrowUp) {
