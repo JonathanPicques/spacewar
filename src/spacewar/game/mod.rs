@@ -31,7 +31,7 @@ impl AddGameAppExt for App {
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(
                 Update,
-                (update, physics_debug_system).run_if(in_state(State::Game)),
+                (update, physics_debug_systems()).run_if(in_state(State::Game)),
             )
             .add_systems(OnExit(State::Game), cleanup)
             //
@@ -42,9 +42,7 @@ impl AddGameAppExt for App {
                     //
                     sprite_sheet_animator_system,
                     //
-                    physics_create_handles_system,
-                    physics_system,
-                    physics_sync_system,
+                    physics_systems(),
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),

@@ -2,6 +2,7 @@ pub mod body;
 pub mod collider;
 pub mod controller;
 
+use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
 use bevy_ggrs::{Rollback, RollbackOrdered};
 use rapier2d::math::Real;
@@ -133,7 +134,10 @@ impl Physics {
     }
 }
 
-pub fn physics_system(
+//
+
+#[allow(clippy::type_complexity)]
+fn physics_system(
     mut query: Query<(
         &Rollback,
         &PhysicsBodyHandle,
@@ -157,7 +161,8 @@ pub fn physics_system(
     physics.step();
 }
 
-pub fn physics_sync_system(
+#[allow(clippy::type_complexity)]
+fn physics_sync_system(
     mut query: Query<(&Rollback, &PhysicsBodyHandle, &mut Transform)>,
     //
     order: Res<RollbackOrdered>,
@@ -173,21 +178,8 @@ pub fn physics_sync_system(
     }
 }
 
-pub fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
-    for (_, collider) in physics.colliders.iter() {
-        if let Some(cuboid) = collider.shape().as_cuboid() {
-            gizmos.rect_2d(
-                collider.translation().to_bevy() * physics.scale,
-                collider.rotation().angle(),
-                cuboid.half_extents.to_bevy() * 2.0 * physics.scale,
-                Color::GREEN,
-            );
-        }
-    }
-}
-
 #[allow(clippy::type_complexity)]
-pub fn physics_create_handles_system(
+fn physics_create_handles_system(
     query: Query<
         (
             Entity,
@@ -217,4 +209,35 @@ pub fn physics_create_handles_system(
             PhysicsColliderHandle(collider_handle),
         ));
     }
+}
+
+//
+
+#[allow(clippy::type_complexity)]
+fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
+    for (_, collider) in physics.colliders.iter() {
+        if let Some(cuboid) = collider.shape().as_cuboid() {
+            gizmos.rect_2d(
+                collider.translation().to_bevy() * physics.scale,
+                collider.rotation().angle(),
+                cuboid.half_extents.to_bevy() * 2.0 * physics.scale,
+                Color::GREEN,
+            );
+        }
+    }
+}
+
+//
+
+pub fn physics_systems() -> SystemConfigs {
+    (
+        physics_system.after(physics_sync_system),
+        physics_sync_system.after(physics_create_handles_system),
+        physics_create_handles_system,
+    )
+        .into_configs()
+}
+
+pub fn physics_debug_systems() -> SystemConfigs {
+    physics_debug_system.into_configs()
 }
