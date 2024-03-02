@@ -8,6 +8,7 @@ use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
 
 use crate::core::anim::SpriteSheetAnimator;
+use crate::core::clock::Clock;
 use crate::core::input::CoreInput;
 use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
@@ -31,10 +32,11 @@ pub enum Direction {
     Right,
 }
 
-#[derive(Eq, Ord, Hash, Clone, PartialEq, PartialOrd, Default, Component)]
+#[derive(Hash, Clone, Default, Component)]
 pub struct Player {
     pub handle: usize,
     pub direction: Direction,
+    pub shoot_clock: Clock,
 }
 
 pub fn player_system(

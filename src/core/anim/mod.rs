@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 use bevy_ggrs::GgrsTime;
 
-#[derive(Default, Component)]
+use crate::core::clock::Clock;
+
+#[derive(Hash, Clone, Default, Component)]
 pub struct SpriteSheetAnimator {
-    pub timer: Timer,
+    pub clock: Clock,
     pub animation: Handle<SpriteSheetAnimation>,
 }
 
@@ -24,15 +26,15 @@ pub fn sprite_sheet_animator_system(
             .get(animator.animation.id())
             .expect("Animation not found");
 
-        animator.timer.tick(time.delta());
-        if animator.timer.finished() {
+        animator.clock.tick(time.delta());
+        if animator.clock.finished() {
             if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
                 atlas.index = animation.start;
             } else {
                 atlas.index += 1;
             }
 
-            animator.timer.reset();
+            animator.clock.reset();
         }
     }
 }

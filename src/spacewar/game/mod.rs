@@ -9,6 +9,7 @@ use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
+use crate::core::clock::Clock;
 use crate::core::physics::body::PhysicsBodyOptions;
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
@@ -147,7 +148,7 @@ fn setup(
                 ..default()
             },
             SpriteSheetAnimator {
-                timer: Timer::new(Duration::from_millis(100), TimerMode::Repeating),
+                clock: Clock::new(Duration::from_millis(100)),
                 animation: game_assets.player_idle_anim.clone(),
             },
         ));
