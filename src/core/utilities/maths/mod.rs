@@ -2,6 +2,7 @@ use bevy::math::{Quat, Vec2, Vec3};
 use rapier2d::prelude::*;
 
 /// Returns the absolute value of a floating point number.
+#[inline(always)]
 pub fn abs(value: f32) -> f32 {
     if value < 0.0 {
         -value
@@ -11,11 +12,13 @@ pub fn abs(value: f32) -> f32 {
 }
 
 /// Linearly interpolates between two values by a delta amount.
+#[inline(always)]
 pub fn lerp(from: f32, to: f32, delta: f32) -> f32 {
     from * (1.0 - delta) + to * delta
 }
 
 /// Returns the sign of a floating point number.
+#[inline(always)]
 pub fn sign(value: f32) -> f32 {
     if value < 0.0 {
         -1.0
@@ -27,6 +30,7 @@ pub fn sign(value: f32) -> f32 {
 }
 
 /// Clamps a value within a specified range.
+#[inline(always)]
 pub fn clamp(value: f32, min: f32, max: f32) -> f32 {
     if value < min {
         min
@@ -38,6 +42,7 @@ pub fn clamp(value: f32, min: f32, max: f32) -> f32 {
 }
 
 /// Moves a value towards another value by a specified delta.
+#[inline(always)]
 pub fn move_towards(from: f32, to: f32, delta: f32) -> f32 {
     if abs(to - from) <= delta {
         to
@@ -47,11 +52,13 @@ pub fn move_towards(from: f32, to: f32, delta: f32) -> f32 {
 }
 
 /// Computes the deceleration of a value over time.
+#[inline(always)]
 pub fn compute_deceleration(value: f32, delta: f32, deceleration: f32) -> f32 {
     move_towards(value, 0.0, deceleration * delta)
 }
 
 /// Computes the acceleration of a value over time.
+#[inline(always)]
 pub fn compute_acceleration(value: f32, delta: f32, max_speed: f32, acceleration: f32) -> f32 {
     move_towards(value, max_speed, acceleration * delta)
 }
@@ -69,21 +76,21 @@ pub trait ToPhysicsVecExt {
 
 impl ToBevyVecExt for Vector<Real> {
     /// Creates a [`Vec2`] from this [`Vector`].
-    #[inline]
+    #[inline(always)]
     fn to_bevy(&self) -> Vec2 {
         Vec2::new(self.x, self.y)
     }
 }
 impl ToBevyVecExt for Isometry<Real> {
     /// Creates a [`Vec2`] from this [`Translation`].
-    #[inline]
+    #[inline(always)]
     fn to_bevy(&self) -> Vec2 {
         Vec2::new(self.translation.x, self.translation.y)
     }
 }
 impl ToBevyVecExt for Translation<Real> {
     /// Creates a [`Vec2`] from this [`Translation`].
-    #[inline]
+    #[inline(always)]
     fn to_bevy(&self) -> Vec2 {
         Vec2::new(self.x, self.y)
     }
@@ -91,7 +98,7 @@ impl ToBevyVecExt for Translation<Real> {
 
 impl ToPhysicsVecExt for Vec2 {
     /// Creates a [`Vector`] from this [`Vec2`].
-    #[inline]
+    #[inline(always)]
     fn to_physics(&self) -> Vector<Real> {
         vector![self.x, self.y]
     }
@@ -99,7 +106,7 @@ impl ToPhysicsVecExt for Vec2 {
 
 impl ToPhysicsVecExt for Vec3 {
     /// Creates a [`Vector`] from this [`Vec3`].
-    #[inline]
+    #[inline(always)]
     fn to_physics(&self) -> Vector<Real> {
         vector![self.x, self.y]
     }
@@ -122,7 +129,7 @@ where
     T: Into<f32>,
 {
     /// Creates a [`Quat`] from this [`f32`].
-    #[inline]
+    #[inline(always)]
     fn to_bevy(self, angle: Angle) -> Quat {
         Quat::from_rotation_z(match angle {
             Angle::Radians => self.into(),
