@@ -15,16 +15,43 @@
         "id": "game"
       },
       "type": "shell",
+      "label": "Run",
+      "command": "cargo run",
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Run local",
+      "command": "cargo run -- --local",
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Run online",
+      "command": "cargo run -- --online",
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
       "label": "Run synctest",
-      "command": "cargo run -- --num-players 4 --input-delay 0 --check-distance 10 --max-prediction 20 --randomize-input",
+      "command": "cargo run -- --local --num-players 4 --input-delay 0 --check-distance 10 --max-prediction 20 --randomize-input",
       "problemMatcher": []
     },
     //
     {
       "hide": true,
       "type": "shell",
-      "label": "Cargo run 1",
-      "command": "cargo run",
+      "label": "Run online (1)",
+      "command": "cargo run -- --online --num-players 2",
       "problemMatcher": [
         "$rustc"
       ]
@@ -32,8 +59,8 @@
     {
       "hide": true,
       "type": "shell",
-      "label": "Cargo run 2",
-      "command": "cargo run",
+      "label": "Run online (2)",
+      "command": "cargo run -- --online --num-players 2",
       "problemMatcher": [
         "$rustc"
       ]
@@ -41,8 +68,8 @@
     {
       "hide": true,
       "type": "shell",
-      "label": "Cargo watch 1",
-      "command": "cargo watch -c -x run",
+      "label": "Watch online (1)",
+      "command": "cargo watch -c -x run -- --online --num-players 2",
       "problemMatcher": [
         "$rustc"
       ]
@@ -50,8 +77,8 @@
     {
       "hide": true,
       "type": "shell",
-      "label": "Cargo watch 2",
-      "command": "cargo watch -c -x run",
+      "label": "Watch online (2)",
+      "command": "cargo watch -c -x run -- --online --num-players 2",
       "problemMatcher": [
         "$rustc"
       ]
@@ -61,11 +88,11 @@
       "icon": {
         "id": "game"
       },
-      "label": "Run",
+      "label": "Run two with matchbox",
       "dependsOn": [
         "Matchbox Server",
-        "Cargo run 1",
-        "Cargo run 2"
+        "Run online (1)",
+        "Run online (2)"
       ],
       "problemMatcher": []
     },
@@ -73,11 +100,11 @@
       "icon": {
         "id": "game"
       },
-      "label": "Watch",
+      "label": "Watch two with matchbox",
       "dependsOn": [
         "Matchbox Server",
-        "Cargo watch 1",
-        "Cargo watch 2"
+        "Watch online (1)",
+        "Watch online (2)"
       ],
       "problemMatcher": []
     }

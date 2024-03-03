@@ -33,10 +33,13 @@ pub enum State {
 
 #[derive(Parser, Resource)]
 pub struct GameArgs {
-    #[clap(long, default_value = "60")]
-    pub fps: usize,
     #[clap(long, default_value = "false")]
     pub local: bool,
+    #[clap(long, default_value = "false")]
+    pub online: bool,
+
+    #[clap(long, default_value = "60")]
+    pub fps: usize,
     #[clap(long, default_value = "2")]
     pub num_players: usize,
     #[clap(long, default_value = "2")]

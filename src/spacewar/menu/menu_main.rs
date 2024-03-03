@@ -18,20 +18,26 @@ impl AddMainMenuAppExt for App {
     }
 }
 
-fn setup() {}
+fn setup(mut args: ResMut<GameArgs>, mut next_state: ResMut<NextState<State>>) {
+    if args.local {
+        args.local = false;
+        goto_local_menu(&mut next_state);
+    }
+    if args.online {
+        args.online = false;
+        goto_online_menu(&mut next_state);
+    }
+}
 
 fn update(
     mut contexts: EguiContexts,
     //
-    mut args: ResMut<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
 ) {
     egui::panel::CentralPanel::default().show(contexts.ctx_mut(), |ui| {
         if ui.button("Local").clicked() {
-            args.local = true;
             goto_local_menu(&mut next_state);
         } else if ui.button("Online").clicked() {
-            args.local = false;
             goto_online_menu(&mut next_state);
         }
     });
