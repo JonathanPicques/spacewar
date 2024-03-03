@@ -2,6 +2,8 @@ pub mod body;
 pub mod collider;
 pub mod controller;
 
+use std::collections::HashMap;
+
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
 use bevy_ggrs::{Rollback, RollbackOrdered};
@@ -24,16 +26,19 @@ pub struct Physics {
     pub scale: f32,
     pub gravity: Vector<Real>,
     //
-    pub bodies: RigidBodySet,
-    pub colliders: ColliderSet,
-    pub ccd_solver: CCDSolver,
-    pub broad_phase: BroadPhase,
-    pub narrow_phase: NarrowPhase,
-    pub query_pipeline: QueryPipeline,
-    pub island_manager: IslandManager,
-    pub impulse_joints: ImpulseJointSet,
-    pub multibody_joints: MultibodyJointSet,
-    pub integration_parameters: IntegrationParameters,
+    pub(crate) bodies: RigidBodySet,
+    pub(crate) colliders: ColliderSet,
+    pub(crate) ccd_solver: CCDSolver,
+    pub(crate) broad_phase: BroadPhase,
+    pub(crate) narrow_phase: NarrowPhase,
+    pub(crate) query_pipeline: QueryPipeline,
+    pub(crate) island_manager: IslandManager,
+    pub(crate) impulse_joints: ImpulseJointSet,
+    pub(crate) multibody_joints: MultibodyJointSet,
+    pub(crate) integration_parameters: IntegrationParameters,
+    //
+    pub(crate) body_handles_by_entity: HashMap<Entity, RigidBodyHandle>,
+    pub(crate) collider_handles_by_entity: HashMap<Entity, ColliderHandle>,
 }
 
 impl Default for Physics {
@@ -41,7 +46,9 @@ impl Default for Physics {
         Self {
             scale: 9.0,
             gravity: vector![0.0, -9.81],
-            integration_parameters: default(),
+            //
+            body_handles_by_entity: default(),
+            collider_handles_by_entity: default(),
             //
             bodies: default(),
             colliders: default(),
@@ -52,6 +59,7 @@ impl Default for Physics {
             island_manager: default(),
             impulse_joints: default(),
             multibody_joints: default(),
+            integration_parameters: default(),
         }
     }
 }
@@ -79,6 +87,8 @@ impl Physics {
         );
     }
 
+    //
+
     pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
         let body_handle = self.bodies.insert(body.build(self, transform));
         let collider_handle = self
@@ -87,6 +97,32 @@ impl Physics {
 
         (body_handle, collider_handle)
     }
+
+    pub(crate) fn remove_body(&mut self, body_handle: RigidBodyHandle) {
+        self.bodies
+            .remove(
+                body_handle,
+                &mut self.island_manager,
+                &mut self.colliders,
+                &mut self.impulse_joints,
+                &mut self.multibody_joints,
+                false,
+            )
+            .expect("Body was not removed");
+    }
+
+    pub(crate) fn remove_collider(&mut self, collider_handle: ColliderHandle) {
+        self.colliders
+            .remove(
+                collider_handle,
+                &mut self.island_manager,
+                &mut self.bodies,
+                false,
+            )
+            .expect("Collider was not removed");
+    }
+
+    //
 
     pub(crate) fn move_controller(
         &mut self,
@@ -279,10 +315,41 @@ fn physics_create_handles_system(
     for (e, _, transform, body, collider) in query {
         let (body_handle, collider_handle) = physics.insert_body(body, collider, transform);
 
+        physics
+            .body_handles_by_entity
+            .insert(e, body_handle);
+        physics
+            .collider_handles_by_entity
+            .insert(e, collider_handle);
         commands.entity(e).insert((
             PhysicsBodyHandle(body_handle),
             PhysicsColliderHandle(collider_handle),
         ));
+    }
+}
+
+#[allow(clippy::type_complexity)]
+fn physics_remove_handles_system(
+    mut removed_bodies: RemovedComponents<PhysicsBodyHandle>,
+    mut removed_colliders: RemovedComponents<PhysicsColliderHandle>,
+    //
+    mut physics: ResMut<Physics>,
+) {
+    for removed_body_entity in removed_bodies.read() {
+        if let Some(body_handle) = physics
+            .body_handles_by_entity
+            .remove(&removed_body_entity)
+        {
+            physics.remove_body(body_handle);
+        }
+    }
+    for removed_collider_entity in removed_colliders.read() {
+        if let Some(collider_handle) = physics
+            .collider_handles_by_entity
+            .remove(&removed_collider_entity)
+        {
+            physics.remove_collider(collider_handle);
+        }
     }
 }
 
@@ -314,7 +381,8 @@ fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
 pub fn physics_systems() -> SystemConfigs {
     (
         physics_create_handles_system,
-        physics_update_system.after(physics_create_handles_system),
+        physics_remove_handles_system.after(physics_create_handles_system),
+        physics_update_system.after(physics_remove_handles_system),
         physics_sync_system.after(physics_update_system),
         physics_system.after(physics_sync_system),
     )

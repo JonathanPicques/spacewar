@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
+use derivative::Derivative;
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::{Clock, TimeToLive};
@@ -35,10 +36,12 @@ pub enum Direction {
     Right,
 }
 
-#[derive(Hash, Clone, Default, Component)]
+#[derive(Clone, Default, Component, Derivative)]
+#[derivative(Hash)]
 pub struct Player {
     pub handle: usize,
     pub direction: Direction,
+    #[derivative(Hash = "ignore")]
     pub shoot_clock: Clock,
 }
 
