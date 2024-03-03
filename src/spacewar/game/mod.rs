@@ -81,7 +81,7 @@ fn setup(
             .with_translation(Vec3::new(0.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
-        PhysicsCollider::Cuboid { width: 35.0, height: 1.0 },
+        PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -90,7 +90,7 @@ fn setup(
             .with_translation(Vec3::new(150.0, 10.0, 0.0)),
         //
         PhysicsBody::Fixed,
-        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
+        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -99,7 +99,7 @@ fn setup(
             .with_translation(Vec3::new(150.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
-        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
+        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -108,7 +108,7 @@ fn setup(
             .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
-        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
+        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -117,7 +117,7 @@ fn setup(
             .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
         //
         PhysicsBody::Fixed,
-        PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
+        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
     ));
 
     commands.spawn_with_rollback((
@@ -133,7 +133,7 @@ fn setup(
         //     angular_velocity: Some(10.0_f32.to_radians()),
         // },
         //
-        PhysicsCollider::Cuboid { width: 1.0, height: 1.0 },
+        PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
         PhysicsColliderOptions { restitution: 1.0, ..default() },
     ));
 
@@ -147,7 +147,7 @@ fn setup(
             },
             //
             PhysicsBody::KinematicPositionBased,
-            PhysicsCollider::Cuboid { width: 0.8, height: 1.8 },
+            PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
             PhysicsCharacterController::default(),
             //
             SpriteSheetBundle {

@@ -91,8 +91,8 @@ pub fn player_system(
                 SpriteBundle {
                     texture: game_assets.bullet.clone(),
                     transform: match player.direction {
-                        Direction::Left => Transform::from_translation(transform.translation - Vec3::new(6.0, 0.0, 0.0)),
-                        Direction::Right => Transform::from_translation(transform.translation + Vec3::new(6.0, 0.0, 0.0)),
+                        Direction::Left => Transform::from_translation(transform.translation + Vec3::new(-15.0, 6.0, 0.0)),
+                        Direction::Right => Transform::from_translation(transform.translation + Vec3::new(15.0, 6.0, 0.0)),
                     },
                     ..default()
                 },
@@ -108,7 +108,7 @@ pub fn player_system(
                 },
                 //
                 PhysicsCollider::Circle { radius: 0.1 },
-                PhysicsColliderOptions { friction: 0.0, restitution: 0.0 },
+                PhysicsColliderOptions { friction: 0.0, restitution: 0.0, ..default() },
             ));
         }
 

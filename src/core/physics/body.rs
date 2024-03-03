@@ -14,6 +14,7 @@ pub enum PhysicsBody {
 
 #[derive(Clone, Component)]
 pub struct PhysicsBodyOptions {
+    pub ccd: bool,
     pub gravity_scale: f32,
     pub linear_damping: f32,
     pub angular_damping: f32,
@@ -55,6 +56,7 @@ impl PhysicsBody {
     }
 
     pub(crate) fn apply_options(&self, body: &mut RigidBody, options: &PhysicsBodyOptions, wake_up: bool) {
+        body.enable_ccd(options.ccd);
         body.set_gravity_scale(options.gravity_scale, wake_up);
         body.set_linear_damping(options.linear_damping);
         body.set_angular_damping(options.angular_damping);
@@ -74,6 +76,7 @@ impl PhysicsBody {
 impl Default for PhysicsBodyOptions {
     fn default() -> Self {
         Self {
+            ccd: false,
             gravity_scale: 1.0,
             linear_damping: default(),
             angular_damping: default(),
