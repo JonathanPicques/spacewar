@@ -1,3 +1,4 @@
+pub mod input;
 pub mod player;
 
 use std::time::Duration;
@@ -16,7 +17,7 @@ use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
-use crate::spacewar::game::player::input::input_system;
+use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
@@ -77,6 +78,7 @@ fn setup(
         Transform::default()
             .with_rotation(0.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(0.0, -30.0, 0.0)),
+        //
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 35.0, height: 1.0 },
     ));
@@ -85,6 +87,7 @@ fn setup(
         Transform::default()
             .with_rotation(0.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(150.0, 10.0, 0.0)),
+        //
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
@@ -93,6 +96,7 @@ fn setup(
         Transform::default()
             .with_rotation(20.0.to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(150.0, -30.0, 0.0)),
+        //
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
@@ -101,6 +105,7 @@ fn setup(
         Transform::default()
             .with_rotation((-20.0).to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
+        //
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
@@ -109,6 +114,7 @@ fn setup(
         Transform::default()
             .with_rotation((20.0).to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
+        //
         PhysicsBody::Fixed,
         PhysicsCollider::Cuboid { width: 5.0, height: 5.0 },
     ));
@@ -118,8 +124,13 @@ fn setup(
         Transform::default()
             .with_rotation((20.0).to_bevy(Angle::Degrees))
             .with_translation(Vec3::new(0.0, 55.0, 0.0)),
+        //
         PhysicsBody::Dynamic,
-        PhysicsBodyOptions { gravity_scale: 1.0, ..default() },
+        PhysicsBodyOptions { gravity_scale: 0.0, ..default() },
+        // PhysicsBodyVelocity {
+        //     linear_velocity: Some(Vec2::new(0.0, 0.0)),
+        //     angular_velocity: Some(10.0_f32.to_radians()),
+        // },
         //
         PhysicsCollider::Cuboid { width: 1.0, height: 1.0 },
         PhysicsColliderOptions { restitution: 1.0, ..default() },

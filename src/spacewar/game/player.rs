@@ -1,5 +1,3 @@
-pub mod input;
-
 use std::cmp::Ordering;
 
 use bevy::prelude::*;
@@ -13,7 +11,7 @@ use crate::core::input::CoreInput;
 use crate::core::physics::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::maths::*;
-use crate::spacewar::game::player::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
+use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
 use crate::spacewar::{GameAssets, GameConfig};
 
 const MAX_SPEED: f32 = 2.0;

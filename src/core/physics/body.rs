@@ -21,6 +21,12 @@ pub struct PhysicsBodyOptions {
 }
 
 #[derive(Clone, Component)]
+pub struct PhysicsBodyVelocity {
+    pub linear_velocity: Option<Vec2>,
+    pub angular_velocity: Option<f32>,
+}
+
+#[derive(Clone, Component)]
 pub(crate) struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
@@ -54,6 +60,15 @@ impl PhysicsBody {
         body.set_angular_damping(options.angular_damping);
         body.set_additional_mass(options.additional_mass, wake_up);
     }
+
+    pub(crate) fn apply_velocity(&self, body: &mut RigidBody, velocity: &PhysicsBodyVelocity, scale: f32, wake_up: bool) {
+        if let Some(linvel) = velocity.linear_velocity {
+            body.set_linvel((linvel / scale).to_physics(), wake_up);
+        }
+        if let Some(angvel) = velocity.angular_velocity {
+            body.set_angvel(angvel, wake_up);
+        }
+    }
 }
 
 impl Default for PhysicsBodyOptions {
@@ -63,6 +78,15 @@ impl Default for PhysicsBodyOptions {
             linear_damping: default(),
             angular_damping: default(),
             additional_mass: default(),
+        }
+    }
+}
+
+impl Default for PhysicsBodyVelocity {
+    fn default() -> Self {
+        Self {
+            linear_velocity: Some(Vec2::ZERO),
+            angular_velocity: Some(0.0),
         }
     }
 }

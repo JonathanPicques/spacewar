@@ -8,7 +8,7 @@ use bevy_ggrs::{Rollback, RollbackOrdered};
 use rapier2d::math::Real;
 use rapier2d::prelude::*;
 
-use crate::core::body::PhysicsBodyOptions;
+use crate::core::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::collider::PhysicsColliderOptions;
 use crate::core::physics::body::PhysicsBodyHandle;
 use crate::core::physics::collider::PhysicsColliderHandle;
@@ -202,15 +202,24 @@ fn physics_update_system(
         ),
         Upserted<PhysicsColliderOptions>,
     >,
+    velocity_query: Query<(
+        &Rollback,
+        &PhysicsBody,
+        &PhysicsBodyHandle,
+        &PhysicsBodyVelocity,
+    )>,
     //
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
 ) {
+    let scale = physics.scale;
     let mut body_query = body_query.iter().collect::<Vec<_>>();
     let mut collider_query = collider_query.iter().collect::<Vec<_>>();
+    let mut velocity_query = velocity_query.iter().collect::<Vec<_>>();
 
     body_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
     collider_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    velocity_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (_, body, body_handle, body_options) in body_query {
         body.apply_options(
@@ -219,6 +228,17 @@ fn physics_update_system(
                 .get_mut(body_handle.0)
                 .expect("Body not found"),
             body_options,
+            true,
+        );
+    }
+    for (_, body, body_handle, body_velocity) in velocity_query {
+        body.apply_velocity(
+            physics
+                .bodies
+                .get_mut(body_handle.0)
+                .expect("Body not found"),
+            body_velocity,
+            scale,
             true,
         );
     }

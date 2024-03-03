@@ -9,8 +9,8 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
 
-use crate::core::body::PhysicsBodyHandle;
-use crate::core::collider::PhysicsColliderHandle;
+use crate::core::body::{PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::collider::{PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::physics::*;
 use crate::core::utilities::hash::{physics_hasher, transform_hasher};
 
@@ -36,8 +36,11 @@ impl AddCoreAppExt for App {
             .rollback_component_with_clone::<Transform>()
             .rollback_component_with_clone::<PhysicsBody>()
             .rollback_component_with_clone::<PhysicsBodyHandle>()
+            .rollback_component_with_clone::<PhysicsBodyOptions>()
+            .rollback_component_with_clone::<PhysicsBodyVelocity>()
             .rollback_component_with_clone::<PhysicsCollider>()
             .rollback_component_with_clone::<PhysicsColliderHandle>()
+            .rollback_component_with_clone::<PhysicsColliderOptions>()
             .rollback_component_with_clone::<PhysicsCharacterController>();
 
         self
