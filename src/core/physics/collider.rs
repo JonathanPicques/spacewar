@@ -34,6 +34,16 @@ impl PhysicsCollider {
     }
 }
 
+impl PhysicsColliderOptions {
+    pub fn from_friction(friction: f32) -> Self {
+        Self { friction, ..default() }
+    }
+
+    pub fn from_restitution(restitution: f32) -> Self {
+        Self { restitution, ..default() }
+    }
+}
+
 impl Default for PhysicsColliderOptions {
     fn default() -> Self {
         Self {

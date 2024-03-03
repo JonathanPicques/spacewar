@@ -73,6 +73,28 @@ impl PhysicsBody {
     }
 }
 
+impl PhysicsBodyOptions {
+    pub fn from_gravity_scale(gravity_scale: f32) -> Self {
+        Self { gravity_scale, ..default() }
+    }
+}
+
+impl PhysicsBodyVelocity {
+    pub fn from_linear_velocity(linear_velocity: Vec2) -> Self {
+        Self {
+            linear_velocity: Some(linear_velocity),
+            ..default()
+        }
+    }
+
+    pub fn from_angular_velocity(angular_velocity: f32) -> Self {
+        Self {
+            angular_velocity: Some(angular_velocity),
+            ..default()
+        }
+    }
+}
+
 impl Default for PhysicsBodyOptions {
     fn default() -> Self {
         Self {

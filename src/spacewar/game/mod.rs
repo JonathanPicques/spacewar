@@ -127,14 +127,14 @@ fn setup(
             .with_translation(Vec3::new(0.0, 55.0, 0.0)),
         //
         PhysicsBody::Dynamic,
-        PhysicsBodyOptions { gravity_scale: 0.0, ..default() },
+        PhysicsBodyOptions::from_gravity_scale(0.0),
         // PhysicsBodyVelocity {
         //     linear_velocity: Some(Vec2::new(0.0, 0.0)),
         //     angular_velocity: Some(10.0_f32.to_radians()),
         // },
         //
         PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
-        PhysicsColliderOptions { restitution: 1.0, ..default() },
+        PhysicsColliderOptions::from_restitution(1.0),
     ));
 
     for handle in 0..game_args.num_players {
