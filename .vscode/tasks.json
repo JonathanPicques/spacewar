@@ -43,7 +43,7 @@
       },
       "type": "shell",
       "label": "Run synctest",
-      "command": "cargo run -- --local --num-players 4 --input-delay 0 --check-distance 10 --max-prediction 20 --randomize-input",
+      "command": "cargo run -- --fps 10 --local --num-players 4 --input-delay 0 --check-distance 10 --max-prediction 20 --randomize-input",
       "problemMatcher": []
     },
     //

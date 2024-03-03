@@ -48,7 +48,7 @@ impl Clock {
 }
 
 impl TimeToLive {
-    pub fn new(secs: f32) -> Self {
+    pub fn from_secs_f32(secs: f32) -> Self {
         Self { clock: Clock::new(Duration::from_secs_f32(secs)) }
     }
 }

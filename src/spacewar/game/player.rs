@@ -87,7 +87,7 @@ pub fn player_system(
             player.shoot_clock.reset();
             commands.spawn_with_rollback((
                 Game {},
-                TimeToLive::new(2.0),
+                TimeToLive::from_secs_f32(2.0),
                 SpriteBundle {
                     texture: game_assets.bullet.clone(),
                     transform: match player.direction {

@@ -2,11 +2,11 @@ pub mod body;
 pub mod collider;
 pub mod controller;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
-use bevy_ggrs::{Rollback, RollbackOrdered};
+use bevy_ggrs::{Rollback, RollbackEntityMap, RollbackOrdered};
 use rapier2d::math::Real;
 use rapier2d::prelude::*;
 
@@ -269,7 +269,7 @@ fn physics_update_system(
             body_options,
             true,
         );
-        println!("body.apply_options");
+        // println!("body.apply_options");
     }
     for (_, body, body_handle, body_velocity) in velocity_query {
         body.apply_velocity(
@@ -281,7 +281,7 @@ fn physics_update_system(
             scale,
             true,
         );
-        println!("body.apply_velocity");
+        // println!("body.apply_velocity");
     }
     for (_, collider, collider_handle, collider_options) in collider_query {
         collider.apply_options(
@@ -291,7 +291,55 @@ fn physics_update_system(
                 .expect("Collider not found"),
             collider_options,
         );
-        println!("collider.apply_options");
+        // println!("collider.apply_options");
+    }
+}
+
+#[allow(clippy::type_complexity)]
+fn physics_rollback_sync_system(
+    query: Query<(Entity, &Rollback)>,
+    //
+    mut physics: ResMut<Physics>,
+    rollback_entity_map: Res<RollbackEntityMap>,
+) {
+    let bodies = physics.bodies.clone();
+    let handles = physics.body_handles_by_entity.clone();
+    let entities = query
+        .iter()
+        .map(|(entity, ..)| entity)
+        .collect::<HashSet<_>>();
+
+    for (body_handle, _) in bodies.iter() {
+        println!("{body_handle:?}");
+        let entity = handles
+            .iter()
+            .find_map(|(entity, handle)| {
+                if *handle == body_handle {
+                    Some(entity)
+                } else {
+                    None
+                }
+            })
+            .expect("Handle not found for entity");
+
+        if !entities.contains(entity) {
+            if let Some(replace_entity) = rollback_entity_map.get(*entity) {
+                println!("entity {entity:?} vanished but was replaced by {replace_entity:?}");
+                let handle = physics
+                    .body_handles_by_entity
+                    .remove(entity)
+                    .unwrap();
+                physics
+                    .body_handles_by_entity
+                    .insert(replace_entity, handle);
+            } else {
+                let handle = physics
+                    .body_handles_by_entity
+                    .remove(entity)
+                    .unwrap();
+                physics.remove_body(handle);
+            }
+        }
     }
 }
 
@@ -327,6 +375,10 @@ fn physics_create_handles_system(
         physics
             .collider_handles_by_entity
             .insert(e, collider_handle);
+
+        println!("insert body {e:?}");
+        println!("insert collider {e:?}");
+
         commands.entity(e).insert((
             PhysicsBodyHandle(body_handle),
             PhysicsColliderHandle(collider_handle),
@@ -388,7 +440,8 @@ pub fn physics_systems() -> SystemConfigs {
     (
         physics_create_handles_system,
         physics_remove_handles_system.after(physics_create_handles_system),
-        physics_update_system.after(physics_remove_handles_system),
+        physics_rollback_sync_system.after(physics_remove_handles_system),
+        physics_update_system.after(physics_rollback_sync_system),
         physics_sync_system.after(physics_update_system),
         physics_system.after(physics_sync_system),
     )
