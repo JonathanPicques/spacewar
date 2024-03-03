@@ -1,17 +1,25 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 
-#[derive(Hash, Clone, Default)]
+use crate::core::utilities::cmp::cmp_rollack;
+
+#[derive(Hash, Clone)]
 pub struct Clock {
     elapsed: Duration,
     duration: Duration,
     finished: bool,
 }
 
+#[derive(Hash, Clone, Component)]
+pub struct TimeToLive {
+    clock: Clock,
+}
+
 impl Clock {
     pub fn new(duration: Duration) -> Self {
-        Self { duration, ..default() }
+        Self { duration, finished: false, ..default() }
     }
 
     pub fn new_finished(duration: Duration) -> Self {
@@ -36,5 +44,46 @@ impl Clock {
     #[inline]
     pub fn finished(&self) -> bool {
         self.finished
+    }
+}
+
+impl TimeToLive {
+    pub fn new(secs: f32) -> Self {
+        Self { clock: Clock::new(Duration::from_secs_f32(secs)) }
+    }
+}
+
+impl Default for Clock {
+    fn default() -> Self {
+        Self {
+            elapsed: default(),
+            duration: default(),
+            finished: true,
+        }
+    }
+}
+
+impl Default for TimeToLive {
+    fn default() -> Self {
+        Self { clock: Clock::new(Duration::from_secs_f32(1.0)) }
+    }
+}
+
+pub fn ttl_system(
+    mut query: Query<(Entity, &Rollback, &mut TimeToLive)>,
+    mut commands: Commands,
+    //
+    time: Res<Time<GgrsTime>>,
+    order: Res<RollbackOrdered>,
+) {
+    let delta = time.delta_seconds();
+    let delta_d = Duration::from_secs_f32(delta);
+    let mut query = query.iter_mut().collect::<Vec<_>>();
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (e, _, mut ttl) in query {
+        if ttl.clock.tick(delta_d).finished() {
+            commands.entity(e).despawn_recursive();
+        }
     }
 }

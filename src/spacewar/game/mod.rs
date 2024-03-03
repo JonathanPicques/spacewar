@@ -10,7 +10,7 @@ use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
-use crate::core::clock::Clock;
+use crate::core::clock::{ttl_system, Clock};
 use crate::core::physics::body::PhysicsBodyOptions;
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
@@ -44,6 +44,7 @@ impl AddGameAppExt for App {
                 ((
                     player_system,
                     //
+                    ttl_system,
                     sprite_sheet_animator_system,
                     //
                     physics_systems(),
