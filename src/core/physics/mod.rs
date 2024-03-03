@@ -238,12 +238,15 @@ fn physics_update_system(
         ),
         Upserted<PhysicsColliderOptions>,
     >,
-    velocity_query: Query<(
-        &Rollback,
-        &PhysicsBody,
-        &PhysicsBodyHandle,
-        &PhysicsBodyVelocity,
-    )>,
+    velocity_query: Query<
+        (
+            &Rollback,
+            &PhysicsBody,
+            &PhysicsBodyHandle,
+            &PhysicsBodyVelocity,
+        ),
+        Upserted<PhysicsBodyVelocity>,
+    >,
     //
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
@@ -266,6 +269,7 @@ fn physics_update_system(
             body_options,
             true,
         );
+        println!("body.apply_options");
     }
     for (_, body, body_handle, body_velocity) in velocity_query {
         body.apply_velocity(
@@ -277,6 +281,7 @@ fn physics_update_system(
             scale,
             true,
         );
+        println!("body.apply_velocity");
     }
     for (_, collider, collider_handle, collider_options) in collider_query {
         collider.apply_options(
@@ -286,6 +291,7 @@ fn physics_update_system(
                 .expect("Collider not found"),
             collider_options,
         );
+        println!("collider.apply_options");
     }
 }
 
