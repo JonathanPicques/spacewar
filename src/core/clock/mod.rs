@@ -21,7 +21,9 @@ impl Clock {
     #[inline]
     pub fn tick(&mut self, delta: Duration) -> &Self {
         self.elapsed += delta;
-        self.finished = self.elapsed >= self.duration;
+        if self.elapsed >= self.duration {
+            self.finished = true;
+        }
         self
     }
 
