@@ -22,8 +22,17 @@ impl Clock {
         Self { duration, finished: false, ..default() }
     }
 
-    pub fn new_finished(duration: Duration) -> Self {
-        Self { duration, finished: true, ..default() }
+    pub fn from_secs_f32(secs: f32) -> Self {
+        Self {
+            duration: Duration::from_secs_f32(secs),
+            finished: false,
+            ..default()
+        }
+    }
+
+    pub fn with_finished(mut self, finished: bool) -> Self {
+        self.finished = finished;
+        self
     }
 
     #[inline]
@@ -48,8 +57,8 @@ impl Clock {
 }
 
 impl TimeToLive {
-    pub fn new(secs: f32) -> Self {
-        Self { clock: Clock::new(Duration::from_secs_f32(secs)) }
+    pub fn from_secs_f32(secs: f32) -> Self {
+        Self { clock: Clock::from_secs_f32(secs) }
     }
 }
 
@@ -65,7 +74,7 @@ impl Default for Clock {
 
 impl Default for TimeToLive {
     fn default() -> Self {
-        Self { clock: Clock::new(Duration::from_secs_f32(1.0)) }
+        Self { clock: Clock::from_secs_f32(1.0) }
     }
 }
 

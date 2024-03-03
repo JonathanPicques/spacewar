@@ -68,10 +68,10 @@ impl DynamicAsset for CoreDynamicAsset {
         let cell = world.cell();
         let asset_server = cell
             .get_resource::<AssetServer>()
-            .expect("Failed to get asset server");
+            .expect("AssetServer not found");
         let mut texture_atlas_layouts = cell
             .get_resource_mut::<Assets<TextureAtlasLayout>>()
-            .expect("Failed to get Assets<TextureAtlas>");
+            .expect("Assets<TextureAtlasLayout> not found");
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),

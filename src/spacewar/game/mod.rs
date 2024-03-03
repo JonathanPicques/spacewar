@@ -1,8 +1,6 @@
 pub mod input;
 pub mod player;
 
-use std::time::Duration;
-
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
@@ -15,6 +13,7 @@ use crate::core::physics::body::PhysicsBodyOptions;
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
+use crate::core::utilities::hash::transform_hasher;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
@@ -29,8 +28,10 @@ pub trait AddGameAppExt {
 impl AddGameAppExt for App {
     fn add_game(&mut self, fps: usize) -> &mut Self {
         self.add_core::<GameConfig, _>(fps, input_system)
+            .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<Player>()
             .rollback_component_with_clone::<Player>()
+            .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(
@@ -142,7 +143,7 @@ fn setup(
             Game {},
             Player {
                 handle,
-                shoot_clock: Clock::new(Duration::from_secs_f32(1.0)),
+                shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
                 ..default()
             },
             //
@@ -164,7 +165,7 @@ fn setup(
                 ..default()
             },
             SpriteSheetAnimator {
-                clock: Clock::new(Duration::from_millis(100)),
+                clock: Clock::from_secs_f32(0.1),
                 animation: game_assets.player_idle_anim.clone(),
             },
         ));

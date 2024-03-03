@@ -89,37 +89,33 @@ impl Physics {
 
     //
 
-    pub(crate) fn insert_body(&mut self, body: &PhysicsBody, collider: &PhysicsCollider, transform: &Transform) -> (RigidBodyHandle, ColliderHandle) {
-        let body_handle = self.bodies.insert(body.build(self, transform));
+    pub(crate) fn insert_body(&mut self, body: RigidBody, collider: Collider) -> (RigidBodyHandle, ColliderHandle) {
+        let body_handle = self.bodies.insert(body);
         let collider_handle = self
             .colliders
-            .insert_with_parent(collider.build(), body_handle, &mut self.bodies);
+            .insert_with_parent(collider, body_handle, &mut self.bodies);
 
         (body_handle, collider_handle)
     }
 
-    pub(crate) fn remove_body(&mut self, body_handle: RigidBodyHandle) {
-        self.bodies
-            .remove(
-                body_handle,
-                &mut self.island_manager,
-                &mut self.colliders,
-                &mut self.impulse_joints,
-                &mut self.multibody_joints,
-                false,
-            )
-            .expect("Body was not removed");
+    pub(crate) fn remove_body(&mut self, body_handle: RigidBodyHandle) -> Option<RigidBody> {
+        self.bodies.remove(
+            body_handle,
+            &mut self.island_manager,
+            &mut self.colliders,
+            &mut self.impulse_joints,
+            &mut self.multibody_joints,
+            false,
+        )
     }
 
-    pub(crate) fn remove_collider(&mut self, collider_handle: ColliderHandle) {
-        self.colliders
-            .remove(
-                collider_handle,
-                &mut self.island_manager,
-                &mut self.bodies,
-                false,
-            )
-            .expect("Collider was not removed");
+    pub(crate) fn remove_collider(&mut self, collider_handle: ColliderHandle) -> Option<Collider> {
+        self.colliders.remove(
+            collider_handle,
+            &mut self.island_manager,
+            &mut self.bodies,
+            false,
+        )
     }
 
     //
@@ -269,7 +265,6 @@ fn physics_update_system(
             body_options,
             true,
         );
-        println!("body.apply_options");
     }
     for (_, body, body_handle, body_velocity) in velocity_query {
         body.apply_velocity(
@@ -281,7 +276,6 @@ fn physics_update_system(
             scale,
             true,
         );
-        println!("body.apply_velocity");
     }
     for (_, collider, collider_handle, collider_options) in collider_query {
         collider.apply_options(
@@ -291,7 +285,6 @@ fn physics_update_system(
                 .expect("Collider not found"),
             collider_options,
         );
-        println!("collider.apply_options");
     }
 }
 
@@ -319,7 +312,9 @@ fn physics_create_handles_system(
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (e, _, transform, body, collider) in query {
-        let (body_handle, collider_handle) = physics.insert_body(body, collider, transform);
+        let body = body.build(&physics, transform);
+        let collider = collider.build();
+        let (body_handle, collider_handle) = physics.insert_body(body, collider);
 
         physics
             .body_handles_by_entity
@@ -346,7 +341,9 @@ fn physics_remove_handles_system(
             .body_handles_by_entity
             .remove(&removed_body_entity)
         {
-            physics.remove_body(body_handle);
+            physics
+                .remove_body(body_handle)
+                .expect("Body not removed");
         }
     }
     for removed_collider_entity in removed_colliders.read() {
@@ -354,7 +351,9 @@ fn physics_remove_handles_system(
             .collider_handles_by_entity
             .remove(&removed_collider_entity)
         {
-            physics.remove_collider(collider_handle);
+            physics
+                .remove_collider(collider_handle)
+                .expect("Collider not removed");
         }
     }
 }

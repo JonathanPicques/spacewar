@@ -10,9 +10,10 @@ use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
 
 use crate::core::body::{PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::clock::TimeToLive;
 use crate::core::collider::{PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::physics::*;
-use crate::core::utilities::hash::{physics_hasher, transform_hasher};
+use crate::core::utilities::hash::physics_hasher;
 
 pub trait AddCoreAppExt {
     fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoSystemConfigs<M>) -> &mut Self
@@ -30,10 +31,10 @@ impl AddCoreAppExt for App {
             .set_rollback_schedule_fps(fps)
             //
             .checksum_resource::<Physics>(physics_hasher)
-            .checksum_component::<Transform>(transform_hasher)
+            .checksum_component_with_hash::<TimeToLive>()
             //
             .rollback_resource_with_clone::<Physics>()
-            .rollback_component_with_clone::<Transform>()
+            .rollback_component_with_clone::<TimeToLive>()
             .rollback_component_with_clone::<PhysicsBody>()
             .rollback_component_with_clone::<PhysicsBodyHandle>()
             .rollback_component_with_clone::<PhysicsBodyOptions>()
