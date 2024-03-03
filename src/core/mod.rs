@@ -6,14 +6,16 @@ pub mod loader;
 pub mod physics;
 pub mod utilities;
 
+use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
 use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
 
+use crate::core::anim::sprite_sheet_animator_system;
 use crate::core::body::{PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
-use crate::core::clock::TimeToLive;
+use crate::core::clock::{ttl_system, TimeToLive};
 use crate::core::collider::{PhysicsColliderHandle, PhysicsColliderOptions};
-use crate::core::frame::Frame;
+use crate::core::frame::{frame_system, Frame};
 use crate::core::physics::*;
 use crate::core::utilities::hash::physics_hasher;
 
@@ -50,4 +52,14 @@ impl AddCoreAppExt for App {
 
         self
     }
+}
+
+pub fn core_systems() -> SystemConfigs {
+    (
+        ttl_system,
+        frame_system,
+        physics_systems(),
+        sprite_sheet_animator_system,
+    )
+        .into_configs()
 }

@@ -7,9 +7,10 @@ use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
 
-use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
-use crate::core::clock::{ttl_system, Clock};
-use crate::core::frame::{frame_system, Frame};
+use crate::core::anim::SpriteSheetAnimator;
+use crate::core::clock::Clock;
+use crate::core::core_systems;
+use crate::core::frame::Frame;
 use crate::core::physics::body::PhysicsBodyOptions;
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
@@ -43,16 +44,7 @@ impl AddGameAppExt for App {
             //
             .add_systems(
                 GgrsSchedule,
-                ((
-                    player_system,
-                    //
-                    ttl_system,
-                    frame_system,
-                    physics_systems(),
-                    sprite_sheet_animator_system,
-                )
-                    .run_if(in_state(State::Game)))
-                .chain(),
+                ((core_systems(), player_system).run_if(in_state(State::Game))).chain(),
             )
     }
 }

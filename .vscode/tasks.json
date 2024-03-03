@@ -69,7 +69,7 @@
       "hide": true,
       "type": "shell",
       "label": "Watch online (1)",
-      "command": "cargo watch -c -x run -- --online --num-players 2",
+      "command": "cargo watch -c -x 'run -- --online --num-players 2'",
       "problemMatcher": [
         "$rustc"
       ]
@@ -78,7 +78,7 @@
       "hide": true,
       "type": "shell",
       "label": "Watch online (2)",
-      "command": "cargo watch -c -x run -- --online --num-players 2",
+      "command": "cargo watch -c -x 'run -- --online --num-players 2'",
       "problemMatcher": [
         "$rustc"
       ]
