@@ -11,6 +11,10 @@ impl CoreInput {
         self.input |= bit;
     }
 
+    pub fn unset(&mut self, bit: u8) {
+        self.input &= !bit;
+    }
+
     pub fn is_set(self, bit: u8) -> bool {
         self.input & bit != 0
     }

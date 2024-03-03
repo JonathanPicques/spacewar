@@ -9,6 +9,7 @@ use bevy_ggrs::{prelude::*, LocalPlayers};
 
 use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
 use crate::core::clock::{ttl_system, Clock};
+use crate::core::frame::{frame_system, Frame};
 use crate::core::physics::body::PhysicsBodyOptions;
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
@@ -46,9 +47,9 @@ impl AddGameAppExt for App {
                     player_system,
                     //
                     ttl_system,
-                    sprite_sheet_animator_system,
-                    //
+                    frame_system,
                     physics_systems(),
+                    sprite_sheet_animator_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),
@@ -65,6 +66,7 @@ fn setup(
     game_args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
+    commands.insert_resource(Frame::default());
     commands.insert_resource(Physics::default());
 
     commands.spawn((
@@ -175,6 +177,7 @@ fn setup(
 fn update(
     mut contexts: EguiContexts,
     //
+    frame: Res<Frame>,
     checksum: Res<Checksum>,
     mut game_args: ResMut<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
@@ -188,7 +191,8 @@ fn update(
         CollapsingHeader::new("Checksum")
             .default_open(true)
             .show(ui, |ui| {
-                ui.label(format!("{}", checksum.0));
+                ui.label(format!("Frame {}", frame.0));
+                ui.label(format!("Checksum {}", checksum.0));
             });
 
         if ui.button("Back to main menu").clicked() {
@@ -202,6 +206,7 @@ fn cleanup(
     //
     query: Query<Entity, With<Game>>,
 ) {
+    commands.remove_resource::<Frame>();
     commands.remove_resource::<Physics>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
