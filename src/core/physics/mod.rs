@@ -291,6 +291,13 @@ fn physics_create_handles_system(
 #[allow(clippy::type_complexity)]
 fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
     for (_, collider) in physics.colliders.iter() {
+        if let Some(ball) = collider.shape().as_ball() {
+            gizmos.circle_2d(
+                collider.translation().to_bevy() * physics.scale,
+                ball.radius,
+                Color::GREEN,
+            );
+        }
         if let Some(cuboid) = collider.shape().as_cuboid() {
             gizmos.rect_2d(
                 collider.translation().to_bevy() * physics.scale,

@@ -139,7 +139,11 @@ fn setup(
     for handle in 0..game_args.num_players {
         commands.spawn_with_rollback((
             Game {},
-            Player { handle, ..default() },
+            Player {
+                handle,
+                shoot_clock: Clock::new(Duration::from_secs_f32(1.0)),
+                ..default()
+            },
             //
             PhysicsBody::KinematicPositionBased,
             PhysicsCollider::Cuboid { width: 0.8, height: 1.8 },

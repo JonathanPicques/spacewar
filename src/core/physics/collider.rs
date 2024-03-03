@@ -3,6 +3,7 @@ use rapier2d::prelude::*;
 
 #[derive(Clone, Component)]
 pub enum PhysicsCollider {
+    Circle { radius: f32 },
     Cuboid { width: f32, height: f32 },
 }
 
@@ -18,6 +19,7 @@ pub(crate) struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 impl PhysicsCollider {
     pub(crate) fn build(&self) -> Collider {
         match self {
+            Self::Circle { radius } => ColliderBuilder::ball(*radius).build(),
             Self::Cuboid { width, height } => ColliderBuilder::cuboid(*width, *height).build(),
         }
     }
