@@ -8,6 +8,7 @@ use bevy_egui::EguiPlugin;
 use bevy_ggrs::ggrs::Config;
 use bevy_matchbox::matchbox_socket::PeerId;
 use clap::Parser;
+use rapier2d::geometry::Group;
 
 use crate::core::anim::SpriteSheetAnimation;
 use crate::core::input::CoreInput;
@@ -29,6 +30,28 @@ pub enum State {
     MenuOnline,
     //
     Game,
+}
+
+pub enum Layer {
+    All,
+    None,
+    //
+    Wall,
+    Player,
+    Projectile,
+}
+
+impl From<Layer> for Group {
+    fn from(value: Layer) -> Self {
+        match value {
+            Layer::All => Group::ALL,
+            Layer::None => Group::NONE,
+            //
+            Layer::Wall => Group::GROUP_1,
+            Layer::Player => Group::GROUP_2,
+            Layer::Projectile => Group::GROUP_3,
+        }
+    }
 }
 
 #[derive(Parser, Resource)]
@@ -56,20 +79,20 @@ pub struct GameArgs {
 
 #[derive(Resource, AssetCollection)]
 pub struct GameAssets {
-    #[asset(key = "player_texture")]
-    pub player_texture: Handle<Image>,
-    #[asset(key = "player_texture_atlas_layout")]
-    pub player_texture_atlas_layout: Handle<TextureAtlasLayout>,
-
-    #[asset(key = "player_anim.idle")]
-    pub player_idle_anim: Handle<SpriteSheetAnimation>,
-    #[asset(key = "player_anim.walk")]
-    pub player_walk_anim: Handle<SpriteSheetAnimation>,
-    #[asset(key = "player_anim.jump")]
-    pub player_jump_anim: Handle<SpriteSheetAnimation>,
-
     #[asset(key = "bullet")]
     pub bullet: Handle<Image>,
+
+    #[asset(key = "player")]
+    pub player: Handle<Image>,
+    #[asset(key = "player_atlas_layout")]
+    pub player_atlas_layout: Handle<TextureAtlasLayout>,
+
+    #[asset(key = "player_idle")]
+    pub player_idle_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_walk")]
+    pub player_walk_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_jump")]
+    pub player_jump_anim: Handle<SpriteSheetAnimation>,
 }
 
 #[derive(Debug)]

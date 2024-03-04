@@ -42,6 +42,10 @@ impl PhysicsColliderOptions {
     pub fn from_restitution(restitution: f32) -> Self {
         Self { restitution, ..default() }
     }
+
+    pub fn from_collision_groups(collision_groups: InteractionGroups) -> Self {
+        Self { collision_groups, ..default() }
+    }
 }
 
 impl Default for PhysicsColliderOptions {

@@ -41,14 +41,14 @@ pub fn input_system(
             if keyboard_input.pressed(KeyCode::ArrowRight) {
                 input.set(INPUT_RIGHT);
             }
-            if keyboard_input.pressed(KeyCode::ControlRight) {
+            if keyboard_input.pressed(KeyCode::KeyM) | keyboard_input.pressed(KeyCode::ControlRight) {
                 input.set(INPUT_SHOOT);
             }
         } else {
-            if keyboard_input.pressed(KeyCode::KeyZ) {
+            if keyboard_input.pressed(KeyCode::KeyW) {
                 input.set(INPUT_UP);
             }
-            if keyboard_input.pressed(KeyCode::KeyQ) {
+            if keyboard_input.pressed(KeyCode::KeyA) {
                 input.set(INPUT_LEFT);
             }
             if keyboard_input.pressed(KeyCode::KeyS) {

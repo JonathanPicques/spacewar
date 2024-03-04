@@ -1,12 +1,20 @@
 ({
-    "player_texture": Asset (
+    "bullet": Asset (
+        Image (
+            ImageAsset (
+                path: "sprites/bullet.png",
+            )
+        ),
+    ),
+    //
+    "player": Asset (
         Image (
             ImageAsset (
                 path: "sprites/player.png"
             )
         )
     ),
-    "player_texture_atlas_layout": Asset (
+    "player_atlas_layout": Asset (
         TextureAtlasLayout (
             TextureAtlasLayoutAsset (
                 rows: 4,
@@ -22,7 +30,7 @@
         )
     ),
     //
-    "player_anim.idle": Asset (
+    "player_idle": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 name: "idle",
@@ -31,7 +39,7 @@
             )
         )
     ),
-    "player_anim.walk": Asset (
+    "player_walk": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 name: "walk",
@@ -40,7 +48,7 @@
             )
         )
     ),
-    "player_anim.jump": Asset (
+    "player_jump": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 name: "jump",
@@ -48,13 +56,5 @@
                 finish: 12
             )
         )
-    ),
-    //
-    "bullet": Asset (
-        Image (
-            ImageAsset (
-                path: "sprites/bullet.png",
-            )
-        ),
     ),
 })

@@ -6,6 +6,7 @@ use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
 use derivative::Derivative;
+use rapier2d::geometry::InteractionGroups;
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::{Clock, TimeToLive};
@@ -18,7 +19,7 @@ use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
 use crate::spacewar::game::Game;
-use crate::spacewar::{GameAssets, GameConfig};
+use crate::spacewar::{GameAssets, GameConfig, Layer};
 
 const MAX_SPEED: f32 = 2.0;
 const ACCELERATION: f32 = 7.0;
@@ -108,7 +109,15 @@ pub fn player_system(
                 },
                 //
                 PhysicsCollider::Circle { radius: 0.1 },
-                PhysicsColliderOptions { friction: 0.0, restitution: 0.0, ..default() },
+                PhysicsColliderOptions {
+                    friction: 0.0,
+                    restitution: 0.0,
+                    collision_groups: InteractionGroups {
+                        filter: Layer::Wall.into(),
+                        memberships: Layer::Projectile.into(),
+                    },
+                    ..default()
+                },
             ));
         }
 

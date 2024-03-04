@@ -6,12 +6,13 @@ use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
+use rapier2d::geometry::InteractionGroups;
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::Clock;
 use crate::core::core_systems;
 use crate::core::frame::Frame;
-use crate::core::physics::body::PhysicsBodyOptions;
+use crate::core::physics::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
@@ -21,7 +22,7 @@ use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
-use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
+use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -77,6 +78,10 @@ fn setup(
         //
         PhysicsBody::Fixed,
         PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
+        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+            filter: Layer::Wall.into(),
+            memberships: Layer::Wall.into(),
+        }),
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -86,6 +91,10 @@ fn setup(
         //
         PhysicsBody::Fixed,
         PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+            filter: Layer::Wall.into(),
+            memberships: Layer::Wall.into(),
+        }),
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -95,6 +104,10 @@ fn setup(
         //
         PhysicsBody::Fixed,
         PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+            filter: Layer::Wall.into(),
+            memberships: Layer::Wall.into(),
+        }),
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -104,6 +117,10 @@ fn setup(
         //
         PhysicsBody::Fixed,
         PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+            filter: Layer::Wall.into(),
+            memberships: Layer::Wall.into(),
+        }),
     ));
     commands.spawn_with_rollback((
         Game {},
@@ -113,6 +130,10 @@ fn setup(
         //
         PhysicsBody::Fixed,
         PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+            filter: Layer::Wall.into(),
+            memberships: Layer::Wall.into(),
+        }),
     ));
 
     commands.spawn_with_rollback((
@@ -123,13 +144,20 @@ fn setup(
         //
         PhysicsBody::Dynamic,
         PhysicsBodyOptions::from_gravity_scale(0.0),
-        // PhysicsBodyVelocity {
-        //     linear_velocity: Some(Vec2::new(0.0, 0.0)),
-        //     angular_velocity: Some(10.0_f32.to_radians()),
-        // },
+        PhysicsBodyVelocity {
+            linear_velocity: Some(Vec2::new(0.0, 0.0)),
+            angular_velocity: Some(20.0_f32.to_radians()),
+        },
         //
         PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
-        PhysicsColliderOptions::from_restitution(1.0),
+        PhysicsColliderOptions {
+            restitution: 1.0,
+            collision_groups: InteractionGroups {
+                filter: Layer::Wall.into(),
+                memberships: Layer::Wall.into(),
+            },
+            ..default()
+        },
     ));
 
     for handle in 0..game_args.num_players {
@@ -143,18 +171,22 @@ fn setup(
             //
             PhysicsBody::KinematicPositionBased,
             PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
+            PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+                filter: Layer::Player.into(),
+                memberships: Layer::Player.into(),
+            }),
             PhysicsCharacterController::default(),
             //
             SpriteSheetBundle {
                 atlas: TextureAtlas {
                     index: 0,
-                    layout: game_assets.player_texture_atlas_layout.clone(),
+                    layout: game_assets.player_atlas_layout.clone(),
                 },
                 sprite: Sprite {
                     anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
                     ..default()
                 },
-                texture: game_assets.player_texture.clone(),
+                texture: game_assets.player.clone(),
                 transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
                 ..default()
             },
