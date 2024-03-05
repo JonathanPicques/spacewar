@@ -2,18 +2,13 @@ pub mod input;
 pub mod player;
 
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers};
-use rapier2d::geometry::InteractionGroups;
 
-use crate::core::anim::SpriteSheetAnimator;
-use crate::core::clock::Clock;
-use crate::core::core_systems;
+use crate::core::anim::sprite_sheet_animator_system;
+use crate::core::clock::{ttl_system, TimeToLive};
 use crate::core::frame::Frame;
-use crate::core::physics::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
-use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::hash::transform_hasher;
@@ -22,10 +17,7 @@ use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
-use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
-
-#[derive(Copy, Clone, Component)]
-pub struct Game {}
+use crate::spacewar::{GameArgs, GameConfig, State};
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -48,17 +40,24 @@ impl AddGameAppExt for App {
             //
             .add_systems(
                 GgrsSchedule,
-                ((core_systems(), player_system).run_if(in_state(State::Game))).chain(),
+                ((
+                    player_system,
+                    //
+                    ttl_system,
+                    sprite_sheet_animator_system,
+                    //
+                    physics_systems(),
+                )
+                    .run_if(in_state(State::Game)))
+                .chain(),
             )
     }
 }
 
-fn setup(
-    mut commands: Commands,
-    //
-    game_args: Res<GameArgs>,
-    game_assets: Res<GameAssets>,
-) {
+#[derive(Copy, Clone, Component)]
+pub struct Game {}
+
+fn setup(mut commands: Commands) {
     commands.spawn((
         Game {},
         Camera2dBundle {
@@ -71,134 +70,17 @@ fn setup(
         Game {},
         Transform::default()
             .with_rotation(0.0.to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(0.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(0.0.to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(150.0, 10.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(20.0.to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(150.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation((-20.0).to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation((20.0).to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation((20.0).to_bevy(Angle::Degrees))
-            .with_translation(Vec3::new(0.0, 55.0, 0.0)),
+            .with_translation(Vec3::new(0.0, 0.0, 0.0)),
+        TimeToLive::from_secs_f32(1.0),
         //
         PhysicsBody::Dynamic,
-        PhysicsBodyOptions::from_gravity_scale(0.0),
-        PhysicsBodyVelocity {
-            linear_velocity: Some(Vec2::new(0.0, 0.0)),
-            angular_velocity: Some(20.0_f32.to_radians()),
-        },
-        //
-        PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
-        PhysicsColliderOptions {
-            restitution: 1.0,
-            collision_groups: InteractionGroups {
-                filter: Layer::Wall.into(),
-                memberships: Layer::Wall.into(),
-            },
-            ..default()
-        },
+        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
     ));
-
-    for handle in 0..game_args.num_players {
-        commands.spawn_with_rollback((
-            Game {},
-            Player {
-                handle,
-                shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
-                ..default()
-            },
-            //
-            PhysicsBody::KinematicPositionBased,
-            PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
-            PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-                filter: Layer::Player.into(),
-                memberships: Layer::Player.into(),
-            }),
-            PhysicsCharacterController::default(),
-            //
-            SpriteSheetBundle {
-                atlas: TextureAtlas {
-                    index: 0,
-                    layout: game_assets.player_atlas_layout.clone(),
-                },
-                sprite: Sprite {
-                    anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
-                    ..default()
-                },
-                texture: game_assets.player.clone(),
-                transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
-                ..default()
-            },
-            SpriteSheetAnimator {
-                clock: Clock::from_secs_f32(0.1),
-                animation: game_assets.player_idle_anim.clone(),
-            },
-        ));
-    }
 }
 
 fn update(
     mut contexts: EguiContexts,
     //
-    frame: Res<Frame>,
     checksum: Res<Checksum>,
     mut game_args: ResMut<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
@@ -212,8 +94,7 @@ fn update(
         CollapsingHeader::new("Checksum")
             .default_open(true)
             .show(ui, |ui| {
-                ui.label(format!("Frame {}", frame.0));
-                ui.label(format!("Checksum {}", checksum.0));
+                ui.label(format!("{}", checksum.0));
             });
 
         if ui.button("Back to main menu").clicked() {
@@ -227,7 +108,6 @@ fn cleanup(
     //
     query: Query<Entity, With<Game>>,
 ) {
-    commands.remove_resource::<Frame>();
     commands.remove_resource::<Physics>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
@@ -247,9 +127,9 @@ pub fn goto_game(
     session: Session<GameConfig>,
     local_players: LocalPlayers,
 ) {
-    commands.insert_resource(session);
-    commands.insert_resource(local_players);
     commands.insert_resource(Frame::default());
     commands.insert_resource(Physics::default());
+    commands.insert_resource(session);
+    commands.insert_resource(local_players);
     next_state.set(State::Game);
 }

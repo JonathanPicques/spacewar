@@ -1,18 +1,18 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
+use bevy_ggrs::{GgrsTime, Rollback, RollbackFrameCount, RollbackOrdered};
 
 use crate::core::utilities::cmp::cmp_rollack;
 
-#[derive(Hash, Clone)]
+#[derive(Hash, Clone, Debug)]
 pub struct Clock {
     elapsed: Duration,
     duration: Duration,
     finished: bool,
 }
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Clone, Component, Debug)]
 pub struct TimeToLive {
     clock: Clock,
 }
@@ -84,6 +84,7 @@ pub fn ttl_system(
     //
     time: Res<Time<GgrsTime>>,
     order: Res<RollbackOrdered>,
+    frame: Res<RollbackFrameCount>,
 ) {
     let delta = time.delta_seconds();
     let delta_d = Duration::from_secs_f32(delta);
@@ -92,6 +93,7 @@ pub fn ttl_system(
 
     for (e, _, mut ttl) in query {
         if ttl.clock.tick(delta_d).finished() {
+            println!("TTL expired @ frame {}", frame.0);
             commands.entity(e).despawn_recursive();
         }
     }

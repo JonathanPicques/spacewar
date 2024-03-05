@@ -1,0 +1,837 @@
+[resource::save] save res Physics @ frame 0 Res(bodies[])
+[component::save] save comp PhysicsBody @ frame 0 Dynamic
+physics_create_handles_system
+insert for handle RigidBodyHandle(Index { index: 0, generation: 0 }) and ColliderHandle(Index { index: 0, generation: 0 })
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 1 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBodyHandle @ frame 1 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::save] save comp PhysicsBody @ frame 1 Dynamic
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 2 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBodyHandle @ frame 2 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::save] save comp PhysicsBody @ frame 2 Dynamic
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 3 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBodyHandle @ frame 3 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::save] save comp PhysicsBody @ frame 3 Dynamic
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 4 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBody @ frame 4 Dynamic
+[component::save] save comp PhysicsBodyHandle @ frame 4 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+TTL expired @ frame 5
+physics_create_handles_system
+physics_remove_handles_system: 0
+remove body RigidBodyHandle(Index { index: 0, generation: 0 })
+remove collider ColliderHandle(Index { index: 0, generation: 0 })
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 5 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[component::load] insert comp PhysicsBody @ frame 1 Dynamic
+[component::load] insert comp PhysicsBodyHandle @ frame 1 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[resource::load] update res Physics @ frame 1 ResMut(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 2 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBody @ frame 2 Dynamic
+[component::save] save comp PhysicsBodyHandle @ frame 2 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 3 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBody @ frame 3 Dynamic
+[component::save] save comp PhysicsBodyHandle @ frame 3 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 4 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBody @ frame 4 Dynamic
+[component::save] save comp PhysicsBodyHandle @ frame 4 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+TTL expired @ frame 5
+physics_create_handles_system
+physics_remove_handles_system: 0
+remove body RigidBodyHandle(Index { index: 0, generation: 0 })
+remove collider ColliderHandle(Index { index: 0, generation: 0 })
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 5 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[component::load] insert comp PhysicsBodyHandle @ frame 2 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::load] insert comp PhysicsBody @ frame 2 Dynamic
+[resource::load] update res Physics @ frame 2 ResMut(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 3 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBodyHandle @ frame 3 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::save] save comp PhysicsBody @ frame 3 Dynamic
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 4 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBodyHandle @ frame 4 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::save] save comp PhysicsBody @ frame 4 Dynamic
+TTL expired @ frame 5
+physics_create_handles_system
+physics_remove_handles_system: 0
+remove body RigidBodyHandle(Index { index: 0, generation: 0 })
+remove collider ColliderHandle(Index { index: 0, generation: 0 })
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 5 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[component::load] insert comp PhysicsBodyHandle @ frame 3 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[resource::load] update res Physics @ frame 3 ResMut(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })]) (was ResMut(bodies[]))
+[component::load] insert comp PhysicsBody @ frame 3 Dynamic
+physics_create_handles_system
+physics_remove_handles_system: 1
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 4 Res(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })])
+[component::save] save comp PhysicsBody @ frame 4 Dynamic
+[component::save] save comp PhysicsBodyHandle @ frame 4 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+TTL expired @ frame 5
+physics_create_handles_system
+physics_remove_handles_system: 0
+remove body RigidBodyHandle(Index { index: 0, generation: 0 })
+remove collider ColliderHandle(Index { index: 0, generation: 0 })
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 5 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[component::load] insert comp PhysicsBodyHandle @ frame 4 PhysicsBodyHandle(RigidBodyHandle(Index { index: 0, generation: 0 }))
+[component::load] insert comp PhysicsBody @ frame 4 Dynamic
+[resource::load] update res Physics @ frame 4 ResMut(bodies[RigidBodyHandle(Index { index: 0, generation: 0 })]) (was ResMut(bodies[]))
+TTL expired @ frame 5
+physics_create_handles_system
+physics_remove_handles_system: 0
+remove body RigidBodyHandle(Index { index: 0, generation: 0 })
+remove collider ColliderHandle(Index { index: 0, generation: 0 })
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 5 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 5 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 6 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 6 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 7 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 7 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 8 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 17 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 8 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 9 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 17 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 18 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 9 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 10 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 17 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 18 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 19 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 10 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 11 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 17 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 18 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 19 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 20 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::load] update res Physics @ frame 11 ResMut(bodies[]) (was ResMut(bodies[]))
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 12 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 13 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 14 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 15 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 16 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 17 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 18 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 19 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 20 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system
+[resource::save] save res Physics @ frame 21 Res(bodies[])
+physics_create_handles_system
+physics_remove_handles_system: 0
+physics_update_system
+physics_sync_system
+physics_system

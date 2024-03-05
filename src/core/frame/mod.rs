@@ -2,7 +2,7 @@ use std::hash::{Hash, Hasher};
 
 use bevy::prelude::*;
 
-#[derive(Copy, Clone, Default, Resource)]
+#[derive(Copy, Clone, Default, Resource, Debug)]
 pub struct Frame(pub u64);
 
 impl Hash for Frame {

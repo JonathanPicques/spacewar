@@ -2,7 +2,7 @@ pub mod body;
 pub mod collider;
 pub mod controller;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
@@ -15,6 +15,7 @@ use crate::core::collider::PhysicsColliderOptions;
 use crate::core::physics::body::PhysicsBodyHandle;
 use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::utilities::cmp::cmp_rollack;
+use crate::core::utilities::hash::physics_hasher;
 use crate::core::utilities::maths::*;
 
 pub use crate::core::physics::body::PhysicsBody;
@@ -39,6 +40,20 @@ pub struct Physics {
     //
     pub(crate) body_handles_by_entity: HashMap<Entity, RigidBodyHandle>,
     pub(crate) collider_handles_by_entity: HashMap<Entity, ColliderHandle>,
+}
+
+impl std::fmt::Debug for Physics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!(
+            "bodies[{}]",
+            &self
+                .bodies
+                .iter()
+                .map(|(handle, _)| format!("{handle:?}"))
+                .collect::<Vec<_>>()
+                .join(",")
+        ))
+    }
 }
 
 impl Default for Physics {
@@ -184,6 +199,7 @@ fn physics_system(
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
 ) {
+    println!("physics_system");
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
@@ -204,6 +220,7 @@ fn physics_sync_system(
     order: Res<RollbackOrdered>,
     physics: Res<Physics>,
 ) {
+    println!("physics_sync_system");
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
@@ -247,6 +264,7 @@ fn physics_update_system(
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
 ) {
+    println!("physics_update_system");
     let scale = physics.scale;
     let mut body_query = body_query.iter().collect::<Vec<_>>();
     let mut collider_query = collider_query.iter().collect::<Vec<_>>();
@@ -308,6 +326,7 @@ fn physics_create_handles_system(
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
 ) {
+    println!("physics_create_handles_system");
     let mut query = query.iter().collect::<Vec<_>>();
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
@@ -322,6 +341,9 @@ fn physics_create_handles_system(
         physics
             .collider_handles_by_entity
             .insert(e, collider_handle);
+
+        println!("insert for handle {body_handle:?} and {collider_handle:?}");
+
         commands.entity(e).insert((
             PhysicsBodyHandle(body_handle),
             PhysicsColliderHandle(collider_handle),
@@ -331,30 +353,41 @@ fn physics_create_handles_system(
 
 #[allow(clippy::type_complexity)]
 fn physics_remove_handles_system(
-    mut removed_bodies: RemovedComponents<PhysicsBodyHandle>,
-    mut removed_colliders: RemovedComponents<PhysicsColliderHandle>,
+    query: Query<&PhysicsBodyHandle>,
+    query2: Query<&PhysicsColliderHandle>,
     //
     mut physics: ResMut<Physics>,
 ) {
-    for removed_body_entity in removed_bodies.read() {
-        if let Some(body_handle) = physics
-            .body_handles_by_entity
-            .remove(&removed_body_entity)
-        {
-            physics
-                .remove_body(body_handle)
-                .expect("Body not removed");
+    println!(
+        "physics_remove_handles_system: {}",
+        query.iter().len()
+    );
+
+    let body_handles = query.iter().map(|f| f.0).collect::<Vec<_>>();
+    let collider_handles = query2.iter().map(|f| f.0).collect::<Vec<_>>();
+    let mut remove = vec![];
+    let mut remove2 = vec![];
+
+    for (handle, _) in physics.bodies.iter() {
+        if !body_handles.contains(&handle) {
+            remove.push(handle);
         }
     }
-    for removed_collider_entity in removed_colliders.read() {
-        if let Some(collider_handle) = physics
-            .collider_handles_by_entity
-            .remove(&removed_collider_entity)
-        {
-            physics
-                .remove_collider(collider_handle)
-                .expect("Collider not removed");
+    for (handle, _) in physics.colliders.iter() {
+        if !collider_handles.contains(&handle) {
+            remove2.push(handle);
         }
+    }
+
+    for i in remove {
+        physics.remove_body(i).expect("Body not removed");
+        println!("remove body {i:?}")
+    }
+    for i in remove2 {
+        physics
+            .remove_collider(i)
+            .expect("Collider not removed");
+        println!("remove collider {i:?}")
     }
 }
 
@@ -386,11 +419,12 @@ fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
 pub fn physics_systems() -> SystemConfigs {
     (
         physics_create_handles_system,
-        physics_remove_handles_system.after(physics_create_handles_system),
-        physics_update_system.after(physics_remove_handles_system),
-        physics_sync_system.after(physics_update_system),
-        physics_system.after(physics_sync_system),
+        physics_remove_handles_system,
+        physics_update_system,
+        physics_sync_system,
+        physics_system,
     )
+        .chain()
         .into_configs()
 }
 

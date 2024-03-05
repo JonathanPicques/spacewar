@@ -56,10 +56,11 @@ impl AddCoreAppExt for App {
 
 pub fn core_systems() -> SystemConfigs {
     (
-        ttl_system,
         frame_system,
         physics_systems(),
         sprite_sheet_animator_system,
+        ttl_system,
     )
+        .chain()
         .into_configs()
 }
