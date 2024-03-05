@@ -24,6 +24,9 @@ use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
 
+#[derive(Copy, Clone, Component)]
+pub struct Game {}
+
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
 }
@@ -50,18 +53,12 @@ impl AddGameAppExt for App {
     }
 }
 
-#[derive(Copy, Clone, Component)]
-pub struct Game {}
-
 fn setup(
     mut commands: Commands,
     //
     game_args: Res<GameArgs>,
     game_assets: Res<GameAssets>,
 ) {
-    commands.insert_resource(Frame::default());
-    commands.insert_resource(Physics::default());
-
     commands.spawn((
         Game {},
         Camera2dBundle {
@@ -252,5 +249,7 @@ pub fn goto_game(
 ) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
+    commands.insert_resource(Frame::default());
+    commands.insert_resource(Physics::default());
     next_state.set(State::Game);
 }
