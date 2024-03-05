@@ -5,13 +5,12 @@ use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
-use bevy_ggrs::{prelude::*, LocalPlayers};
+use bevy_ggrs::{prelude::*, LocalPlayers, RollbackFrameCount};
 use rapier2d::geometry::InteractionGroups;
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::Clock;
 use crate::core::core_systems;
-use crate::core::frame::Frame;
 use crate::core::physics::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::PhysicsColliderOptions;
 use crate::core::physics::*;
@@ -198,7 +197,7 @@ fn setup(
 fn update(
     mut contexts: EguiContexts,
     //
-    frame: Res<Frame>,
+    frame: Res<RollbackFrameCount>,
     checksum: Res<Checksum>,
     mut game_args: ResMut<GameArgs>,
     mut next_state: ResMut<NextState<State>>,
@@ -227,7 +226,6 @@ fn cleanup(
     //
     query: Query<Entity, With<Game>>,
 ) {
-    commands.remove_resource::<Frame>();
     commands.remove_resource::<Physics>();
     commands.remove_resource::<LocalPlayers>();
     commands.remove_resource::<Session<GameConfig>>();
@@ -249,7 +247,6 @@ pub fn goto_game(
 ) {
     commands.insert_resource(session);
     commands.insert_resource(local_players);
-    commands.insert_resource(Frame::default());
     commands.insert_resource(Physics::default());
     next_state.set(State::Game);
 }

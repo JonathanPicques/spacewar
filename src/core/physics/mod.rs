@@ -2,7 +2,7 @@ pub mod body;
 pub mod collider;
 pub mod controller;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
@@ -331,30 +331,42 @@ fn physics_create_handles_system(
 
 #[allow(clippy::type_complexity)]
 fn physics_remove_handles_system(
-    mut removed_bodies: RemovedComponents<PhysicsBodyHandle>,
-    mut removed_colliders: RemovedComponents<PhysicsColliderHandle>,
+    query_body_handles: Query<&PhysicsBodyHandle>,
+    query_collider_handles: Query<&PhysicsColliderHandle>,
     //
     mut physics: ResMut<Physics>,
 ) {
-    for removed_body_entity in removed_bodies.read() {
-        if let Some(body_handle) = physics
-            .body_handles_by_entity
-            .remove(&removed_body_entity)
-        {
-            physics
-                .remove_body(body_handle)
-                .expect("Body not removed");
+    let body_handles = query_body_handles
+        .iter()
+        .map(|b| b.0)
+        .collect::<HashSet<_>>();
+    let collider_handles = query_collider_handles
+        .iter()
+        .map(|c| c.0)
+        .collect::<HashSet<_>>();
+    let mut remove_body_handles = vec![];
+    let mut remove_collider_handles = vec![];
+
+    for (handle, _) in physics.bodies.iter() {
+        if !body_handles.contains(&handle) {
+            remove_body_handles.push(handle);
         }
     }
-    for removed_collider_entity in removed_colliders.read() {
-        if let Some(collider_handle) = physics
-            .collider_handles_by_entity
-            .remove(&removed_collider_entity)
-        {
-            physics
-                .remove_collider(collider_handle)
-                .expect("Collider not removed");
+    for (handle, _) in physics.colliders.iter() {
+        if !collider_handles.contains(&handle) {
+            remove_collider_handles.push(handle);
         }
+    }
+
+    for handle in remove_body_handles {
+        physics
+            .remove_body(handle)
+            .expect("Body not removed");
+    }
+    for handle in remove_collider_handles {
+        physics
+            .remove_collider(handle)
+            .expect("Collider not removed");
     }
 }
 
@@ -386,11 +398,12 @@ fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
 pub fn physics_systems() -> SystemConfigs {
     (
         physics_create_handles_system,
-        physics_remove_handles_system.after(physics_create_handles_system),
-        physics_update_system.after(physics_remove_handles_system),
-        physics_sync_system.after(physics_update_system),
-        physics_system.after(physics_sync_system),
+        physics_remove_handles_system,
+        physics_update_system,
+        physics_sync_system,
+        physics_system,
     )
+        .chain()
         .into_configs()
 }
 

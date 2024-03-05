@@ -1,6 +1,5 @@
 pub mod anim;
 pub mod clock;
-pub mod frame;
 pub mod input;
 pub mod loader;
 pub mod physics;
@@ -15,7 +14,6 @@ use crate::core::anim::sprite_sheet_animator_system;
 use crate::core::body::{PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::clock::{ttl_system, TimeToLive};
 use crate::core::collider::{PhysicsColliderHandle, PhysicsColliderOptions};
-use crate::core::frame::{frame_system, Frame};
 use crate::core::physics::*;
 use crate::core::utilities::hash::physics_hasher;
 
@@ -35,10 +33,8 @@ impl AddCoreAppExt for App {
             .set_rollback_schedule_fps(fps)
             //
             .checksum_resource::<Physics>(physics_hasher)
-            .checksum_resource_with_hash::<Frame>()
             .checksum_component_with_hash::<TimeToLive>()
             //
-            .rollback_resource_with_copy::<Frame>()
             .rollback_resource_with_clone::<Physics>()
             .rollback_component_with_clone::<TimeToLive>()
             .rollback_component_with_clone::<PhysicsBody>()
@@ -57,9 +53,9 @@ impl AddCoreAppExt for App {
 pub fn core_systems() -> SystemConfigs {
     (
         ttl_system,
-        frame_system,
         physics_systems(),
         sprite_sheet_animator_system,
     )
+        .chain()
         .into_configs()
 }
