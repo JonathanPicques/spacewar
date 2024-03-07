@@ -5,14 +5,14 @@ use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 
 use crate::core::utilities::cmp::cmp_rollack;
 
-#[derive(Hash, Clone)]
+#[derive(Hash, Clone, Debug)]
 pub struct Clock {
     elapsed: Duration,
     duration: Duration,
     finished: bool,
 }
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Clone, Debug, Component)]
 pub struct TimeToLive {
     clock: Clock,
 }

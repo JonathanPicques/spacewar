@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 use rapier2d::prelude::*;
 
-#[derive(Clone, Component)]
+#[derive(Clone, Debug, Component)]
 pub enum PhysicsCollider {
     Circle { radius: f32 },
     Rectangle { width: f32, height: f32 },
 }
 
-#[derive(Clone, Component)]
+#[derive(Clone, Debug, Component)]
 pub struct PhysicsColliderOptions {
     pub friction: f32,
     pub restitution: f32,
@@ -15,7 +15,7 @@ pub struct PhysicsColliderOptions {
     pub active_collision_types: ActiveCollisionTypes,
 }
 
-#[derive(Clone, Component)]
+#[derive(Clone, Debug, Component)]
 pub(crate) struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {

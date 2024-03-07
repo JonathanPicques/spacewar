@@ -3,6 +3,7 @@ pub mod collider;
 pub mod controller;
 
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
 
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
@@ -39,29 +40,6 @@ pub struct Physics {
     //
     pub(crate) body_handles_by_entity: HashMap<Entity, RigidBodyHandle>,
     pub(crate) collider_handles_by_entity: HashMap<Entity, ColliderHandle>,
-}
-
-impl Default for Physics {
-    fn default() -> Self {
-        Self {
-            scale: 9.0,
-            gravity: vector![0.0, -9.81],
-            //
-            body_handles_by_entity: default(),
-            collider_handles_by_entity: default(),
-            //
-            bodies: default(),
-            colliders: default(),
-            ccd_solver: default(),
-            broad_phase: default(),
-            narrow_phase: default(),
-            query_pipeline: default(),
-            island_manager: default(),
-            impulse_joints: default(),
-            multibody_joints: default(),
-            integration_parameters: default(),
-        }
-    }
 }
 
 impl Physics {
@@ -165,6 +143,38 @@ impl Physics {
 
         body.set_next_kinematic_translation(position.translation.vector + movement.translation);
         character_controller.update_with_movement(movement, collisions);
+    }
+}
+
+impl Debug for Physics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Physics")
+            .field("scale", &self.scale)
+            .field("gravity", &self.gravity)
+            .finish()
+    }
+}
+
+impl Default for Physics {
+    fn default() -> Self {
+        Self {
+            scale: 9.0,
+            gravity: vector![0.0, -9.81],
+            //
+            body_handles_by_entity: default(),
+            collider_handles_by_entity: default(),
+            //
+            bodies: default(),
+            colliders: default(),
+            ccd_solver: default(),
+            broad_phase: default(),
+            narrow_phase: default(),
+            query_pipeline: default(),
+            island_manager: default(),
+            impulse_joints: default(),
+            multibody_joints: default(),
+            integration_parameters: default(),
+        }
     }
 }
 

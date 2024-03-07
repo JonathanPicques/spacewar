@@ -23,7 +23,7 @@ use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
 
-#[derive(Copy, Clone, Component)]
+#[derive(Copy, Clone, Debug, Component)]
 pub struct Game {}
 
 pub trait AddGameAppExt {

@@ -15,7 +15,7 @@ pub struct Floor {
     pub angle: f32,
 }
 
-#[derive(Clone, Component)]
+#[derive(Clone, Debug, Component)]
 pub struct PhysicsCharacterController {
     pub up: Vec2,
     pub right: Vec2,

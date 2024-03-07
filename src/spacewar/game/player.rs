@@ -30,14 +30,14 @@ const JUMP_STRENGTH: f32 = 6.0;
 const GRAVITY_MAX_SPEED: f32 = -12.0;
 const GRAVITY_ACCELERATION: f32 = 20.0;
 
-#[derive(Eq, Ord, Hash, Clone, PartialEq, PartialOrd, Default)]
+#[derive(Eq, Ord, Hash, Clone, Debug, Default, PartialEq, PartialOrd)]
 pub enum Direction {
     #[default]
     Left,
     Right,
 }
 
-#[derive(Clone, Default, Component, Derivative)]
+#[derive(Clone, Debug, Default, Component, Derivative)]
 #[derivative(Hash)]
 pub struct Player {
     pub handle: usize,
