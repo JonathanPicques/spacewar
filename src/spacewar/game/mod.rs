@@ -168,8 +168,8 @@ fn setup(
             PhysicsBody::KinematicPositionBased,
             PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
             PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-                filter: Layer::Player.into(),
-                memberships: Layer::Player.into(),
+                filter: Layer::Wall.into(),
+                memberships: Layer::Wall.into(),
             }),
             PhysicsCharacterController::default(),
             //

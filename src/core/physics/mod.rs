@@ -3,7 +3,6 @@ pub mod collider;
 pub mod controller;
 
 use std::collections::{HashMap, HashSet};
-use std::fmt::Debug;
 
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
@@ -102,6 +101,7 @@ impl Physics {
         &mut self,
         body_handle: &PhysicsBodyHandle,
         collider_handle: &PhysicsColliderHandle,
+        collider_options: Option<&PhysicsColliderOptions>,
         character_controller: &mut PhysicsCharacterController,
     ) {
         let (movement, collisions) = {
@@ -114,11 +114,15 @@ impl Physics {
                 .get(collider_handle.0)
                 .expect("Collider not found");
             let position = body.position();
+            let controller = character_controller.rapier_controller;
             let collider_shape = collider.shape();
-            let rapier_controller = character_controller.rapier_controller;
-
             let mut collisions = vec![];
-            let movement = rapier_controller.move_shape(
+            let mut query_filter = QueryFilter::default().exclude_rigid_body(body_handle.0);
+
+            if let Some(collider_options) = collider_options {
+                query_filter = query_filter.groups(collider_options.collision_groups);
+            }
+            let movement = controller.move_shape(
                 self.integration_parameters.dt,
                 &self.bodies,
                 &self.colliders,
@@ -126,7 +130,7 @@ impl Physics {
                 collider_shape,
                 position,
                 (character_controller.velocity / self.scale).to_physics(),
-                QueryFilter::default().exclude_rigid_body(body_handle.0),
+                query_filter,
                 |collision| {
                     collisions.push(collision);
                 },
@@ -146,7 +150,7 @@ impl Physics {
     }
 }
 
-impl Debug for Physics {
+impl std::fmt::Debug for Physics {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Physics")
             .field("scale", &self.scale)
@@ -188,6 +192,7 @@ fn physics_system(
         &Rollback,
         &PhysicsBodyHandle,
         &PhysicsColliderHandle,
+        Option<&PhysicsColliderOptions>,
         &mut PhysicsCharacterController,
     )>,
     //
@@ -197,10 +202,11 @@ fn physics_system(
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, body_handle, collider_handle, mut character_controller) in query {
+    for (_, body_handle, collider_handle, collider_options, mut character_controller) in query {
         physics.move_controller(
             body_handle,
             collider_handle,
+            collider_options,
             &mut character_controller,
         );
     }
