@@ -11,8 +11,9 @@ use rapier2d::geometry::InteractionGroups;
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::Clock;
 use crate::core::core_systems;
-use crate::core::physics::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
-use crate::core::physics::collider::PhysicsColliderOptions;
+use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
+use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::hash::transform_hasher;
@@ -22,9 +23,6 @@ use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::player::{player_system, Player};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
-
-#[derive(Copy, Clone, Debug, Component)]
-pub struct Game {}
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -51,6 +49,9 @@ impl AddGameAppExt for App {
             )
     }
 }
+
+#[derive(Hash, Copy, Clone, Component)]
+pub struct Game {}
 
 fn setup(
     mut commands: Commands,

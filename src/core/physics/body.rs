@@ -1,10 +1,11 @@
 use bevy::prelude::*;
+use derivative::Derivative;
 use rapier2d::prelude::*;
 
 use crate::core::utilities::maths::*;
 use crate::core::Physics;
 
-#[derive(Clone, Debug, Component)]
+#[derive(Hash, Clone, Component)]
 pub enum PhysicsBody {
     Fixed,
     Dynamic,
@@ -12,22 +13,30 @@ pub enum PhysicsBody {
     KinematicVelocityBased,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub struct PhysicsBodyOptions {
     pub ccd: bool,
+    #[derivative(Hash = "ignore")]
     pub gravity_scale: f32,
+    #[derivative(Hash = "ignore")]
     pub linear_damping: f32,
+    #[derivative(Hash = "ignore")]
     pub angular_damping: f32,
+    #[derivative(Hash = "ignore")]
     pub additional_mass: f32,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub struct PhysicsBodyVelocity {
+    #[derivative(Hash = "ignore")]
     pub linear_velocity: Option<Vec2>,
+    #[derivative(Hash = "ignore")]
     pub angular_velocity: Option<f32>,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Hash, Clone, Component)]
 pub(crate) struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {

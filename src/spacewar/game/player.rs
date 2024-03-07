@@ -11,9 +11,9 @@ use rapier2d::geometry::InteractionGroups;
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::{Clock, TimeToLive};
 use crate::core::input::CoreInput;
-use crate::core::physics::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
-use crate::core::physics::collider::PhysicsColliderOptions;
-use crate::core::physics::{PhysicsBody, PhysicsCharacterController, PhysicsCollider};
+use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
+use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
@@ -30,19 +30,19 @@ const JUMP_STRENGTH: f32 = 6.0;
 const GRAVITY_MAX_SPEED: f32 = -12.0;
 const GRAVITY_ACCELERATION: f32 = 20.0;
 
-#[derive(Eq, Ord, Hash, Clone, Debug, Default, PartialEq, PartialOrd)]
+#[derive(Eq, Hash, Clone, Default, PartialEq)]
 pub enum Direction {
     #[default]
     Left,
     Right,
 }
 
-#[derive(Clone, Debug, Default, Component, Derivative)]
+#[derive(Clone, Default, Component, Derivative)]
 #[derivative(Hash)]
 pub struct Player {
     pub handle: usize,
     pub direction: Direction,
-    #[derivative(Hash = "ignore")]
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
 }
 

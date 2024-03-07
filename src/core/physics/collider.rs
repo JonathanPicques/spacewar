@@ -1,21 +1,34 @@
 use bevy::prelude::*;
+use derivative::Derivative;
 use rapier2d::prelude::*;
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub enum PhysicsCollider {
-    Circle { radius: f32 },
-    Rectangle { width: f32, height: f32 },
+    Circle {
+        #[derivative(Hash = "ignore")]
+        radius: f32,
+    },
+    Rectangle {
+        #[derivative(Hash = "ignore")]
+        width: f32,
+        #[derivative(Hash = "ignore")]
+        height: f32,
+    },
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub struct PhysicsColliderOptions {
+    #[derivative(Hash = "ignore")]
     pub friction: f32,
+    #[derivative(Hash = "ignore")]
     pub restitution: f32,
     pub collision_groups: InteractionGroups,
     pub active_collision_types: ActiveCollisionTypes,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Hash, Clone, Component)]
 pub(crate) struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {

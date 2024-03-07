@@ -1,29 +1,37 @@
 use bevy::prelude::*;
+use derivative::Derivative;
 use rapier2d::control::{CharacterCollision, EffectiveCharacterMovement, KinematicCharacterController};
 
 use crate::core::utilities::maths::*;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct Wall {
     pub left: bool,
     pub right: bool,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct Floor {
     pub on: bool,
     pub angle: f32,
 }
 
-#[derive(Clone, Debug, Component)]
+#[derive(Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub struct PhysicsCharacterController {
+    #[derivative(Hash = "ignore")]
     pub up: Vec2,
+    #[derivative(Hash = "ignore")]
     pub right: Vec2,
+    #[derivative(Hash = "ignore")]
     pub velocity: Vec2,
     //
+    #[derivative(Hash = "ignore")]
     pub wall: Wall,
+    #[derivative(Hash = "ignore")]
     pub floor: Floor,
     //
+    #[derivative(Hash = "ignore")]
     pub(crate) rapier_controller: KinematicCharacterController,
 }
 

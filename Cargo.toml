@@ -3,6 +3,10 @@ name = "game"
 edition = "2021"
 version = "0.1.0"
 
+[features]
+default = ["stable"]
+stable = []
+
 [dependencies]
 ggrs = { version = "0.10.1" }
 anyhow = { version = "1.0.80" }

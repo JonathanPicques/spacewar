@@ -11,11 +11,11 @@ use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
 
 use crate::core::anim::sprite_sheet_animator_system;
-use crate::core::body::{PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::body::{PhysicsBody, PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::clock::{ttl_system, TimeToLive};
-use crate::core::collider::{PhysicsColliderHandle, PhysicsColliderOptions};
+use crate::core::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
+use crate::core::controller::PhysicsCharacterController;
 use crate::core::physics::*;
-use crate::core::utilities::hash::physics_hasher;
 
 pub trait AddCoreAppExt {
     fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoSystemConfigs<M>) -> &mut Self
@@ -32,7 +32,7 @@ impl AddCoreAppExt for App {
             .add_systems(ReadInputs, input_system)
             .set_rollback_schedule_fps(fps)
             //
-            .checksum_resource::<Physics>(physics_hasher)
+            .checksum_resource_with_hash::<Physics>()
             .checksum_component_with_hash::<TimeToLive>()
             //
             .rollback_resource_with_clone::<Physics>()

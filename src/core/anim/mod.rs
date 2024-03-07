@@ -3,13 +3,13 @@ use bevy_ggrs::GgrsTime;
 
 use crate::core::clock::Clock;
 
-#[derive(Hash, Clone, Debug, Default, Component)]
+#[derive(Hash, Clone, Default, Component)]
 pub struct SpriteSheetAnimator {
     pub clock: Clock,
     pub animation: Handle<SpriteSheetAnimation>,
 }
 
-#[derive(Asset, Debug, TypePath)]
+#[derive(Asset, TypePath)]
 pub struct SpriteSheetAnimation {
     pub start: usize,
     pub finish: usize,
