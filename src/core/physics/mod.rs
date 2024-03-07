@@ -263,7 +263,6 @@ fn physics_update_system(
                 .get_mut(body_handle.0)
                 .expect("Body not found"),
             body_options,
-            true,
         );
     }
     for (_, body, body_handle, body_velocity) in velocity_query {
@@ -274,7 +273,6 @@ fn physics_update_system(
                 .expect("Body not found"),
             body_velocity,
             scale,
-            true,
         );
     }
     for (_, collider, collider_handle, collider_options) in collider_query {

@@ -55,7 +55,9 @@ impl PhysicsBody {
         }
     }
 
-    pub(crate) fn apply_options(&self, body: &mut RigidBody, options: &PhysicsBodyOptions, wake_up: bool) {
+    pub(crate) fn apply_options(&self, body: &mut RigidBody, options: &PhysicsBodyOptions) {
+        let wake_up = false; // would desync if true
+
         body.enable_ccd(options.ccd);
         body.set_gravity_scale(options.gravity_scale, wake_up);
         body.set_linear_damping(options.linear_damping);
@@ -63,7 +65,9 @@ impl PhysicsBody {
         body.set_additional_mass(options.additional_mass, wake_up);
     }
 
-    pub(crate) fn apply_velocity(&self, body: &mut RigidBody, velocity: &PhysicsBodyVelocity, scale: f32, wake_up: bool) {
+    pub(crate) fn apply_velocity(&self, body: &mut RigidBody, velocity: &PhysicsBodyVelocity, scale: f32) {
+        let wake_up = false; // would desync if true
+
         if let Some(linvel) = velocity.linear_velocity {
             body.set_linvel((linvel / scale).to_physics(), wake_up);
         }

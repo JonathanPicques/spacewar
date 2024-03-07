@@ -27,7 +27,6 @@ pub fn input_system(
 
         if game_args.randomize_input {
             input.set(random());
-            input.unset(INPUT_SHOOT); // FIXME: Desync
         } else if !local || *handle == 0 {
             if keyboard_input.pressed(KeyCode::ArrowUp) {
                 input.set(INPUT_UP);
