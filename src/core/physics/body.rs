@@ -17,6 +17,7 @@ pub enum PhysicsBody {
 #[derivative(Hash)]
 pub struct PhysicsBodyOptions {
     pub ccd: bool,
+    pub sleep: Option<bool>,
     #[derivative(Hash = "ignore")]
     pub gravity_scale: f32,
     #[derivative(Hash = "ignore")]
@@ -65,8 +66,13 @@ impl PhysicsBody {
     }
 
     pub(crate) fn apply_options(&self, body: &mut RigidBody, options: &PhysicsBodyOptions) {
-        let wake_up = false; // would desync if true
+        let wake_up = true;
 
+        match options.sleep {
+            None => (),
+            Some(true) => body.sleep(),
+            Some(false) => body.wake_up(false),
+        }
         body.enable_ccd(options.ccd);
         body.set_gravity_scale(options.gravity_scale, wake_up);
         body.set_linear_damping(options.linear_damping);
@@ -75,7 +81,7 @@ impl PhysicsBody {
     }
 
     pub(crate) fn apply_velocity(&self, body: &mut RigidBody, velocity: &PhysicsBodyVelocity, scale: f32) {
-        let wake_up = false; // would desync if true
+        let wake_up = true;
 
         if let Some(linvel) = velocity.linear_velocity {
             body.set_linvel((linvel / scale).to_physics(), wake_up);
@@ -112,6 +118,7 @@ impl Default for PhysicsBodyOptions {
     fn default() -> Self {
         Self {
             ccd: false,
+            sleep: default(),
             gravity_scale: 1.0,
             linear_damping: default(),
             angular_damping: default(),

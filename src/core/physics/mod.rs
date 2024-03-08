@@ -197,8 +197,6 @@ impl Default for Physics {
 
 //
 
-type Upserted<T> = Or<(Added<T>, Changed<T>)>;
-
 #[allow(clippy::type_complexity)]
 fn physics_system(
     mut query: Query<(
@@ -245,33 +243,24 @@ fn physics_sync_system(
 
 #[allow(clippy::type_complexity)]
 fn physics_update_system(
-    body_query: Query<
-        (
-            &Rollback,
-            &PhysicsBody,
-            &PhysicsBodyHandle,
-            &PhysicsBodyOptions,
-        ),
-        Upserted<PhysicsBodyOptions>,
-    >,
-    collider_query: Query<
-        (
-            &Rollback,
-            &PhysicsCollider,
-            &PhysicsColliderHandle,
-            &PhysicsColliderOptions,
-        ),
-        Upserted<PhysicsColliderOptions>,
-    >,
-    velocity_query: Query<
-        (
-            &Rollback,
-            &PhysicsBody,
-            &PhysicsBodyHandle,
-            &PhysicsBodyVelocity,
-        ),
-        Upserted<PhysicsBodyVelocity>,
-    >,
+    body_query: Query<(
+        &Rollback,
+        &PhysicsBody,
+        &PhysicsBodyHandle,
+        &PhysicsBodyOptions,
+    )>,
+    collider_query: Query<(
+        &Rollback,
+        &PhysicsCollider,
+        &PhysicsColliderHandle,
+        &PhysicsColliderOptions,
+    )>,
+    velocity_query: Query<(
+        &Rollback,
+        &PhysicsBody,
+        &PhysicsBodyHandle,
+        &PhysicsBodyVelocity,
+    )>,
     //
     order: Res<RollbackOrdered>,
     mut physics: ResMut<Physics>,
