@@ -6,6 +6,7 @@ use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers, RollbackFrameCount};
+use rapier2d::dynamics::IntegrationParameters;
 use rapier2d::geometry::InteractionGroups;
 
 use crate::core::anim::SpriteSheetAnimator;
@@ -243,11 +244,21 @@ pub fn goto_game(
     commands: &mut Commands,
     next_state: &mut NextState<State>,
     //
+    args: &GameArgs,
     session: Session<GameConfig>,
     local_players: LocalPlayers,
 ) {
+    let fps = args.fps as f32;
+
     commands.insert_resource(session);
     commands.insert_resource(local_players);
-    commands.insert_resource(Physics::default());
+    commands.insert_resource(Physics {
+        integration_parameters: IntegrationParameters {
+            dt: 1.0 / fps,
+            min_ccd_dt: 1.0 / fps / 100.0,
+            ..default()
+        },
+        ..default()
+    });
     next_state.set(State::Game);
 }

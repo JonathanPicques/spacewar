@@ -2,6 +2,7 @@ pub mod game;
 pub mod menu;
 
 use bevy::prelude::*;
+use bevy::window::PresentMode;
 use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
 use bevy_egui::EguiPlugin;
@@ -114,7 +115,11 @@ pub fn spacewar() {
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
-                    primary_window: Some(Window { prevent_default_event_handling: false, ..default() }),
+                    primary_window: Some(Window {
+                        present_mode: PresentMode::AutoVsync,
+                        prevent_default_event_handling: false,
+                        ..default()
+                    }),
                     ..default()
                 }),
         )

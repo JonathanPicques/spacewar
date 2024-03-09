@@ -48,6 +48,8 @@ fn update(
     goto_game(
         &mut commands,
         &mut next_state,
+        //
+        &game_args,
         Session::SyncTest(session),
         LocalPlayers((0..game_args.num_players).collect()),
     );

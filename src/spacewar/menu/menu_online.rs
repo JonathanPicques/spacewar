@@ -94,6 +94,8 @@ fn update(
         goto_game(
             &mut commands,
             &mut next_state,
+            &game_args,
+            //
             Session::P2P(session),
             LocalPlayers(handles),
         );
