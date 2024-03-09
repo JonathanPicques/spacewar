@@ -2,26 +2,22 @@ pub mod input;
 pub mod player;
 
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers, RollbackFrameCount};
 use rapier2d::dynamics::IntegrationParameters;
 use rapier2d::geometry::InteractionGroups;
 
-use crate::core::anim::SpriteSheetAnimator;
-use crate::core::clock::Clock;
 use crate::core::core_systems;
 use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
-use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::hash::transform_hasher;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
-use crate::spacewar::game::player::{player_system, Player};
+use crate::spacewar::game::player::{player_system, Player, PlayerBundle};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
 
@@ -34,6 +30,7 @@ impl AddGameAppExt for App {
         self.add_core::<GameConfig, _>(fps, input_system)
             .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<Player>()
+            .rollback_component_with_copy::<Game>()
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
             //
@@ -51,7 +48,7 @@ impl AddGameAppExt for App {
     }
 }
 
-#[derive(Hash, Copy, Clone, Component)]
+#[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Game {}
 
 fn setup(
@@ -159,40 +156,7 @@ fn setup(
     ));
 
     for handle in 0..game_args.num_players {
-        commands.spawn_with_rollback((
-            Game {},
-            Player {
-                handle,
-                shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
-                ..default()
-            },
-            //
-            PhysicsBody::KinematicPositionBased,
-            PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
-            PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-                filter: Layer::Wall.into(),
-                memberships: Layer::Wall.into(),
-            }),
-            PhysicsCharacterController::default(),
-            //
-            SpriteSheetBundle {
-                atlas: TextureAtlas {
-                    index: 0,
-                    layout: game_assets.player_atlas_layout.clone(),
-                },
-                sprite: Sprite {
-                    anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
-                    ..default()
-                },
-                texture: game_assets.player.clone(),
-                transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
-                ..default()
-            },
-            SpriteSheetAnimator {
-                clock: Clock::from_secs_f32(0.1),
-                animation: game_assets.player_idle_anim.clone(),
-            },
-        ));
+        commands.spawn_with_rollback(PlayerBundle::new(handle, &game_assets));
     }
 }
 

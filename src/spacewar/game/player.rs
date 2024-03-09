@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy::sprite::Anchor;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
@@ -44,6 +45,59 @@ pub struct Player {
     pub direction: Direction,
     #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
+}
+
+#[derive(Bundle)]
+pub struct PlayerBundle {
+    game: Game,
+    player: Player,
+    //
+    body: PhysicsBody,
+    collider: PhysicsCollider,
+    collider_options: PhysicsColliderOptions,
+    character_controller: PhysicsCharacterController,
+    //
+    sprite_sheet_bundle: SpriteSheetBundle,
+    sprite_sheet_animator: SpriteSheetAnimator,
+}
+
+impl PlayerBundle {
+    pub(crate) fn new(handle: usize, game_assets: &GameAssets) -> Self {
+        Self {
+            game: default(),
+            player: Player {
+                handle,
+                shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
+                ..default()
+            },
+            //
+            body: PhysicsBody::KinematicPositionBased,
+            collider: PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
+            collider_options: PhysicsColliderOptions::from_collision_groups(InteractionGroups {
+                filter: Layer::Wall.into(),
+                memberships: Layer::Wall.into(),
+            }),
+            character_controller: default(),
+            //
+            sprite_sheet_bundle: SpriteSheetBundle {
+                atlas: TextureAtlas {
+                    index: 0,
+                    layout: game_assets.player_atlas_layout.clone(),
+                },
+                sprite: Sprite {
+                    anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
+                    ..default()
+                },
+                texture: game_assets.player.clone(),
+                transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
+                ..default()
+            },
+            sprite_sheet_animator: SpriteSheetAnimator {
+                clock: Clock::from_secs_f32(0.1),
+                animation: game_assets.player_idle_anim.clone(),
+            },
+        }
+    }
 }
 
 #[allow(clippy::type_complexity)]
