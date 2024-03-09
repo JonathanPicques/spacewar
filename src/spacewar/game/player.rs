@@ -33,14 +33,26 @@ const JUMP_STRENGTH: f32 = 6.0;
 const GRAVITY_MAX_SPEED: f32 = -12.0;
 const GRAVITY_ACCELERATION: f32 = 20.0;
 
-#[derive(Eq, Hash, Clone, Default, PartialEq)]
+#[derive(Eq, Hash, Copy, Clone, Default, PartialEq)]
 pub enum Direction {
     #[default]
     Left,
     Right,
 }
 
-#[derive(Clone, Default, Component, Derivative)]
+#[derive(Copy, Clone, Default, Component, Derivative)]
+#[derivative(Hash)]
+pub struct Stats {
+    pub shots: u8,
+    pub kills: u8,
+}
+
+#[derive(Hash, Copy, Clone, Default, Component)]
+pub struct Health {
+    pub hp: u8,
+}
+
+#[derive(Copy, Clone, Default, Component, Derivative)]
 #[derivative(Hash)]
 pub struct Player {
     pub handle: PlayerHandle,
@@ -49,17 +61,11 @@ pub struct Player {
     pub shoot_clock: Clock,
 }
 
-#[derive(Clone, Default, Component, Derivative)]
-#[derivative(Hash)]
-pub struct PlayerStats {
-    pub shots: u8,
-    pub kills: u8,
-}
-
 #[derive(Bundle)]
 pub struct PlayerBundle {
     game: Game,
-    stats: PlayerStats,
+    stats: Stats,
+    health: Health,
     player: Player,
     //
     body: PhysicsBody,
@@ -75,7 +81,8 @@ impl PlayerBundle {
     pub(crate) fn new(handle: usize, game_assets: &GameAssets) -> Self {
         Self {
             game: default(),
-            stats: PlayerStats::default(),
+            stats: Stats::default(),
+            health: Health { hp: 1 },
             player: Player {
                 handle,
                 shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
@@ -191,7 +198,7 @@ pub fn player_system(
 
         player.direction = match 0.0_f32.total_cmp(&velocity.x) {
             Ordering::Less => Direction::Right,
-            Ordering::Equal => player.direction.clone(),
+            Ordering::Equal => player.direction,
             Ordering::Greater => Direction::Left,
         };
 
