@@ -79,7 +79,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation(0.0.to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(0.0).into())
             .with_translation(Vec3::new(0.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
@@ -92,7 +92,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation(0.0.to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(0.0).into())
             .with_translation(Vec3::new(150.0, 10.0, 0.0)),
         //
         PhysicsBody::Fixed,
@@ -105,7 +105,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation(20.0.to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(20.0).into())
             .with_translation(Vec3::new(150.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
@@ -118,7 +118,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation((-20.0).to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(-20.0).into())
             .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
         //
         PhysicsBody::Fixed,
@@ -131,7 +131,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation((20.0).to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(20.0).into())
             .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
         //
         PhysicsBody::Fixed,
@@ -145,7 +145,7 @@ fn setup(
     commands.spawn_with_rollback((
         Game {},
         Transform::default()
-            .with_rotation((20.0).to_bevy(Angle::Degrees))
+            .with_rotation(Rotation::Degrees(20.0).into())
             .with_translation(Vec3::new(0.0, 55.0, 0.0)),
         //
         PhysicsBody::Dynamic,

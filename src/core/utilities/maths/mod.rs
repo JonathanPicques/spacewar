@@ -116,24 +116,18 @@ impl ToPhysicsVecExt for Vec3 {
  * Quaternions
  */
 
-pub enum Angle {
-    Radians,
-    Degrees,
-}
-pub trait ToBevyQuatExt {
-    fn to_bevy(self, angle: Angle) -> Quat;
+pub enum Rotation {
+    Radians(f32),
+    Degrees(f32),
 }
 
-impl<T> ToBevyQuatExt for T
-where
-    T: Into<f32>,
-{
-    /// Creates a [`Quat`] from this [`f32`].
+impl From<Rotation> for Quat {
+    /// Creates a [`Quat`] from this [`Rotation`].
     #[inline(always)]
-    fn to_bevy(self, angle: Angle) -> Quat {
-        Quat::from_rotation_z(match angle {
-            Angle::Radians => self.into(),
-            Angle::Degrees => self.into().to_radians(),
+    fn from(value: Rotation) -> Self {
+        Quat::from_rotation_z(match value {
+            Rotation::Radians(radians) => radians,
+            Rotation::Degrees(degrees) => degrees.to_radians(),
         })
     }
 }
