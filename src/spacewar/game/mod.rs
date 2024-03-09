@@ -1,5 +1,6 @@
 pub mod input;
 pub mod player;
+pub mod projectile;
 
 use bevy::prelude::*;
 use bevy_egui::egui::CollapsingHeader;
@@ -17,7 +18,8 @@ use crate::core::utilities::hash::transform_hasher;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
-use crate::spacewar::game::player::{player_system, Player, PlayerBundle};
+use crate::spacewar::game::player::{player_system, Player, PlayerBundle, PlayerStats};
+use crate::spacewar::game::projectile::Projectile;
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
 
@@ -28,11 +30,18 @@ pub trait AddGameAppExt {
 impl AddGameAppExt for App {
     fn add_game(&mut self, fps: usize) -> &mut Self {
         self.add_core::<GameConfig, _>(fps, input_system)
+            //
             .checksum_component::<Transform>(transform_hasher)
+            .checksum_component_with_hash::<Game>()
             .checksum_component_with_hash::<Player>()
+            .checksum_component_with_hash::<Projectile>()
+            .checksum_component_with_hash::<PlayerStats>()
+            //
             .rollback_component_with_copy::<Game>()
             .rollback_component_with_clone::<Player>()
             .rollback_component_with_clone::<Transform>()
+            .rollback_component_with_clone::<Projectile>()
+            .rollback_component_with_clone::<PlayerStats>()
             //
             .add_systems(OnEnter(State::Game), setup)
             .add_systems(

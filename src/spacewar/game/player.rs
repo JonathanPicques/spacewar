@@ -7,18 +7,20 @@ use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
 use derivative::Derivative;
+use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 
 use crate::core::anim::SpriteSheetAnimator;
-use crate::core::clock::{Clock, TimeToLive};
+use crate::core::clock::Clock;
 use crate::core::input::CoreInput;
-use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
+use crate::core::physics::body::PhysicsBody;
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::*;
 use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
+use crate::spacewar::game::projectile::ProjectileBundle;
 use crate::spacewar::game::Game;
 use crate::spacewar::{GameAssets, GameConfig, Layer};
 
@@ -41,15 +43,23 @@ pub enum Direction {
 #[derive(Clone, Default, Component, Derivative)]
 #[derivative(Hash)]
 pub struct Player {
-    pub handle: usize,
+    pub handle: PlayerHandle,
     pub direction: Direction,
     #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
 }
 
+#[derive(Clone, Default, Component, Derivative)]
+#[derivative(Hash)]
+pub struct PlayerStats {
+    pub shots: u8,
+    pub kills: u8,
+}
+
 #[derive(Bundle)]
 pub struct PlayerBundle {
     game: Game,
+    stats: PlayerStats,
     player: Player,
     //
     body: PhysicsBody,
@@ -65,6 +75,7 @@ impl PlayerBundle {
     pub(crate) fn new(handle: usize, game_assets: &GameAssets) -> Self {
         Self {
             game: default(),
+            stats: PlayerStats::default(),
             player: Player {
                 handle,
                 shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
@@ -140,38 +151,10 @@ pub fn player_system(
 
         if input.is_set(INPUT_SHOOT) && player.shoot_clock.finished() {
             player.shoot_clock.reset();
-            commands.spawn_with_rollback((
-                Game {},
-                TimeToLive::from_secs_f32(2.0),
-                SpriteBundle {
-                    texture: game_assets.bullet.clone(),
-                    transform: match player.direction {
-                        Direction::Left => Transform::from_translation(transform.translation + Vec3::new(-15.0, 6.0, 0.0)),
-                        Direction::Right => Transform::from_translation(transform.translation + Vec3::new(15.0, 6.0, 0.0)),
-                    },
-                    ..default()
-                },
-                //
-                PhysicsBody::Dynamic,
-                PhysicsBodyOptions { gravity_scale: 0.0, ..default() },
-                PhysicsBodyVelocity {
-                    linear_velocity: Some(match player.direction {
-                        Direction::Left => Vec2::new(-80.0, 0.0),
-                        Direction::Right => Vec2::new(80.0, 0.0),
-                    }),
-                    ..default()
-                },
-                //
-                PhysicsCollider::Circle { radius: 0.1 },
-                PhysicsColliderOptions {
-                    friction: 0.0,
-                    restitution: 0.0,
-                    collision_groups: InteractionGroups {
-                        filter: Layer::Wall.into(),
-                        memberships: Layer::Projectile.into(),
-                    },
-                    ..default()
-                },
+            commands.spawn_with_rollback(ProjectileBundle::new(
+                &player,
+                transform,
+                &game_assets,
             ));
         }
 
