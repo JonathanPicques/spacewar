@@ -1,4 +1,5 @@
 pub mod input;
+pub mod level;
 pub mod player;
 pub mod projectile;
 
@@ -18,6 +19,7 @@ use crate::core::utilities::hash::transform_hasher;
 use crate::core::utilities::maths::*;
 use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
+use crate::spacewar::game::level::LevelRectBundle;
 use crate::spacewar::game::player::{player_system, Health, Player, PlayerBundle, Stats};
 use crate::spacewar::game::projectile::{projectile_system, Projectile};
 use crate::spacewar::menu::menu_main::goto_main_menu;
@@ -76,95 +78,41 @@ fn setup(
         },
     ));
 
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(0.0).into())
-            .with_translation(Vec3::new(0.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(0.0).into())
-            .with_translation(Vec3::new(150.0, 10.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(20.0).into())
-            .with_translation(Vec3::new(150.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(-20.0).into())
-            .with_translation(Vec3::new(-100.0, -30.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(20.0).into())
-            .with_translation(Vec3::new(-200.0, -35.0, 0.0)),
-        //
-        PhysicsBody::Fixed,
-        PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
-        PhysicsColliderOptions::from_collision_groups(InteractionGroups {
-            filter: Layer::Wall.into(),
-            memberships: Layer::Wall.into(),
-        }),
-    ));
+    // Level
+    {
+        commands.spawn_with_rollback(LevelRectBundle::new(
+            PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
+            Rotation::Degrees(0.0),
+            Vec3::new(0.0, -30.0, 0.0),
+        ));
+    }
 
-    commands.spawn_with_rollback((
-        Game {},
-        Transform::default()
-            .with_rotation(Rotation::Degrees(20.0).into())
-            .with_translation(Vec3::new(0.0, 55.0, 0.0)),
-        //
-        PhysicsBody::Dynamic,
-        PhysicsBodyOptions::from_gravity_scale(0.0),
-        PhysicsBodyVelocity {
-            linear_velocity: Some(Vec2::new(0.0, 0.0)),
-            angular_velocity: Some(20.0_f32.to_radians()),
-        },
-        //
-        PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
-        PhysicsColliderOptions {
-            restitution: 1.0,
-            collision_groups: InteractionGroups {
-                filter: Layer::Wall.into(),
-                memberships: Layer::Wall.into(),
+    // Rotating square
+    {
+        commands.spawn_with_rollback((
+            Game {},
+            Transform::default()
+                .with_rotation(Rotation::Degrees(20.0).into())
+                .with_translation(Vec3::new(0.0, 55.0, 0.0)),
+            //
+            PhysicsBody::Dynamic,
+            PhysicsBodyOptions::from_gravity_scale(0.0),
+            PhysicsBodyVelocity {
+                linear_velocity: Some(Vec2::new(0.0, 0.0)),
+                angular_velocity: Some(20.0_f32.to_radians()),
             },
-            ..default()
-        },
-    ));
+            //
+            PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
+            PhysicsColliderOptions {
+                restitution: 1.0,
+                collision_groups: InteractionGroups {
+                    filter: Layer::Wall.into(),
+                    memberships: Layer::Wall.into(),
+                },
+                ..default()
+            },
+        ));
+    }
 
     for handle in 0..game_args.num_players {
         commands.spawn_with_rollback(PlayerBundle::new(handle, &game_assets));
