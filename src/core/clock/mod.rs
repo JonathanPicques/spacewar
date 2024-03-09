@@ -12,7 +12,7 @@ pub struct Clock {
     finished: bool,
 }
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Copy, Clone, Component)]
 pub struct TimeToLive {
     clock: Clock,
 }

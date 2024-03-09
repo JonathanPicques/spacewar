@@ -36,15 +36,15 @@ impl AddCoreAppExt for App {
             .checksum_component_with_hash::<TimeToLive>()
             //
             .rollback_resource_with_clone::<Physics>()
-            .rollback_component_with_clone::<TimeToLive>()
-            .rollback_component_with_clone::<PhysicsBody>()
-            .rollback_component_with_clone::<PhysicsBodyHandle>()
-            .rollback_component_with_clone::<PhysicsBodyOptions>()
-            .rollback_component_with_clone::<PhysicsBodyVelocity>()
-            .rollback_component_with_clone::<PhysicsCollider>()
-            .rollback_component_with_clone::<PhysicsColliderHandle>()
-            .rollback_component_with_clone::<PhysicsColliderOptions>()
-            .rollback_component_with_clone::<PhysicsCharacterController>();
+            .rollback_component_with_copy::<TimeToLive>()
+            .rollback_component_with_copy::<PhysicsBody>()
+            .rollback_component_with_copy::<PhysicsBodyHandle>()
+            .rollback_component_with_copy::<PhysicsBodyOptions>()
+            .rollback_component_with_copy::<PhysicsBodyVelocity>()
+            .rollback_component_with_copy::<PhysicsCollider>()
+            .rollback_component_with_copy::<PhysicsColliderHandle>()
+            .rollback_component_with_copy::<PhysicsColliderOptions>()
+            .rollback_component_with_copy::<PhysicsCharacterController>();
 
         self
     }

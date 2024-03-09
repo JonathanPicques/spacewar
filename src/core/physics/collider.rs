@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use derivative::Derivative;
 use rapier2d::prelude::*;
 
-#[derive(Clone, Component, Derivative)]
+#[derive(Copy, Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub enum PhysicsCollider {
     Circle {
@@ -17,7 +17,7 @@ pub enum PhysicsCollider {
     },
 }
 
-#[derive(Clone, Component, Derivative)]
+#[derive(Copy, Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub struct PhysicsColliderOptions {
     #[derivative(Hash = "ignore")]
@@ -28,7 +28,7 @@ pub struct PhysicsColliderOptions {
     pub active_collision_types: ActiveCollisionTypes,
 }
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Copy, Clone, Component)]
 pub struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {

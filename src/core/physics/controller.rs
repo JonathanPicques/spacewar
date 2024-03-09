@@ -4,19 +4,19 @@ use rapier2d::control::{CharacterCollision, EffectiveCharacterMovement, Kinemati
 
 use crate::core::utilities::maths::*;
 
-#[derive(Clone, Default)]
+#[derive(Copy, Clone, Default)]
 pub struct Wall {
     pub left: bool,
     pub right: bool,
 }
 
-#[derive(Clone, Default)]
+#[derive(Copy, Clone, Default)]
 pub struct Floor {
     pub on: bool,
     pub angle: f32,
 }
 
-#[derive(Clone, Component, Derivative)]
+#[derive(Copy, Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub struct PhysicsCharacterController {
     #[derivative(Hash = "ignore")]

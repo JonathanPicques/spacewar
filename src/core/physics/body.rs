@@ -4,7 +4,7 @@ use rapier2d::prelude::*;
 
 use crate::core::utilities::maths::*;
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Copy, Clone, Component)]
 pub enum PhysicsBody {
     Fixed,
     Dynamic,
@@ -12,7 +12,7 @@ pub enum PhysicsBody {
     KinematicVelocityBased,
 }
 
-#[derive(Clone, Component, Derivative)]
+#[derive(Clone, Copy, Component, Derivative)]
 #[derivative(Hash)]
 pub struct PhysicsBodyOptions {
     pub ccd: bool,
@@ -27,7 +27,7 @@ pub struct PhysicsBodyOptions {
     pub additional_mass: f32,
 }
 
-#[derive(Clone, Component, Derivative)]
+#[derive(Copy, Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub struct PhysicsBodyVelocity {
     #[derivative(Hash = "ignore")]
@@ -36,7 +36,7 @@ pub struct PhysicsBodyVelocity {
     pub angular_velocity: Option<f32>,
 }
 
-#[derive(Hash, Clone, Component)]
+#[derive(Hash, Copy, Clone, Component)]
 pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
