@@ -81,9 +81,19 @@ fn setup(
     // Level
     {
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 35.0, height: 1.0 },
+            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(0.0, -30.0, 0.0),
+            Vec3::new(-7.5, -10.0, 0.0),
+        ));
+        commands.spawn_with_rollback(LevelRectBundle::new(
+            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+            Rotation::Degrees(0.0),
+            Vec3::new(0.0, -10.0, 0.0),
+        ));
+        commands.spawn_with_rollback(LevelRectBundle::new(
+            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+            Rotation::Degrees(0.0),
+            Vec3::new(7.5, -10.0, 0.0),
         ));
     }
 
@@ -115,7 +125,11 @@ fn setup(
     }
 
     for handle in 0..game_args.num_players {
-        commands.spawn_with_rollback(PlayerBundle::new(handle, &game_assets));
+        commands.spawn_with_rollback(PlayerBundle::new(
+            handle,
+            &game_args,
+            &game_assets,
+        ));
     }
 }
 

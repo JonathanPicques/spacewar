@@ -3,7 +3,6 @@ use derivative::Derivative;
 use rapier2d::prelude::*;
 
 use crate::core::utilities::maths::*;
-use crate::core::Physics;
 
 #[derive(Hash, Clone, Component)]
 pub enum PhysicsBody {
@@ -41,9 +40,9 @@ pub struct PhysicsBodyVelocity {
 pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
-    pub(crate) fn build(&self, physics: &Physics, transform: &Transform) -> RigidBody {
+    pub(crate) fn build(&self, transform: &Transform) -> RigidBody {
         let rotation = transform.rotation.to_euler(EulerRot::ZYX).0;
-        let translation = (transform.translation / physics.scale).to_physics();
+        let translation = transform.translation.to_physics();
 
         match self {
             PhysicsBody::Fixed => RigidBodyBuilder::fixed()

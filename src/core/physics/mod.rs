@@ -175,7 +175,7 @@ impl Hash for Physics {
 impl Default for Physics {
     fn default() -> Self {
         Self {
-            scale: 9.0,
+            scale: 18.0,
             gravity: vector![0.0, -9.81],
             //
             body_handles_by_entity: default(),
@@ -328,7 +328,7 @@ fn physics_create_handles_system(
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (e, _, transform, body, collider) in query {
-        let body = body.build(&physics, transform);
+        let body = body.build(transform);
         let collider = collider.build();
         let (body_handle, collider_handle) = physics.insert_body(body, collider);
 

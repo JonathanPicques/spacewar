@@ -22,7 +22,7 @@ use crate::core::utilities::maths::*;
 use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
 use crate::spacewar::game::projectile::ProjectileBundle;
 use crate::spacewar::game::Game;
-use crate::spacewar::{GameAssets, GameConfig, Layer};
+use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer};
 
 const MAX_SPEED: f32 = 2.0;
 const ACCELERATION: f32 = 7.0;
@@ -78,7 +78,7 @@ pub struct PlayerBundle {
 }
 
 impl PlayerBundle {
-    pub fn new(handle: usize, game_assets: &GameAssets) -> Self {
+    pub fn new(handle: usize, game_args: &GameArgs, game_assets: &GameAssets) -> Self {
         Self {
             game: default(),
             stats: Stats::default(),
@@ -107,7 +107,15 @@ impl PlayerBundle {
                     ..default()
                 },
                 texture: game_assets.player.clone(),
-                transform: Transform::from_translation(Vec3::new((handle * 32) as f32, 1.0, 5.0)),
+                transform: Transform::from_translation(Vec3::new(
+                    lerp(
+                        -2.0,
+                        2.0,
+                        (handle as f32) / ((game_args.num_players - 1) as f32),
+                    ),
+                    1.0,
+                    5.0,
+                )),
                 ..default()
             },
             sprite_sheet_animator: SpriteSheetAnimator {

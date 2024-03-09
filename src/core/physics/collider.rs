@@ -35,7 +35,7 @@ impl PhysicsCollider {
     pub(crate) fn build(&self) -> Collider {
         match self {
             Self::Circle { radius } => ColliderBuilder::ball(*radius).build(),
-            Self::Rectangle { width, height } => ColliderBuilder::cuboid(*width, *height).build(),
+            Self::Rectangle { width, height } => ColliderBuilder::cuboid(width / 2.0, height / 2.0).build(),
         }
     }
 
