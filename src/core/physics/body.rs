@@ -38,7 +38,7 @@ pub struct PhysicsBodyVelocity {
 }
 
 #[derive(Hash, Clone, Component)]
-pub(crate) struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
+pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
     pub(crate) fn build(&self, physics: &Physics, transform: &Transform) -> RigidBody {
@@ -89,6 +89,13 @@ impl PhysicsBody {
         if let Some(angvel) = velocity.angular_velocity {
             body.set_angvel(angvel, wake_up);
         }
+    }
+}
+
+impl PhysicsBodyHandle {
+    #[inline(always)]
+    pub fn handle(&self) -> RigidBodyHandle {
+        self.0
     }
 }
 

@@ -78,7 +78,7 @@ pub struct PlayerBundle {
 }
 
 impl PlayerBundle {
-    pub(crate) fn new(handle: usize, game_assets: &GameAssets) -> Self {
+    pub fn new(handle: usize, game_assets: &GameAssets) -> Self {
         Self {
             game: default(),
             stats: Stats::default(),

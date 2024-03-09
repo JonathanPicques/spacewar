@@ -29,7 +29,7 @@ pub struct PhysicsColliderOptions {
 }
 
 #[derive(Hash, Clone, Component)]
-pub(crate) struct PhysicsColliderHandle(pub(crate) ColliderHandle);
+pub struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {
     pub(crate) fn build(&self) -> Collider {
@@ -44,6 +44,13 @@ impl PhysicsCollider {
         collider.set_restitution(options.restitution);
         collider.set_collision_groups(options.collision_groups);
         collider.set_active_collision_types(options.active_collision_types);
+    }
+}
+
+impl PhysicsColliderHandle {
+    #[inline(always)]
+    pub fn handle(&self) -> ColliderHandle {
+        self.0
     }
 }
 

@@ -34,7 +34,7 @@ pub struct ProjectileBundle {
 }
 
 impl ProjectileBundle {
-    pub(crate) fn new(player: &Player, transform: &Transform, game_assets: &GameAssets) -> Self {
+    pub fn new(player: &Player, transform: &Transform, game_assets: &GameAssets) -> Self {
         Self {
             game: Game {},
             projectile: Projectile { owner: player.handle },
@@ -73,7 +73,7 @@ impl ProjectileBundle {
     }
 }
 
-pub(crate) fn projectile_system(
+pub fn projectile_system(
     query: Query<(
         Entity,
         &Rollback,
@@ -95,7 +95,7 @@ pub(crate) fn projectile_system(
     for (e, _, _, collider_handle) in projectiles {
         let rapier_collider = physics
             .colliders
-            .get(collider_handle.0)
+            .get(collider_handle.handle())
             .expect("Collider not found");
 
         physics.query_pipeline.intersections_with_shape(
@@ -103,11 +103,11 @@ pub(crate) fn projectile_system(
             &physics.colliders,
             rapier_collider.position(),
             rapier_collider.shape(),
-            QueryFilter::default().exclude_collider(collider_handle.0),
+            QueryFilter::default().exclude_collider(collider_handle.handle()),
             |hit_handle| {
                 if let Some((_, target, ..)) = healths
                     .iter_mut()
-                    .find(|(_, _, target_handle)| hit_handle == target_handle.0)
+                    .find(|(_, _, target_handle)| hit_handle == target_handle.handle())
                 {
                     target.hp = target.hp.saturating_sub(1);
                     commands.entity(e).despawn_recursive();

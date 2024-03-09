@@ -108,17 +108,17 @@ impl Physics {
         let (movement, collisions) = {
             let body = self
                 .bodies
-                .get(body_handle.0)
+                .get(body_handle.handle())
                 .expect("Body not found");
             let collider = self
                 .colliders
-                .get(collider_handle.0)
+                .get(collider_handle.handle())
                 .expect("Collider not found");
             let position = body.position();
             let controller = character_controller.rapier_controller;
             let collider_shape = collider.shape();
             let mut collisions = vec![];
-            let mut query_filter = QueryFilter::default().exclude_rigid_body(body_handle.0);
+            let mut query_filter = QueryFilter::default().exclude_rigid_body(body_handle.handle());
 
             if let Some(collider_options) = collider_options {
                 query_filter = query_filter.groups(collider_options.collision_groups);
@@ -142,7 +142,7 @@ impl Physics {
 
         let body = self
             .bodies
-            .get_mut(body_handle.0)
+            .get_mut(body_handle.handle())
             .expect("Body not found");
         let position = body.position();
 
@@ -278,7 +278,7 @@ fn physics_update_system(
         body.apply_options(
             physics
                 .bodies
-                .get_mut(body_handle.0)
+                .get_mut(body_handle.handle())
                 .expect("Body not found"),
             body_options,
         );
@@ -287,7 +287,7 @@ fn physics_update_system(
         body.apply_velocity(
             physics
                 .bodies
-                .get_mut(body_handle.0)
+                .get_mut(body_handle.handle())
                 .expect("Body not found"),
             body_velocity,
             scale,
@@ -297,7 +297,7 @@ fn physics_update_system(
         collider.apply_options(
             physics
                 .colliders
-                .get_mut(collider_handle.0)
+                .get_mut(collider_handle.handle())
                 .expect("Collider not found"),
             collider_options,
         );
@@ -354,11 +354,11 @@ fn physics_remove_handles_system(
 ) {
     let body_handles = query_body_handles
         .iter()
-        .map(|b| b.0)
+        .map(|b| b.handle())
         .collect::<HashSet<_>>();
     let collider_handles = query_collider_handles
         .iter()
-        .map(|c| c.0)
+        .map(|c| c.handle())
         .collect::<HashSet<_>>();
     let mut remove_body_handles = vec![];
     let mut remove_collider_handles = vec![];
