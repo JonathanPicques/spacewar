@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
+use derivative::Derivative;
 
 use crate::core::utilities::cmp::cmp_rollack;
 
@@ -12,8 +13,10 @@ pub struct Clock {
     finished: bool,
 }
 
-#[derive(Hash, Copy, Clone, Component)]
+#[derive(Copy, Clone, Component, Derivative)]
+#[derivative(Hash)]
 pub struct TimeToLive {
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     clock: Clock,
 }
 

@@ -19,7 +19,6 @@ use crate::core::physics::collider::PhysicsCollider;
 use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
-use crate::core::utilities::hash::f32_hasher;
 use crate::core::utilities::maths::*;
 
 #[derive(Clone, Resource)]
@@ -152,22 +151,25 @@ impl Physics {
 }
 
 impl Hash for Physics {
+    #[cfg(feature = "stable")]
+    fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
+    #[cfg(not(feature = "stable"))]
     fn hash<H: std::hash::Hasher>(&self, mut state: &mut H) {
         for (_, body) in self.bodies.iter() {
             let rotation = body.rotation().angle();
             let translation = body.translation();
 
-            f32_hasher(rotation, &mut state);
-            f32_hasher(translation.x, &mut state);
-            f32_hasher(translation.y, &mut state);
+            crate::core::utilities::hash::f32_hasher(rotation, &mut state);
+            crate::core::utilities::hash::f32_hasher(translation.x, &mut state);
+            crate::core::utilities::hash::f32_hasher(translation.y, &mut state);
         }
         for (_, collider) in self.colliders.iter() {
             let rotation = collider.rotation().angle();
             let translation = collider.translation();
 
-            f32_hasher(rotation, &mut state);
-            f32_hasher(translation.x, &mut state);
-            f32_hasher(translation.y, &mut state);
+            crate::core::utilities::hash::f32_hasher(rotation, &mut state);
+            crate::core::utilities::hash::f32_hasher(translation.x, &mut state);
+            crate::core::utilities::hash::f32_hasher(translation.y, &mut state);
         }
     }
 }

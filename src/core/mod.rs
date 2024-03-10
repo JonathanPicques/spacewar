@@ -34,6 +34,14 @@ impl AddCoreAppExt for App {
             //
             .checksum_resource_with_hash::<Physics>()
             .checksum_component_with_hash::<TimeToLive>()
+            .checksum_component_with_hash::<PhysicsBody>()
+            .checksum_component_with_hash::<PhysicsBodyHandle>()
+            .checksum_component_with_hash::<PhysicsBodyOptions>()
+            .checksum_component_with_hash::<PhysicsBodyVelocity>()
+            .checksum_component_with_hash::<PhysicsCollider>()
+            .checksum_component_with_hash::<PhysicsColliderHandle>()
+            .checksum_component_with_hash::<PhysicsColliderOptions>()
+            .checksum_component_with_hash::<PhysicsCharacterController>()
             //
             .rollback_resource_with_clone::<Physics>()
             .rollback_component_with_copy::<TimeToLive>()

@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 use bevy_ggrs::GgrsTime;
+use derivative::Derivative;
 
 use crate::core::clock::Clock;
 
-#[derive(Hash, Clone, Default, Component)]
+#[derive(Clone, Default, Component, Derivative)]
+#[derivative(Hash)]
 pub struct SpriteSheetAnimator {
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub clock: Clock,
     pub animation: Handle<SpriteSheetAnimation>,
 }

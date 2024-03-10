@@ -40,8 +40,7 @@ pub enum Direction {
     Right,
 }
 
-#[derive(Copy, Clone, Default, Component, Derivative)]
-#[derivative(Hash)]
+#[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Stats {
     pub shots: u8,
     pub kills: u8,
