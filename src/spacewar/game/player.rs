@@ -100,7 +100,7 @@ impl PlayerBundle {
             },
             //
             body: PhysicsBody::KinematicPositionBased,
-            collider: PhysicsCollider::Rectangle { width: 0.8, height: 1.8 },
+            collider: PhysicsCollider::Rectangle { width: 14.0, height: 32.0 },
             collider_options: PhysicsColliderOptions::from_collision_groups(InteractionGroups {
                 filter: Layer::Wall.into(),
                 memberships: Layer::Wall.into(),

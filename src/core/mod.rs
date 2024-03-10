@@ -43,6 +43,7 @@ impl AddCoreAppExt for App {
             .checksum_component_with_hash::<PhysicsColliderOptions>()
             .checksum_component_with_hash::<PhysicsCharacterController>()
             //
+            .rollback_resource_with_copy::<Scaler>()
             .rollback_resource_with_clone::<Physics>()
             .rollback_component_with_copy::<TimeToLive>()
             .rollback_component_with_copy::<PhysicsBody>()

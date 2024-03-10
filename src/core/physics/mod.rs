@@ -19,11 +19,16 @@ use crate::core::physics::collider::PhysicsCollider;
 use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
+use crate::core::utilities::hash::f32_hasher;
 use crate::core::utilities::maths::*;
+
+#[derive(Copy, Clone, Resource)]
+pub struct Scaler {
+    pub scale: f32,
+}
 
 #[derive(Clone, Resource)]
 pub struct Physics {
-    pub scale: f32,
     pub gravity: Vector<Real>,
     //
     pub(crate) bodies: RigidBodySet,
@@ -39,6 +44,24 @@ pub struct Physics {
     //
     pub(crate) body_handles_by_entity: HashMap<Entity, RigidBodyHandle>,
     pub(crate) collider_handles_by_entity: HashMap<Entity, ColliderHandle>,
+}
+
+impl Scaler {
+    #[inline(always)]
+    pub fn pixels_to_meters<T>(&self, value: T) -> T::Output
+    where
+        T: std::ops::Div<f32>,
+    {
+        value / self.scale
+    }
+
+    #[inline(always)]
+    pub fn meters_to_pixels<T>(&self, value: T) -> T::Output
+    where
+        T: std::ops::Mul<f32>,
+    {
+        value * self.scale
+    }
 }
 
 impl Physics {
@@ -99,6 +122,7 @@ impl Physics {
 
     pub(crate) fn move_controller(
         &mut self,
+        scaler: &Scaler,
         body_handle: &PhysicsBodyHandle,
         collider_handle: &PhysicsColliderHandle,
         collider_options: Option<&PhysicsColliderOptions>,
@@ -129,7 +153,9 @@ impl Physics {
                 &self.query_pipeline,
                 collider_shape,
                 position,
-                (character_controller.velocity / self.scale).to_physics(),
+                scaler
+                    .pixels_to_meters(character_controller.velocity)
+                    .to_physics(),
                 query_filter,
                 |collision| {
                     collisions.push(collision);
@@ -150,6 +176,12 @@ impl Physics {
     }
 }
 
+impl Hash for Scaler {
+    fn hash<H: std::hash::Hasher>(&self, mut state: &mut H) {
+        f32_hasher(self.scale, &mut state);
+    }
+}
+
 impl Hash for Physics {
     #[cfg(feature = "stable")]
     fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
@@ -159,25 +191,30 @@ impl Hash for Physics {
             let rotation = body.rotation().angle();
             let translation = body.translation();
 
-            crate::core::utilities::hash::f32_hasher(rotation, &mut state);
-            crate::core::utilities::hash::f32_hasher(translation.x, &mut state);
-            crate::core::utilities::hash::f32_hasher(translation.y, &mut state);
+            f32_hasher(rotation, &mut state);
+            f32_hasher(translation.x, &mut state);
+            f32_hasher(translation.y, &mut state);
         }
         for (_, collider) in self.colliders.iter() {
             let rotation = collider.rotation().angle();
             let translation = collider.translation();
 
-            crate::core::utilities::hash::f32_hasher(rotation, &mut state);
-            crate::core::utilities::hash::f32_hasher(translation.x, &mut state);
-            crate::core::utilities::hash::f32_hasher(translation.y, &mut state);
+            f32_hasher(rotation, &mut state);
+            f32_hasher(translation.x, &mut state);
+            f32_hasher(translation.y, &mut state);
         }
+    }
+}
+
+impl Default for Scaler {
+    fn default() -> Self {
+        Self { scale: 100.0 }
     }
 }
 
 impl Default for Physics {
     fn default() -> Self {
         Self {
-            scale: 18.0,
             gravity: vector![0.0, -9.81],
             //
             body_handles_by_entity: default(),
@@ -210,6 +247,7 @@ fn physics_system(
     )>,
     //
     order: Res<RollbackOrdered>,
+    scaler: Res<Scaler>,
     mut physics: ResMut<Physics>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
@@ -217,6 +255,7 @@ fn physics_system(
 
     for (_, body_handle, collider_handle, collider_options, mut character_controller) in query {
         physics.move_controller(
+            &scaler,
             body_handle,
             collider_handle,
             collider_options,
@@ -231,14 +270,15 @@ fn physics_sync_system(
     mut query: Query<(&Rollback, &PhysicsBodyHandle, &mut Transform)>,
     //
     order: Res<RollbackOrdered>,
+    scaler: Res<Scaler>,
     physics: Res<Physics>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, body, mut transform) in query {
-        if let Some(body) = physics.bodies.get(body.0) {
-            transform.translation = (body.position().to_bevy() * physics.scale).extend(transform.translation.z);
+    for (_, body_handle, mut transform) in query {
+        if let Some(body) = physics.bodies.get(body_handle.handle()) {
+            transform.translation = (scaler.meters_to_pixels(body.position().to_bevy())).extend(transform.translation.z);
         }
     }
 }
@@ -265,9 +305,9 @@ fn physics_update_system(
     )>,
     //
     order: Res<RollbackOrdered>,
+    scaler: Res<Scaler>,
     mut physics: ResMut<Physics>,
 ) {
-    let scale = physics.scale;
     let mut body_query = body_query.iter().collect::<Vec<_>>();
     let mut collider_query = collider_query.iter().collect::<Vec<_>>();
     let mut velocity_query = velocity_query.iter().collect::<Vec<_>>();
@@ -278,6 +318,7 @@ fn physics_update_system(
 
     for (_, body, body_handle, body_options) in body_query {
         body.apply_options(
+            &scaler,
             physics
                 .bodies
                 .get_mut(body_handle.handle())
@@ -287,16 +328,17 @@ fn physics_update_system(
     }
     for (_, body, body_handle, body_velocity) in velocity_query {
         body.apply_velocity(
+            &scaler,
             physics
                 .bodies
                 .get_mut(body_handle.handle())
                 .expect("Body not found"),
             body_velocity,
-            scale,
         );
     }
     for (_, collider, collider_handle, collider_options) in collider_query {
         collider.apply_options(
+            &scaler,
             physics
                 .colliders
                 .get_mut(collider_handle.handle())
@@ -324,14 +366,15 @@ fn physics_create_handles_system(
     mut commands: Commands,
     //
     order: Res<RollbackOrdered>,
+    scaler: Res<Scaler>,
     mut physics: ResMut<Physics>,
 ) {
     let mut query = query.iter().collect::<Vec<_>>();
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (e, _, transform, body, collider) in query {
-        let body = body.build(transform);
-        let collider = collider.build();
+        let body = body.build(&scaler, transform);
+        let collider = collider.build(&scaler);
         let (body_handle, collider_handle) = physics.insert_body(body, collider);
 
         physics
@@ -391,20 +434,20 @@ fn physics_remove_handles_system(
 //
 
 #[allow(clippy::type_complexity)]
-fn physics_debug_system(mut gizmos: Gizmos, physics: Res<Physics>) {
+fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Physics>) {
     for (_, collider) in physics.colliders.iter() {
         if let Some(ball) = collider.shape().as_ball() {
             gizmos.circle_2d(
-                collider.translation().to_bevy() * physics.scale,
+                scaler.meters_to_pixels(collider.translation().to_bevy()),
                 ball.radius,
                 Color::GREEN,
             );
         }
         if let Some(cuboid) = collider.shape().as_cuboid() {
             gizmos.rect_2d(
-                collider.translation().to_bevy() * physics.scale,
+                scaler.meters_to_pixels(collider.translation().to_bevy()),
                 collider.rotation().angle(),
-                cuboid.half_extents.to_bevy() * 2.0 * physics.scale,
+                scaler.meters_to_pixels(cuboid.half_extents.to_bevy()) * 2.0,
                 Color::GREEN,
             );
         }

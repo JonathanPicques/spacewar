@@ -3,6 +3,7 @@ use derivative::Derivative;
 use rapier2d::prelude::*;
 
 use crate::core::utilities::maths::*;
+use crate::core::Scaler;
 
 #[derive(Hash, Copy, Clone, Component)]
 pub enum PhysicsBody {
@@ -40,9 +41,11 @@ pub struct PhysicsBodyVelocity {
 pub struct PhysicsBodyHandle(pub(crate) RigidBodyHandle);
 
 impl PhysicsBody {
-    pub(crate) fn build(&self, transform: &Transform) -> RigidBody {
+    pub(crate) fn build(&self, scaler: &Scaler, transform: &Transform) -> RigidBody {
         let rotation = transform.rotation.to_euler(EulerRot::ZYX).0;
-        let translation = transform.translation.to_physics();
+        let translation = scaler
+            .pixels_to_meters(transform.translation)
+            .to_physics();
 
         match self {
             PhysicsBody::Fixed => RigidBodyBuilder::fixed()
@@ -64,7 +67,7 @@ impl PhysicsBody {
         }
     }
 
-    pub(crate) fn apply_options(&self, body: &mut RigidBody, options: &PhysicsBodyOptions) {
+    pub(crate) fn apply_options(&self, scaler: &Scaler, body: &mut RigidBody, options: &PhysicsBodyOptions) {
         let wake_up = true;
 
         match options.sleep {
@@ -73,17 +76,26 @@ impl PhysicsBody {
             Some(false) => body.wake_up(false),
         }
         body.enable_ccd(options.ccd);
-        body.set_gravity_scale(options.gravity_scale, wake_up);
-        body.set_linear_damping(options.linear_damping);
+        body.set_gravity_scale(
+            scaler.pixels_to_meters(options.gravity_scale),
+            wake_up,
+        );
+        body.set_linear_damping(scaler.pixels_to_meters(options.linear_damping));
         body.set_angular_damping(options.angular_damping);
-        body.set_additional_mass(options.additional_mass, wake_up);
+        body.set_additional_mass(
+            scaler.pixels_to_meters(options.additional_mass),
+            wake_up,
+        );
     }
 
-    pub(crate) fn apply_velocity(&self, body: &mut RigidBody, velocity: &PhysicsBodyVelocity, scale: f32) {
+    pub(crate) fn apply_velocity(&self, scaler: &Scaler, body: &mut RigidBody, velocity: &PhysicsBodyVelocity) {
         let wake_up = true;
 
         if let Some(linvel) = velocity.linear_velocity {
-            body.set_linvel((linvel / scale).to_physics(), wake_up);
+            body.set_linvel(
+                scaler.pixels_to_meters(linvel).to_physics(),
+                wake_up,
+            );
         }
         if let Some(angvel) = velocity.angular_velocity {
             body.set_angvel(angvel, wake_up);

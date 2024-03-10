@@ -8,11 +8,9 @@ use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers, RollbackFrameCount};
 use rapier2d::dynamics::IntegrationParameters;
-use rapier2d::geometry::InteractionGroups;
 
 use crate::core::core_systems;
-use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
-use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
+use crate::core::physics::collider::PhysicsCollider;
 use crate::core::physics::*;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::hash::transform_hasher;
@@ -23,7 +21,7 @@ use crate::spacewar::game::level::LevelRectBundle;
 use crate::spacewar::game::player::{player_system, Health, Player, PlayerBundle, Stats};
 use crate::spacewar::game::projectile::{projectile_system, Projectile};
 use crate::spacewar::menu::menu_main::goto_main_menu;
-use crate::spacewar::{GameArgs, GameAssets, GameConfig, Layer, State};
+use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;
@@ -81,51 +79,24 @@ fn setup(
     // Level
     {
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 6.0, height: 1.0 },
+            PhysicsCollider::Rectangle { width: 160.0, height: 10.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(0.0, -8.0, 0.0),
+            Vec3::new(0.0, 50.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 6.0, height: 1.0 },
+            PhysicsCollider::Rectangle { width: 160.0, height: 10.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(0.0, -4.0, 0.0),
+            Vec3::new(0.0, -50.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 1.0, height: 5.0 },
+            PhysicsCollider::Rectangle { width: 10.0, height: 90.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(3.5, -6.0, 0.0),
+            Vec3::new(80.0, 0.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 1.0, height: 5.0 },
+            PhysicsCollider::Rectangle { width: 10.0, height: 90.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(-3.5, -6.0, 0.0),
-        ));
-    }
-
-    // Rotating square
-    {
-        commands.spawn_with_rollback((
-            Game {},
-            Transform::default()
-                .with_rotation(Rotation::Degrees(20.0).into())
-                .with_translation(Vec3::new(-10.0, 0.0, 0.0)),
-            //
-            PhysicsBody::Dynamic,
-            PhysicsBodyOptions::from_gravity_scale(0.0),
-            PhysicsBodyVelocity {
-                linear_velocity: Some(Vec2::new(0.0, 0.0)),
-                angular_velocity: Some(20.0_f32.to_radians()),
-            },
-            //
-            PhysicsCollider::Rectangle { width: 1.0, height: 1.0 },
-            PhysicsColliderOptions {
-                restitution: 1.0,
-                collision_groups: InteractionGroups {
-                    filter: Layer::Wall.into(),
-                    memberships: Layer::Wall.into(),
-                },
-                ..default()
-            },
+            Vec3::new(-80.0, 0.0, 0.0),
         ));
     }
 
@@ -194,6 +165,7 @@ pub fn goto_game(
 
     commands.insert_resource(session);
     commands.insert_resource(local_players);
+    commands.insert_resource(Scaler::default());
     commands.insert_resource(Physics {
         integration_parameters: IntegrationParameters {
             dt: 1.0 / fps,

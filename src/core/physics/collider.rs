@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use derivative::Derivative;
 use rapier2d::prelude::*;
 
+use crate::core::Scaler;
+
 #[derive(Copy, Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub enum PhysicsCollider {
@@ -32,14 +34,18 @@ pub struct PhysicsColliderOptions {
 pub struct PhysicsColliderHandle(pub(crate) ColliderHandle);
 
 impl PhysicsCollider {
-    pub(crate) fn build(&self) -> Collider {
+    pub(crate) fn build(&self, scaler: &Scaler) -> Collider {
         match self {
-            Self::Circle { radius } => ColliderBuilder::ball(*radius).build(),
-            Self::Rectangle { width, height } => ColliderBuilder::cuboid(width / 2.0, height / 2.0).build(),
+            Self::Circle { radius } => ColliderBuilder::ball(scaler.pixels_to_meters(radius)).build(),
+            Self::Rectangle { width, height } => ColliderBuilder::cuboid(
+                scaler.pixels_to_meters(width) / 2.0,
+                scaler.pixels_to_meters(height) / 2.0,
+            )
+            .build(),
         }
     }
 
-    pub(crate) fn apply_options(&self, collider: &mut Collider, options: &PhysicsColliderOptions) {
+    pub(crate) fn apply_options(&self, _scaler: &Scaler, collider: &mut Collider, options: &PhysicsColliderOptions) {
         collider.set_friction(options.friction);
         collider.set_restitution(options.restitution);
         collider.set_collision_groups(options.collision_groups);
