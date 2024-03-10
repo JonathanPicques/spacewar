@@ -4,16 +4,15 @@ use rapier2d::control::{CharacterCollision, EffectiveCharacterMovement, Kinemati
 
 use crate::core::utilities::maths::*;
 
-#[derive(Copy, Clone, Default)]
+#[derive(Hash, Copy, Clone, Default)]
 pub struct Wall {
     pub left: bool,
     pub right: bool,
 }
 
-#[derive(Copy, Clone, Default)]
+#[derive(Hash, Copy, Clone, Default)]
 pub struct Floor {
     pub on: bool,
-    pub angle: f32,
 }
 
 #[derive(Copy, Clone, Component, Derivative)]
@@ -26,9 +25,7 @@ pub struct PhysicsCharacterController {
     #[derivative(Hash = "ignore")]
     pub velocity: Vec2,
     //
-    #[derivative(Hash = "ignore")]
     pub wall: Wall,
-    #[derivative(Hash = "ignore")]
     pub floor: Floor,
     //
     #[derivative(Hash = "ignore")]
@@ -63,7 +60,6 @@ impl PhysicsCharacterController {
         self.wall.left = false;
         self.wall.right = false;
         self.floor.on = movement.grounded;
-        self.floor.angle = 0.0;
 
         for collision in collisions.iter() {
             match collision.toi.status {
@@ -74,18 +70,17 @@ impl PhysicsCharacterController {
                     let up_angle = normal.angle_between(self.up);
 
                     if abs(up_angle) > self.rapier_controller.max_slope_climb_angle {
-                        if self.right.dot(normal) > 0.0 {
-                            self.wall.left = true;
-                        } else {
-                            self.wall.right = true;
-                        }
-                    } else {
-                        self.floor.on = true;
-                        self.floor.angle = up_angle;
+                        self.wall.left = self.right.dot(normal) > 0.0;
+                        self.wall.right = !self.wall.left;
                     }
                 }
                 _ => (),
             }
         }
+
+        println!(
+            "left: {} right: {}",
+            self.wall.left, self.wall.right
+        );
     }
 }
