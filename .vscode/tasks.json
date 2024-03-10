@@ -24,8 +24,17 @@
         "id": "game"
       },
       "type": "shell",
-      "label": "Run local",
-      "command": "cargo run -- --local",
+      "label": "Run local (1 player)",
+      "command": "cargo run -- --local --num-players 1",
+      "problemMatcher": []
+    },
+    {
+      "icon": {
+        "id": "game"
+      },
+      "type": "shell",
+      "label": "Run local (2 players)",
+      "command": "cargo run -- --local --num-players 2",
       "problemMatcher": []
     },
     {

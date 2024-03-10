@@ -110,7 +110,11 @@ impl PlayerBundle {
                     lerp(
                         -2.0,
                         2.0,
-                        (handle as f32) / ((game_args.num_players - 1) as f32),
+                        if game_args.num_players == 1 {
+                            0.5
+                        } else {
+                            handle as f32 / ((game_args.num_players - 1) as f32)
+                        },
                     ),
                     1.0,
                     5.0,
