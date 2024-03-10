@@ -63,6 +63,10 @@ impl PhysicsCharacterController {
         self.floor.on
     }
 
+    pub fn is_on_ceiling(&self) -> bool {
+        self.ceiling.on
+    }
+
     pub(crate) fn update_with_movement(&mut self, movement: EffectiveCharacterMovement, collisions: Vec<CharacterCollision>) {
         self.wall.left = false;
         self.wall.right = false;

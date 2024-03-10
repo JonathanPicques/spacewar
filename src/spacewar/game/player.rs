@@ -54,10 +54,21 @@ pub struct Health {
 #[derive(Copy, Clone, Default, Component, Derivative)]
 #[derivative(Hash)]
 pub struct Player {
+    pub state: PlayerState,
     pub handle: PlayerHandle,
     pub direction: Direction,
     #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
+}
+
+#[derive(Hash, Copy, Clone, Debug, Default)]
+pub enum PlayerState {
+    #[default]
+    None,
+    Idle,
+    Walk,
+    Jump,
+    Fall,
 }
 
 #[derive(Bundle)]
@@ -161,12 +172,13 @@ pub fn player_system(
             (i, InputStatus::Predicted) => i,
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
+        let on_wall = controller.is_on_wall();
+        let on_floor = controller.is_on_floor();
+        let on_ceiling = controller.is_on_ceiling();
 
-        let on_floor = controller.is_on_floor() || (controller.wall.left && controller.wall.right);
-        let mut velocity = controller.velocity;
+        let velocity = &mut controller.velocity;
 
         player.shoot_clock.tick(delta_d);
-
         if input.is_set(INPUT_SHOOT) && player.shoot_clock.finished() {
             player.shoot_clock.reset();
             commands.spawn_with_rollback(ProjectileBundle::new(
@@ -176,48 +188,179 @@ pub fn player_system(
             ));
         }
 
-        if input.is_set(INPUT_UP) && on_floor {
-            velocity.y = JUMP_STRENGTH;
-        }
-        if input.is_set(INPUT_LEFT) {
-            velocity.x = compute_acceleration(velocity.x, delta, -MAX_SPEED, ACCELERATION);
-        } else if input.is_set(INPUT_RIGHT) {
-            velocity.x = compute_acceleration(velocity.x, delta, MAX_SPEED, ACCELERATION);
-        } else {
-            velocity.x = compute_deceleration(velocity.x, delta, DECELERATION);
-        }
-
-        if on_floor {
-            if !input.is_set(INPUT_UP) {
-                velocity.y = 0.0; // stick to floor
+        match player.state {
+            PlayerState::None => {
+                if on_floor {
+                    player.state = PlayerState::Idle;
+                    animator.animation = game_assets.player_idle_anim.clone();
+                    continue;
+                } else {
+                    player.state = PlayerState::Fall;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    continue;
+                }
             }
-            if velocity.x != 0.0 {
-                animator.animation = game_assets.player_walk_anim.clone();
-            } else {
-                animator.animation = game_assets.player_idle_anim.clone();
+            PlayerState::Idle => {
+                if !on_floor {
+                    player.state = PlayerState::Fall;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    continue;
+                }
+
+                if input.is_set(INPUT_UP) {
+                    player.state = PlayerState::Jump;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    velocity.y = JUMP_STRENGTH;
+                }
+                if (input.is_set(INPUT_LEFT) || input.is_set(INPUT_RIGHT)) && !(input.is_set(INPUT_LEFT) && input.is_set(INPUT_RIGHT)) {
+                    player.state = PlayerState::Walk;
+                    animator.animation = game_assets.player_walk_anim.clone();
+                    continue;
+                }
+
+                velocity.y = compute_acceleration(
+                    velocity.y,
+                    delta,
+                    GRAVITY_MAX_SPEED,
+                    GRAVITY_ACCELERATION,
+                );
             }
-        } else {
-            animator.animation = game_assets.player_jump_anim.clone();
+            PlayerState::Walk => {
+                if !on_floor {
+                    player.state = PlayerState::Fall;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    continue;
+                }
+
+                if input.is_set(INPUT_UP) {
+                    player.state = PlayerState::Jump;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    velocity.y = JUMP_STRENGTH;
+                    continue;
+                }
+
+                if on_wall {
+                    velocity.x = 0.0;
+                }
+
+                if input.is_set(INPUT_LEFT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, -MAX_SPEED, ACCELERATION);
+                } else if input.is_set(INPUT_RIGHT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, MAX_SPEED, ACCELERATION);
+                } else {
+                    velocity.x = compute_deceleration(velocity.x, delta, DECELERATION);
+                }
+
+                if velocity.x == 0.0 {
+                    player.state = PlayerState::Idle;
+                    animator.animation = game_assets.player_idle_anim.clone();
+                    continue;
+                }
+
+                velocity.y = compute_acceleration(
+                    velocity.y,
+                    delta,
+                    GRAVITY_MAX_SPEED,
+                    GRAVITY_ACCELERATION,
+                );
+
+                player.direction = match 0.0_f32.total_cmp(&velocity.x) {
+                    Ordering::Less => Direction::Right,
+                    Ordering::Equal => player.direction,
+                    Ordering::Greater => Direction::Left,
+                };
+
+                sprite.flip_x = match player.direction {
+                    Direction::Left => true,
+                    Direction::Right => false,
+                };
+            }
+            PlayerState::Jump => {
+                if on_floor {
+                    player.state = PlayerState::Idle;
+                    animator.animation = game_assets.player_idle_anim.clone();
+                    continue;
+                }
+
+                if input.is_set(INPUT_LEFT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, -MAX_SPEED, ACCELERATION);
+                } else if input.is_set(INPUT_RIGHT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, MAX_SPEED, ACCELERATION);
+                } else {
+                    velocity.x = compute_deceleration(velocity.x, delta, DECELERATION);
+                }
+
+                velocity.y = compute_acceleration(
+                    velocity.y,
+                    delta,
+                    GRAVITY_MAX_SPEED,
+                    GRAVITY_ACCELERATION,
+                );
+
+                if on_wall {
+                    velocity.x = 0.0;
+                }
+                if on_ceiling {
+                    velocity.y = 0.0;
+                }
+
+                if velocity.y < 0.0 {
+                    player.state = PlayerState::Fall;
+                    animator.animation = game_assets.player_jump_anim.clone();
+                    continue;
+                }
+
+                player.direction = match 0.0_f32.total_cmp(&velocity.x) {
+                    Ordering::Less => Direction::Right,
+                    Ordering::Equal => player.direction,
+                    Ordering::Greater => Direction::Left,
+                };
+
+                sprite.flip_x = match player.direction {
+                    Direction::Left => true,
+                    Direction::Right => false,
+                };
+            }
+            PlayerState::Fall => {
+                if on_floor {
+                    player.state = PlayerState::Idle;
+                    animator.animation = game_assets.player_idle_anim.clone();
+                    continue;
+                }
+
+                if input.is_set(INPUT_LEFT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, -MAX_SPEED, ACCELERATION);
+                } else if input.is_set(INPUT_RIGHT) {
+                    velocity.x = compute_acceleration(velocity.x, delta, MAX_SPEED, ACCELERATION);
+                } else {
+                    velocity.x = compute_deceleration(velocity.x, delta, DECELERATION);
+                }
+
+                if on_wall {
+                    velocity.x = 0.0;
+                }
+                if on_ceiling {
+                    velocity.y = 0.0;
+                }
+
+                velocity.y = compute_acceleration(
+                    velocity.y,
+                    delta,
+                    GRAVITY_MAX_SPEED,
+                    GRAVITY_ACCELERATION,
+                );
+
+                player.direction = match 0.0_f32.total_cmp(&velocity.x) {
+                    Ordering::Less => Direction::Right,
+                    Ordering::Equal => player.direction,
+                    Ordering::Greater => Direction::Left,
+                };
+
+                sprite.flip_x = match player.direction {
+                    Direction::Left => true,
+                    Direction::Right => false,
+                };
+            }
         }
-
-        velocity.y = compute_acceleration(
-            velocity.y,
-            delta,
-            GRAVITY_MAX_SPEED,
-            GRAVITY_ACCELERATION,
-        );
-
-        player.direction = match 0.0_f32.total_cmp(&velocity.x) {
-            Ordering::Less => Direction::Right,
-            Ordering::Equal => player.direction,
-            Ordering::Greater => Direction::Left,
-        };
-
-        sprite.flip_x = match player.direction {
-            Direction::Left => true,
-            Direction::Right => false,
-        };
-
-        controller.velocity = velocity;
     }
 }
