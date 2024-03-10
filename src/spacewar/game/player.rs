@@ -116,7 +116,7 @@ impl PlayerBundle {
                             handle as f32 / ((game_args.num_players - 1) as f32)
                         },
                     ),
-                    1.0,
+                    -6.0,
                     5.0,
                 )),
                 ..default()

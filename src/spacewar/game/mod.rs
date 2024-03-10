@@ -81,19 +81,24 @@ fn setup(
     // Level
     {
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+            PhysicsCollider::Rectangle { width: 6.0, height: 1.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(-7.5, -10.0, 0.0),
+            Vec3::new(0.0, -8.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+            PhysicsCollider::Rectangle { width: 6.0, height: 1.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(0.0, -10.0, 0.0),
+            Vec3::new(0.0, -4.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
-            PhysicsCollider::Rectangle { width: 5.0, height: 5.0 },
+            PhysicsCollider::Rectangle { width: 1.0, height: 5.0 },
             Rotation::Degrees(0.0),
-            Vec3::new(7.5, -10.0, 0.0),
+            Vec3::new(3.5, -6.0, 0.0),
+        ));
+        commands.spawn_with_rollback(LevelRectBundle::new(
+            PhysicsCollider::Rectangle { width: 1.0, height: 5.0 },
+            Rotation::Degrees(0.0),
+            Vec3::new(-3.5, -6.0, 0.0),
         ));
     }
 
@@ -103,7 +108,7 @@ fn setup(
             Game {},
             Transform::default()
                 .with_rotation(Rotation::Degrees(20.0).into())
-                .with_translation(Vec3::new(0.0, 55.0, 0.0)),
+                .with_translation(Vec3::new(-10.0, 0.0, 0.0)),
             //
             PhysicsBody::Dynamic,
             PhysicsBodyOptions::from_gravity_scale(0.0),
