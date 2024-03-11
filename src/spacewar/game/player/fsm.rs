@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::time::Duration;
 
 use bevy::prelude::*;
 
@@ -36,6 +37,9 @@ pub struct PlayerArgs<'a> {
 #[allow(clippy::needless_return)]
 impl Player {
     pub fn tick(&mut self, mut args: PlayerArgs) {
+        self.shoot_clock
+            .tick(Duration::from_secs_f32(args.delta));
+
         match self.state {
             super::PlayerState::None => self.tick_none(&mut args),
             super::PlayerState::Idle => self.tick_idle(&mut args),
@@ -78,6 +82,7 @@ impl Player {
 
     fn tick_idle(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
+        self.apply_deceleration(args, FLOOR_DECELERATION);
         self.apply_velocity_direction(args);
 
         if !args.controller.is_on_floor() {
@@ -89,7 +94,7 @@ impl Player {
             self.apply_jump(args);
             return;
         }
-        if args.input.is_set(INPUT_LEFT) || args.input.is_set(INPUT_RIGHT) {
+        if self.only_left(args) || self.only_right(args) {
             self.set_state(PlayerState::Walk, args);
             return;
         }
@@ -97,9 +102,17 @@ impl Player {
 
     fn tick_walk(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
-        self.apply_floor_movement(args);
+        self.apply_movement(
+            args,
+            FLOOR_MAX_SPEED,
+            FLOOR_ACCELERATION,
+            FLOOR_DECELERATION,
+        );
         self.apply_velocity_direction(args);
 
+        if args.controller.is_on_wall() {
+            self.apply_wall_bump(args);
+        }
         if !args.controller.is_on_floor() {
             self.set_state(PlayerState::Fall, args);
             return;
@@ -117,11 +130,24 @@ impl Player {
 
     fn tick_jump(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
-        self.apply_airborne_movement(args);
+        self.apply_movement(
+            args,
+            AIRBORNE_MAX_SPEED,
+            AIRBORNE_ACCELERATION,
+            AIRBORNE_DECELERATION,
+        );
         self.apply_velocity_direction(args);
 
+        if args.controller.is_on_wall() {
+            self.apply_wall_bump(args);
+        }
         if args.controller.is_on_floor() {
             self.set_state(PlayerState::Idle, args);
+            return;
+        }
+        if args.controller.is_on_ceiling() {
+            self.set_state(PlayerState::Fall, args);
+            self.apply_ceiling_bump(args);
             return;
         }
         if args.controller.velocity.y < 0.0 {
@@ -132,11 +158,24 @@ impl Player {
 
     fn tick_fall(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
-        self.apply_airborne_movement(args);
+        self.apply_movement(
+            args,
+            AIRBORNE_MAX_SPEED,
+            AIRBORNE_ACCELERATION,
+            AIRBORNE_DECELERATION,
+        );
         self.apply_velocity_direction(args);
 
+        if args.controller.is_on_wall() {
+            self.apply_wall_bump(args);
+        }
         if args.controller.is_on_floor() {
             self.set_state(PlayerState::Idle, args);
+            return;
+        }
+        if args.controller.is_on_ceiling() {
+            self.set_state(PlayerState::Fall, args);
+            self.apply_ceiling_bump(args);
             return;
         }
     }
@@ -163,10 +202,28 @@ impl Player {
     }
     fn leave_fall(&mut self, _: &mut PlayerArgs) {}
 
+    // Input helpers
+
+    fn only_left(self, args: &mut PlayerArgs) -> bool {
+        args.input.is_set(INPUT_LEFT) && !args.input.is_set(INPUT_RIGHT)
+    }
+
+    fn only_right(self, args: &mut PlayerArgs) -> bool {
+        args.input.is_set(INPUT_RIGHT) && !args.input.is_set(INPUT_LEFT)
+    }
+
     // Movement helpers
 
     fn apply_jump(self, args: &mut PlayerArgs) {
         args.controller.velocity.y = JUMP_STRENGTH;
+    }
+
+    fn apply_wall_bump(self, args: &mut PlayerArgs) {
+        args.controller.velocity.x = 0.0;
+    }
+
+    fn apply_ceiling_bump(self, args: &mut PlayerArgs) {
+        args.controller.velocity.y = 0.0;
     }
 
     fn apply_gravity(self, args: &mut PlayerArgs) {
@@ -177,46 +234,24 @@ impl Player {
         );
     }
 
-    fn apply_floor_movement(self, args: &mut PlayerArgs) {
-        let left = args.input.is_set(INPUT_LEFT);
-        let right = args.input.is_set(INPUT_RIGHT);
+    fn apply_movement(self, args: &mut PlayerArgs, max_speed: f32, acceleration: f32, deceleration: f32) {
+        let left = self.only_left(args);
+        let right = self.only_right(args);
+        let velocity = &mut args.controller.velocity;
 
-        if left && !right {
-            args.controller.velocity.x = compute_acceleration(
-                args.controller.velocity.x,
-                -FLOOR_MAX_SPEED,
-                FLOOR_ACCELERATION,
-            );
-        } else if right && !left {
-            args.controller.velocity.x = compute_acceleration(
-                args.controller.velocity.x,
-                FLOOR_MAX_SPEED,
-                FLOOR_ACCELERATION,
-            );
+        if left {
+            velocity.x = compute_acceleration(velocity.x, -max_speed, acceleration);
+        } else if right {
+            velocity.x = compute_acceleration(velocity.x, max_speed, acceleration);
         } else {
-            args.controller.velocity.x = compute_deceleration(args.controller.velocity.x, FLOOR_DECELERATION);
+            velocity.x = compute_deceleration(velocity.x, deceleration);
         }
     }
 
-    fn apply_airborne_movement(self, args: &mut PlayerArgs) {
-        let left = args.input.is_set(INPUT_LEFT);
-        let right = args.input.is_set(INPUT_RIGHT);
+    fn apply_deceleration(self, args: &mut PlayerArgs, deceleration: f32) {
+        let velocity = &mut args.controller.velocity;
 
-        if left && !right {
-            args.controller.velocity.x = compute_acceleration(
-                args.controller.velocity.x,
-                -AIRBORNE_MAX_SPEED,
-                AIRBORNE_ACCELERATION,
-            );
-        } else if right && !left {
-            args.controller.velocity.x = compute_acceleration(
-                args.controller.velocity.x,
-                AIRBORNE_MAX_SPEED,
-                AIRBORNE_ACCELERATION,
-            );
-        } else {
-            args.controller.velocity.x = compute_deceleration(args.controller.velocity.x, AIRBORNE_DECELERATION);
-        }
+        velocity.x = compute_deceleration(velocity.x, deceleration);
     }
 
     fn apply_velocity_direction(&mut self, args: &mut PlayerArgs) {
@@ -225,7 +260,6 @@ impl Player {
             Ordering::Equal => self.direction,
             Ordering::Greater => Direction::Left,
         };
-
         args.sprite.flip_x = match self.direction {
             Direction::Left => true,
             Direction::Right => false,
