@@ -35,25 +35,35 @@
             SpriteSheetAnimationAsset (
                 name: "idle",
                 start: 0,
-                finish: 3
+                finish: 3,
+                repeat: true,
             )
         )
     ),
-    "player_walk": Asset (
+    "player_fall": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                name: "walk",
-                start: 20,
-                finish: 29
+                start: 13,
+                finish: 14,
+                repeat: false,
             )
         )
     ),
     "player_jump": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                name: "jump",
-                start: 12,
-                finish: 12
+                start: 10,
+                finish: 12,
+                repeat: false,
+            )
+        )
+    ),
+    "player_walk": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                start: 20,
+                finish: 29,
+                repeat: true,
             )
         )
     ),

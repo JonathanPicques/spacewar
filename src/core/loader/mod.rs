@@ -35,6 +35,7 @@ struct TextureAtlasLayoutAsset {
 struct SpriteSheetAnimationAsset {
     start: usize,
     finish: usize,
+    repeat: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -50,8 +51,8 @@ impl DynamicAsset for CoreDynamicAsset {
             Asset::TextureAtlasLayout(TextureAtlasLayoutAsset { .. }) => asset_server
                 .add(TextureAtlasLayout::new_empty(Vec2::ONE))
                 .untyped(),
-            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish }) => asset_server
-                .add(SpriteSheetAnimation { start, finish })
+            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish, repeat }) => asset_server
+                .add(SpriteSheetAnimation { start, finish, repeat })
                 .untyped(),
         };
 
@@ -93,8 +94,8 @@ impl DynamicAsset for CoreDynamicAsset {
                     Some(Vec2::new(offset_x, offset_y)),
                 ))
                 .untyped(),
-            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish }) => asset_server
-                .add(SpriteSheetAnimation { start, finish })
+            Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { start, finish, repeat }) => asset_server
+                .add(SpriteSheetAnimation { start, finish, repeat })
                 .untyped(),
         };
         match self {

@@ -92,10 +92,12 @@ pub struct GameAssets {
 
     #[asset(key = "player_idle")]
     pub player_idle_anim: Handle<SpriteSheetAnimation>,
-    #[asset(key = "player_walk")]
-    pub player_walk_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_fall")]
+    pub player_fall_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_jump")]
     pub player_jump_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_walk")]
+    pub player_walk_anim: Handle<SpriteSheetAnimation>,
 }
 
 #[derive(Debug)]

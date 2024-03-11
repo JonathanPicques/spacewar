@@ -54,9 +54,9 @@ pub enum PlayerState {
     #[default]
     None,
     Idle,
-    Walk,
-    Jump,
     Fall,
+    Jump,
+    Walk,
 }
 
 #[derive(Bundle)]

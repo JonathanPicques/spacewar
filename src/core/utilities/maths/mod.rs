@@ -31,7 +31,10 @@ pub fn sign(value: f32) -> f32 {
 
 /// Clamps a value within a specified range.
 #[inline(always)]
-pub fn clamp(value: f32, min: f32, max: f32) -> f32 {
+pub fn clamp<T>(value: T, min: T, max: T) -> T
+where
+    T: std::cmp::PartialOrd,
+{
     if value < min {
         min
     } else if value > max {

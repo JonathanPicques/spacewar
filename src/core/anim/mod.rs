@@ -3,6 +3,7 @@ use bevy_ggrs::GgrsTime;
 use derivative::Derivative;
 
 use crate::core::clock::Clock;
+use crate::core::utilities::maths::clamp;
 
 #[derive(Clone, Default, Component, Derivative)]
 #[derivative(Hash)]
@@ -16,6 +17,7 @@ pub struct SpriteSheetAnimator {
 pub struct SpriteSheetAnimation {
     pub start: usize,
     pub finish: usize,
+    pub repeat: bool,
 }
 
 pub fn sprite_sheet_animator_system(
@@ -31,13 +33,20 @@ pub fn sprite_sheet_animator_system(
 
         animator.clock.tick(time.delta());
         if animator.clock.finished() {
-            if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
-                atlas.index = animation.start;
-            } else {
-                atlas.index += 1;
-            }
-
             animator.clock.reset();
+
+            match animation.repeat {
+                true => {
+                    if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
+                        atlas.index = animation.start;
+                    } else {
+                        atlas.index += 1;
+                    }
+                }
+                false => {
+                    atlas.index = clamp(atlas.index + 1, animation.start, animation.finish);
+                }
+            };
         }
     }
 }
