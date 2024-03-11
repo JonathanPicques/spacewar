@@ -141,6 +141,7 @@ pub fn player_system(
         ),
         With<Rollback>,
     >,
+    mut commands: Commands,
     //
     time: Res<Time>,
     order: Res<RollbackOrdered>,
@@ -165,6 +166,7 @@ pub fn player_system(
             sprite: &mut sprite,
             assets: &game_assets,
             animator: &mut animator,
+            commands: &mut commands,
             controller: &mut controller,
             translation: &transform.translation,
         });

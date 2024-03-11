@@ -6,9 +6,11 @@ use bevy::prelude::*;
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
 use crate::core::physics::controller::PhysicsCharacterController;
+use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
-use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_UP};
+use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
 use crate::spacewar::game::player::{Direction, Player, PlayerState};
+use crate::spacewar::game::projectile::ProjectileBundle;
 use crate::spacewar::GameAssets;
 
 const JUMP_STRENGTH: f32 = 8.5;
@@ -24,12 +26,13 @@ const AIRBORNE_DECELERATION: f32 = 0.35;
 const GRAVITY_MAX_SPEED: f32 = -5.0;
 const GRAVITY_ACCELERATION: f32 = 1.0;
 
-pub struct PlayerArgs<'a> {
+pub struct PlayerArgs<'a, 'w, 's> {
     pub delta: f32,
     pub input: &'a CoreInput,
     pub assets: &'a GameAssets,
     pub sprite: &'a mut Sprite,
     pub animator: &'a mut SpriteSheetAnimator,
+    pub commands: &'a mut Commands<'w, 's>,
     pub controller: &'a mut PhysicsCharacterController,
     pub translation: &'a Vec3,
 }
@@ -81,6 +84,7 @@ impl Player {
     }
 
     fn tick_idle(&mut self, args: &mut PlayerArgs) {
+        self.projectile(args);
         self.apply_gravity(args);
         self.apply_deceleration(args, FLOOR_DECELERATION);
         self.apply_velocity_direction(args);
@@ -101,6 +105,7 @@ impl Player {
     }
 
     fn tick_walk(&mut self, args: &mut PlayerArgs) {
+        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -129,6 +134,7 @@ impl Player {
     }
 
     fn tick_jump(&mut self, args: &mut PlayerArgs) {
+        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -157,6 +163,7 @@ impl Player {
     }
 
     fn tick_fall(&mut self, args: &mut PlayerArgs) {
+        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -264,5 +271,19 @@ impl Player {
             Direction::Left => true,
             Direction::Right => false,
         };
+    }
+
+    // Miscellaneous helpers
+
+    fn projectile(&mut self, args: &mut PlayerArgs) {
+        if args.input.is_set(INPUT_SHOOT) && self.shoot_clock.finished() {
+            args.commands
+                .spawn_with_rollback(ProjectileBundle::new(
+                    self,
+                    args.assets,
+                    args.translation,
+                ));
+            self.shoot_clock.reset();
+        }
     }
 }

@@ -34,7 +34,7 @@ pub struct ProjectileBundle {
 }
 
 impl ProjectileBundle {
-    pub fn new(player: &Player, transform: &Transform, game_assets: &GameAssets) -> Self {
+    pub fn new(player: &Player, game_assets: &GameAssets, translation: &Vec3) -> Self {
         Self {
             game: Game {},
             projectile: Projectile { owner: player.handle },
@@ -64,8 +64,8 @@ impl ProjectileBundle {
             sprite_bundle: SpriteBundle {
                 texture: game_assets.bullet.clone(),
                 transform: match player.direction {
-                    Direction::Left => Transform::from_translation(transform.translation + Vec3::new(-15.0, 6.0, 0.0)),
-                    Direction::Right => Transform::from_translation(transform.translation + Vec3::new(15.0, 6.0, 0.0)),
+                    Direction::Left => Transform::from_translation(*translation + Vec3::new(-15.0, 6.0, 0.0)),
+                    Direction::Right => Transform::from_translation(*translation + Vec3::new(15.0, 6.0, 0.0)),
                 },
                 ..default()
             },
