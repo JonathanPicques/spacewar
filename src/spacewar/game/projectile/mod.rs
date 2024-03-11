@@ -44,8 +44,8 @@ impl ProjectileBundle {
             body_options: PhysicsBodyOptions { gravity_scale: 0.0, ..default() },
             body_velocity: PhysicsBodyVelocity {
                 linear_velocity: Some(match player.direction {
-                    Direction::Left => Vec2::new(-80.0, 0.0),
-                    Direction::Right => Vec2::new(80.0, 0.0),
+                    Direction::Left => Vec2::new(-170.0, 0.0),
+                    Direction::Right => Vec2::new(170.0, 0.0),
                 }),
                 ..default()
             },
@@ -64,8 +64,8 @@ impl ProjectileBundle {
             sprite_bundle: SpriteBundle {
                 texture: game_assets.bullet.clone(),
                 transform: match player.direction {
-                    Direction::Left => Transform::from_translation(*translation + Vec3::new(-15.0, 6.0, 0.0)),
-                    Direction::Right => Transform::from_translation(*translation + Vec3::new(15.0, 6.0, 0.0)),
+                    Direction::Left => Transform::from_translation(*translation + Vec3::new(-17.0, 7.0, 0.0)),
+                    Direction::Right => Transform::from_translation(*translation + Vec3::new(17.0, 7.0, 0.0)),
                 },
                 ..default()
             },

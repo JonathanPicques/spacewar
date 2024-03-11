@@ -15,16 +15,16 @@ use crate::spacewar::GameAssets;
 
 const JUMP_STRENGTH: f32 = 7.5;
 
-const FLOOR_MAX_SPEED: f32 = 2.5;
-const FLOOR_ACCELERATION: f32 = 0.4;
-const FLOOR_DECELERATION: f32 = 0.35;
+const FLOOR_MAX_SPEED: f32 = 2.4;
+const FLOOR_ACCELERATION: f32 = 0.35;
+const FLOOR_DECELERATION: f32 = 0.2;
 
-const AIRBORNE_MAX_SPEED: f32 = 2.25;
-const AIRBORNE_ACCELERATION: f32 = 0.35;
-const AIRBORNE_DECELERATION: f32 = 0.3;
+const AIRBORNE_MAX_SPEED: f32 = 2.2;
+const AIRBORNE_ACCELERATION: f32 = 0.3;
+const AIRBORNE_DECELERATION: f32 = 0.18;
 
-const GRAVITY_MAX_SPEED: f32 = -2.5;
-const GRAVITY_ACCELERATION: f32 = 0.5;
+const GRAVITY_MAX_SPEED: f32 = -3.5;
+const GRAVITY_ACCELERATION: f32 = 0.75;
 
 pub struct PlayerArgs<'a, 'w, 's> {
     pub delta: f32,
@@ -49,6 +49,7 @@ impl Player {
             super::PlayerState::Fall => self.tick_fall(&mut args),
             super::PlayerState::Jump => self.tick_jump(&mut args),
             super::PlayerState::Walk => self.tick_walk(&mut args),
+            super::PlayerState::Shoot => self.tick_shoot(&mut args),
         }
     }
 
@@ -62,6 +63,7 @@ impl Player {
             PlayerState::Fall => self.leave_fall(args),
             PlayerState::Jump => self.leave_jump(args),
             PlayerState::Walk => self.leave_walk(args),
+            PlayerState::Shoot => self.leave_shoot(args),
         };
         match new_state {
             PlayerState::None => (),
@@ -69,6 +71,7 @@ impl Player {
             PlayerState::Fall => self.enter_fall(args),
             PlayerState::Jump => self.enter_jump(args),
             PlayerState::Walk => self.enter_walk(args),
+            PlayerState::Shoot => self.enter_shoot(args),
         };
     }
 
@@ -84,7 +87,6 @@ impl Player {
     }
 
     fn tick_idle(&mut self, args: &mut PlayerArgs) {
-        self.projectile(args);
         self.apply_gravity(args);
         self.apply_deceleration(args, FLOOR_DECELERATION);
         self.apply_velocity_direction(args);
@@ -102,10 +104,13 @@ impl Player {
             self.set_state(PlayerState::Walk, args);
             return;
         }
+        if self.shot_projectile(args) {
+            self.set_state(PlayerState::Shoot, args);
+            return;
+        }
     }
 
     fn tick_jump(&mut self, args: &mut PlayerArgs) {
-        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -134,7 +139,6 @@ impl Player {
     }
 
     fn tick_fall(&mut self, args: &mut PlayerArgs) {
-        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -159,7 +163,6 @@ impl Player {
     }
 
     fn tick_walk(&mut self, args: &mut PlayerArgs) {
-        self.projectile(args);
         self.apply_gravity(args);
         self.apply_movement(
             args,
@@ -181,9 +184,28 @@ impl Player {
             self.apply_jump(args);
             return;
         }
+        if self.shot_projectile(args) {
+            self.set_state(PlayerState::Shoot, args);
+            return;
+        }
         if args.controller.velocity.x == 0.0 {
             self.set_state(PlayerState::Idle, args);
             return;
+        }
+    }
+
+    fn tick_shoot(&mut self, args: &mut PlayerArgs) {
+        self.apply_gravity(args);
+
+        if args.animator.finished() {
+            if args.controller.is_on_floor() {
+                self.set_state(PlayerState::Idle, args);
+            }
+            self.set_state(PlayerState::Fall, args);
+        }
+        match args.controller.is_on_floor() {
+            true => self.apply_deceleration(args, FLOOR_DECELERATION),
+            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
         }
     }
 
@@ -208,6 +230,11 @@ impl Player {
         args.animator.animation = args.assets.player_walk_anim.clone();
     }
     fn leave_walk(&mut self, _: &mut PlayerArgs) {}
+
+    fn enter_shoot(&mut self, args: &mut PlayerArgs) {
+        args.animator.animation = args.assets.player_shoot_anim.clone();
+    }
+    fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
 
     // Input helpers
 
@@ -277,7 +304,7 @@ impl Player {
 
     // Miscellaneous helpers
 
-    fn projectile(&mut self, args: &mut PlayerArgs) {
+    fn shot_projectile(&mut self, args: &mut PlayerArgs) -> bool {
         if args.input.is_set(INPUT_SHOOT) && self.shoot_clock.finished() {
             args.commands
                 .spawn_with_rollback(ProjectileBundle::new(
@@ -286,6 +313,8 @@ impl Player {
                     args.translation,
                 ));
             self.shoot_clock.reset();
+            return true;
         }
+        false
     }
 }

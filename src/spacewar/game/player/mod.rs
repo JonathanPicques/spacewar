@@ -49,7 +49,7 @@ pub struct Player {
     pub shoot_clock: Clock,
 }
 
-#[derive(Hash, Copy, Clone, Debug, Default)]
+#[derive(Hash, Copy, Clone, Default)]
 pub enum PlayerState {
     #[default]
     None,
@@ -57,6 +57,7 @@ pub enum PlayerState {
     Fall,
     Jump,
     Walk,
+    Shoot,
 }
 
 #[derive(Bundle)]
@@ -123,6 +124,7 @@ impl PlayerBundle {
             sprite_sheet_animator: SpriteSheetAnimator {
                 clock: Clock::from_secs_f32(0.1),
                 animation: game_assets.player_idle_anim.clone(),
+                ..default()
             },
         }
     }

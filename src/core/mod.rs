@@ -10,7 +10,7 @@ use bevy::prelude::*;
 use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
 
-use crate::core::anim::sprite_sheet_animator_system;
+use crate::core::anim::{sprite_sheet_animator_system, SpriteSheetAnimator};
 use crate::core::body::{PhysicsBody, PhysicsBodyHandle, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::clock::{ttl_system, TimeToLive};
 use crate::core::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
@@ -53,7 +53,8 @@ impl AddCoreAppExt for App {
             .rollback_component_with_copy::<PhysicsCollider>()
             .rollback_component_with_copy::<PhysicsColliderHandle>()
             .rollback_component_with_copy::<PhysicsColliderOptions>()
-            .rollback_component_with_copy::<PhysicsCharacterController>();
+            .rollback_component_with_copy::<PhysicsCharacterController>()
+            .rollback_component_with_clone::<SpriteSheetAnimator>();
 
         self
     }

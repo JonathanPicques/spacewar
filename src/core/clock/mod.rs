@@ -37,7 +37,9 @@ impl Clock {
         self.finished = finished;
         self
     }
+}
 
+impl Clock {
     #[inline]
     pub fn tick(&mut self, delta: Duration) -> &Self {
         self.elapsed += delta;

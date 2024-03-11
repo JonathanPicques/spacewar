@@ -98,6 +98,8 @@ pub struct GameAssets {
     pub player_jump_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_walk")]
     pub player_walk_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_shoot")]
+    pub player_shoot_anim: Handle<SpriteSheetAnimation>,
 }
 
 #[derive(Debug)]

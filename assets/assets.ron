@@ -33,7 +33,6 @@
     "player_idle": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                name: "idle",
                 start: 0,
                 finish: 3,
                 repeat: true,
@@ -64,6 +63,15 @@
                 start: 20,
                 finish: 29,
                 repeat: true,
+            )
+        )
+    ),
+     "player_shoot": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                start: 4,
+                finish: 5,
+                repeat: false,
             )
         )
     ),
