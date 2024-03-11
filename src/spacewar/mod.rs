@@ -76,6 +76,8 @@ pub struct GameArgs {
     pub randomize_input: bool,
     #[clap(long, default_value = "ws://127.0.0.1:3536")]
     pub matchbox_address: String,
+    #[clap(long, default_value = "0")]
+    pub desync_detection_interval: u8,
 }
 
 #[derive(Resource, AssetCollection)]

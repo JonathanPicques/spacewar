@@ -60,7 +60,7 @@
       "hide": true,
       "type": "shell",
       "label": "Run online (1)",
-      "command": "cargo run -- --online --num-players 2",
+      "command": "cargo run -- --online --num-players 2 --desync-detection-interval 1",
       "problemMatcher": [
         "$rustc"
       ]
@@ -69,7 +69,7 @@
       "hide": true,
       "type": "shell",
       "label": "Run online (2)",
-      "command": "cargo run -- --online --num-players 2",
+      "command": "cargo run -- --online --num-players 2 --desync-detection-interval 1",
       "problemMatcher": [
         "$rustc"
       ]

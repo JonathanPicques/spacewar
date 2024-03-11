@@ -4,6 +4,7 @@ use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
 use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
 use bevy_matchbox::MatchboxSocket;
+use ggrs::DesyncDetection;
 
 use crate::spacewar::game::goto_game;
 use crate::spacewar::menu::menu_main::goto_main_menu;
@@ -74,7 +75,11 @@ fn update(
             .with_max_prediction_window(game_args.max_prediction)
             .expect("Invalid max prediction window")
             .with_num_players(game_args.num_players)
-            .with_input_delay(game_args.input_delay);
+            .with_input_delay(game_args.input_delay)
+            .with_desync_detection_mode(match game_args.desync_detection_interval {
+                0 => DesyncDetection::Off,
+                x => DesyncDetection::On { interval: x.into() },
+            });
 
         let mut handles = Vec::new();
         for (i, player_type) in socket.players().iter().enumerate() {

@@ -107,8 +107,8 @@ impl PlayerBundle {
                 texture: game_assets.player.clone(),
                 transform: Transform::from_translation(Vec3::new(
                     lerp(
-                        -2.0,
-                        2.0,
+                        -20.0,
+                        20.0,
                         if game_args.num_players == 1 {
                             0.5
                         } else {
