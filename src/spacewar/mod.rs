@@ -84,12 +84,13 @@ pub struct GameArgs {
 pub struct GameAssets {
     #[asset(key = "bullet")]
     pub bullet: Handle<Image>,
+    #[asset(key = "bullet_idle")]
+    pub bullet_idle_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "bullet_atlas_layout")]
+    pub bullet_atlas_layout: Handle<TextureAtlasLayout>,
 
     #[asset(key = "player")]
     pub player: Handle<Image>,
-    #[asset(key = "player_atlas_layout")]
-    pub player_atlas_layout: Handle<TextureAtlasLayout>,
-
     #[asset(key = "player_idle")]
     pub player_idle_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_fall")]
@@ -100,6 +101,8 @@ pub struct GameAssets {
     pub player_walk_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_shoot")]
     pub player_shoot_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_atlas_layout")]
+    pub player_atlas_layout: Handle<TextureAtlasLayout>,
 }
 
 #[derive(Debug)]

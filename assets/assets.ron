@@ -6,6 +6,30 @@
             )
         ),
     ),
+    "bullet_idle": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                start: 0,
+                finish: 1,
+                repeat: true,
+            )
+        )
+    ),
+    "bullet_atlas_layout": Asset (
+        TextureAtlasLayout (
+            TextureAtlasLayoutAsset (
+                rows: 1,
+                columns: 2,
+                //
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 11,
+                tile_size_y: 4
+            )
+        )
+    ),
     //
     "player": Asset (
         Image (
@@ -14,22 +38,6 @@
             )
         )
     ),
-    "player_atlas_layout": Asset (
-        TextureAtlasLayout (
-            TextureAtlasLayoutAsset (
-                rows: 4,
-                columns: 10,
-                //
-                offset_x: 0,
-                offset_y: 0,
-                padding_x: 0,
-                padding_y: 0,
-                tile_size_x: 64,
-                tile_size_y: 64
-            )
-        )
-    ),
-    //
     "player_idle": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
@@ -72,6 +80,21 @@
                 start: 4,
                 finish: 5,
                 repeat: false,
+            )
+        )
+    ),
+    "player_atlas_layout": Asset (
+        TextureAtlasLayout (
+            TextureAtlasLayoutAsset (
+                rows: 4,
+                columns: 10,
+                //
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 64,
+                tile_size_y: 64
             )
         )
     ),

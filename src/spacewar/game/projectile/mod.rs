@@ -4,7 +4,8 @@ use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 use rapier2d::pipeline::QueryFilter;
 
-use crate::core::clock::TimeToLive;
+use crate::core::anim::SpriteSheetAnimator;
+use crate::core::clock::{Clock, TimeToLive};
 use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::physics::Physics;
@@ -12,6 +13,8 @@ use crate::core::utilities::cmp::cmp_rollack;
 use crate::spacewar::game::player::{Direction, Health, Player};
 use crate::spacewar::game::Game;
 use crate::spacewar::{GameAssets, Layer};
+
+const PROJECTILE_SPEED: f32 = 250.0;
 
 #[derive(Hash, Copy, Clone, Component)]
 pub struct Projectile {
@@ -30,7 +33,8 @@ pub struct ProjectileBundle {
     collider: PhysicsCollider,
     collider_options: PhysicsColliderOptions,
     //
-    sprite_bundle: SpriteBundle,
+    sprite_sheet_bundle: SpriteSheetBundle,
+    sprite_sheet_animator: SpriteSheetAnimator,
 }
 
 impl ProjectileBundle {
@@ -44,8 +48,8 @@ impl ProjectileBundle {
             body_options: PhysicsBodyOptions { gravity_scale: 0.0, ..default() },
             body_velocity: PhysicsBodyVelocity {
                 linear_velocity: Some(match player.direction {
-                    Direction::Left => Vec2::new(-170.0, 0.0),
-                    Direction::Right => Vec2::new(170.0, 0.0),
+                    Direction::Left => Vec2::new(-PROJECTILE_SPEED, 0.0),
+                    Direction::Right => Vec2::new(PROJECTILE_SPEED, 0.0),
                 }),
                 ..default()
             },
@@ -61,12 +65,25 @@ impl ProjectileBundle {
                 ..default()
             },
             //
-            sprite_bundle: SpriteBundle {
+            sprite_sheet_bundle: SpriteSheetBundle {
+                atlas: TextureAtlas {
+                    index: 0,
+                    layout: game_assets.bullet_atlas_layout.clone(),
+                },
+                sprite: Sprite {
+                    flip_x: player.direction == Direction::Left,
+                    ..default()
+                },
                 texture: game_assets.bullet.clone(),
                 transform: match player.direction {
                     Direction::Left => Transform::from_translation(*translation + Vec3::new(-17.0, 7.0, 0.0)),
                     Direction::Right => Transform::from_translation(*translation + Vec3::new(17.0, 7.0, 0.0)),
                 },
+                ..default()
+            },
+            sprite_sheet_animator: SpriteSheetAnimator {
+                clock: Clock::from_secs_f32(0.1),
+                animation: game_assets.bullet_idle_anim.clone(),
                 ..default()
             },
         }
