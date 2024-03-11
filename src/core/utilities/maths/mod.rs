@@ -53,14 +53,14 @@ pub fn move_towards(from: f32, to: f32, delta: f32) -> f32 {
 
 /// Computes the deceleration of a value over time.
 #[inline(always)]
-pub fn compute_deceleration(value: f32, delta: f32, deceleration: f32) -> f32 {
-    move_towards(value, 0.0, deceleration * delta)
+pub fn compute_deceleration(value: f32, deceleration: f32) -> f32 {
+    move_towards(value, 0.0, deceleration)
 }
 
 /// Computes the acceleration of a value over time.
 #[inline(always)]
-pub fn compute_acceleration(value: f32, delta: f32, max_speed: f32, acceleration: f32) -> f32 {
-    move_towards(value, max_speed, acceleration * delta)
+pub fn compute_acceleration(value: f32, max_speed: f32, acceleration: f32) -> f32 {
+    move_towards(value, max_speed, acceleration)
 }
 
 /**
