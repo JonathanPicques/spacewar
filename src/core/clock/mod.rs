@@ -40,7 +40,7 @@ impl Clock {
 }
 
 impl Clock {
-    #[inline]
+    #[inline(always)]
     pub fn tick(&mut self, delta: Duration) -> &Self {
         self.elapsed += delta;
         if self.elapsed >= self.duration {
@@ -49,15 +49,21 @@ impl Clock {
         self
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn reset(&mut self) {
         self.elapsed = default();
         self.finished = self.elapsed >= self.duration;
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn finished(&self) -> bool {
         self.finished
+    }
+
+    #[inline(always)]
+    pub(crate) fn set_duration(&mut self, duration: Duration) {
+        self.duration = duration;
+        self.finished = self.elapsed >= self.duration;
     }
 }
 

@@ -5,7 +5,7 @@ use rapier2d::geometry::InteractionGroups;
 use rapier2d::pipeline::QueryFilter;
 
 use crate::core::anim::SpriteSheetAnimator;
-use crate::core::clock::{Clock, TimeToLive};
+use crate::core::clock::TimeToLive;
 use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::physics::Physics;
@@ -81,11 +81,7 @@ impl ProjectileBundle {
                 },
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator {
-                clock: Clock::from_secs_f32(0.1),
-                animation: game_assets.bullet_idle_anim.clone(),
-                ..default()
-            },
+            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.bullet_idle_anim.clone()),
         }
     }
 }

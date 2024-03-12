@@ -121,11 +121,7 @@ impl PlayerBundle {
                 )),
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator {
-                clock: Clock::from_secs_f32(0.1),
-                animation: game_assets.player_idle_anim.clone(),
-                ..default()
-            },
+            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.player_idle_anim.clone()),
         }
     }
 }

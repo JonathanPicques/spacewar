@@ -212,27 +212,32 @@ impl Player {
     // Transitions
 
     fn enter_idle(&mut self, args: &mut PlayerArgs) {
-        args.animator.animation = args.assets.player_idle_anim.clone();
+        args.animator
+            .set_animation(args.assets.player_idle_anim.clone());
     }
     fn leave_idle(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_fall(&mut self, args: &mut PlayerArgs) {
-        args.animator.animation = args.assets.player_fall_anim.clone();
+        args.animator
+            .set_animation(args.assets.player_fall_anim.clone());
     }
     fn leave_fall(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_jump(&mut self, args: &mut PlayerArgs) {
-        args.animator.animation = args.assets.player_jump_anim.clone();
+        args.animator
+            .set_animation(args.assets.player_jump_anim.clone());
     }
     fn leave_jump(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_walk(&mut self, args: &mut PlayerArgs) {
-        args.animator.animation = args.assets.player_walk_anim.clone();
+        args.animator
+            .set_animation(args.assets.player_walk_anim.clone());
     }
     fn leave_walk(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_shoot(&mut self, args: &mut PlayerArgs) {
-        args.animator.animation = args.assets.player_shoot_anim.clone();
+        args.animator
+            .set_animation(args.assets.player_shoot_anim.clone());
     }
     fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
 

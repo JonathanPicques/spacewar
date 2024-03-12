@@ -1,30 +1,51 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 use derivative::Derivative;
 
 use crate::core::clock::Clock;
 use crate::core::utilities::cmp::cmp_rollack;
-use crate::core::utilities::maths::clamp;
 
-#[derive(Clone, Default, Component, Derivative)]
+#[derive(Hash, Clone, PartialEq)]
+enum State {
+    Changed,
+    Playing,
+    Finished,
+}
+
+#[derive(Clone, Component, Derivative)]
 #[derivative(Hash)]
 pub struct SpriteSheetAnimator {
+    state: State,
     #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
-    pub clock: Clock,
-    pub finished: bool,
-    pub animation: Handle<SpriteSheetAnimation>,
+    clock: Clock,
+    animation: Handle<SpriteSheetAnimation>,
 }
 
 #[derive(Asset, TypePath)]
 pub struct SpriteSheetAnimation {
+    pub speed: f32,
     pub start: usize,
     pub finish: usize,
     pub repeat: bool,
 }
 
 impl SpriteSheetAnimator {
+    pub fn new(animation: Handle<SpriteSheetAnimation>) -> Self {
+        Self { state: State::Changed, clock: default(), animation }
+    }
+}
+
+impl SpriteSheetAnimator {
     pub fn finished(&self) -> bool {
-        self.finished
+        self.state == State::Finished
+    }
+
+    pub fn set_animation(&mut self, animation: Handle<SpriteSheetAnimation>) {
+        self.clock.reset();
+        self.state = State::Changed;
+        self.animation = animation;
     }
 }
 
@@ -48,13 +69,20 @@ pub fn sprite_sheet_animator_system(
             .expect("Animation not found");
 
         animator.clock.tick(time.delta());
+
+        if animator.state == State::Changed {
+            atlas.index = animation.start;
+            animator
+                .clock
+                .set_duration(Duration::from_secs_f32(animation.speed));
+            animator.clock.reset();
+            animator.state = State::Playing;
+        }
         if animator.clock.finished() {
             animator.clock.reset();
 
             match animation.repeat {
                 true => {
-                    animator.finished = false;
-
                     if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
                         atlas.index = animation.start;
                     } else {
@@ -62,8 +90,11 @@ pub fn sprite_sheet_animator_system(
                     }
                 }
                 false => {
-                    atlas.index = clamp(atlas.index + 1, animation.start, animation.finish);
-                    animator.finished = atlas.index == animation.finish;
+                    if atlas.index < animation.finish {
+                        atlas.index += 1;
+                    } else {
+                        animator.state = State::Finished;
+                    }
                 }
             };
         }
