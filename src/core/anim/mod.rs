@@ -38,7 +38,7 @@ impl SpriteSheetAnimator {
 }
 
 impl SpriteSheetAnimator {
-    pub fn finished(&self) -> bool {
+    pub fn is_finished(&self) -> bool {
         self.state == State::Finished
     }
 
@@ -78,7 +78,7 @@ pub fn sprite_sheet_animator_system(
             animator.clock.reset();
             animator.state = State::Playing;
         }
-        if animator.clock.finished() {
+        if animator.clock.is_finished() {
             animator.clock.reset();
 
             match animation.repeat {

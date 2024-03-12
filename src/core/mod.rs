@@ -54,6 +54,7 @@ impl AddCoreAppExt for App {
             .rollback_component_with_copy::<PhysicsColliderHandle>()
             .rollback_component_with_copy::<PhysicsColliderOptions>()
             .rollback_component_with_copy::<PhysicsCharacterController>()
+            .rollback_component_with_clone::<TextureAtlas>()
             .rollback_component_with_clone::<SpriteSheetAnimator>();
 
         self

@@ -197,7 +197,7 @@ impl Player {
     fn tick_shoot(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
 
-        if args.animator.finished() {
+        if args.animator.is_finished() {
             if args.controller.is_on_floor() {
                 self.set_state(PlayerState::Idle, args);
             }
@@ -310,7 +310,7 @@ impl Player {
     // Miscellaneous helpers
 
     fn shot_projectile(&mut self, args: &mut PlayerArgs) -> bool {
-        if args.input.is_set(INPUT_SHOOT) && self.shoot_clock.finished() {
+        if args.input.is_set(INPUT_SHOOT) && self.shoot_clock.is_finished() {
             args.commands
                 .spawn_with_rollback(ProjectileBundle::new(
                     self,

@@ -56,12 +56,12 @@ impl Clock {
     }
 
     #[inline(always)]
-    pub fn finished(&self) -> bool {
+    pub fn is_finished(&self) -> bool {
         self.finished
     }
 
     #[inline(always)]
-    pub(crate) fn set_duration(&mut self, duration: Duration) {
+    pub fn set_duration(&mut self, duration: Duration) {
         self.duration = duration;
         self.finished = self.elapsed >= self.duration;
     }
@@ -102,7 +102,7 @@ pub fn ttl_system(
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (e, _, mut ttl) in query {
-        if ttl.clock.tick(delta_d).finished() {
+        if ttl.clock.tick(delta_d).is_finished() {
             commands.entity(e).despawn_recursive();
         }
     }
