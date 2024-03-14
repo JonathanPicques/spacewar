@@ -7,7 +7,7 @@ use crate::core::anim::SpriteSheetAnimator;
 use crate::core::input::CoreInput;
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
-use crate::core::utilities::maths::{compute_acceleration, compute_deceleration};
+use crate::core::utilities::maths::move_towards;
 use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
 use crate::spacewar::game::player::{Direction, Player, PlayerState};
 use crate::spacewar::game::projectile::ProjectileBundle;
@@ -268,7 +268,7 @@ impl Player {
     // Movement helpers
 
     fn apply_gravity(self, args: &mut PlayerArgs) {
-        args.controller.velocity.y = compute_acceleration(
+        args.controller.velocity.y = move_towards(
             args.controller.velocity.y,
             GRAVITY_MAX_SPEED,
             GRAVITY_ACCELERATION,
@@ -281,18 +281,18 @@ impl Player {
         let velocity = &mut args.controller.velocity;
 
         if left {
-            velocity.x = compute_acceleration(velocity.x, -max_speed, acceleration);
+            velocity.x = move_towards(velocity.x, -max_speed, acceleration);
         } else if right {
-            velocity.x = compute_acceleration(velocity.x, max_speed, acceleration);
+            velocity.x = move_towards(velocity.x, max_speed, acceleration);
         } else {
-            velocity.x = compute_deceleration(velocity.x, deceleration);
+            self.apply_deceleration(args, deceleration);
         }
     }
 
     fn apply_deceleration(self, args: &mut PlayerArgs, deceleration: f32) {
         let velocity = &mut args.controller.velocity;
 
-        velocity.x = compute_deceleration(velocity.x, deceleration);
+        velocity.x = move_towards(velocity.x, 0.0, deceleration);
     }
 
     fn apply_velocity_direction(&mut self, args: &mut PlayerArgs) {
