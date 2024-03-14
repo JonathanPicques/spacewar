@@ -8,7 +8,7 @@ use crate::core::input::CoreInput;
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::move_towards;
-use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_UP};
+use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_THROW, INPUT_UP};
 use crate::spacewar::game::player::{Direction, Player, PlayerState};
 use crate::spacewar::game::projectile::ProjectileBundle;
 use crate::spacewar::GameAssets;
@@ -40,16 +40,18 @@ pub struct PlayerArgs<'a, 'w, 's> {
 #[allow(clippy::needless_return)]
 impl Player {
     pub fn tick(&mut self, mut args: PlayerArgs) {
-        self.shoot_clock
-            .tick(Duration::from_secs_f32(args.delta));
+        let delta = Duration::from_secs_f32(args.delta);
 
+        self.shoot_clock.tick(delta);
+        self.throw_clock.tick(delta);
         match self.state {
-            super::PlayerState::None => self.tick_none(&mut args),
-            super::PlayerState::Idle => self.tick_idle(&mut args),
-            super::PlayerState::Fall => self.tick_fall(&mut args),
-            super::PlayerState::Jump => self.tick_jump(&mut args),
-            super::PlayerState::Walk => self.tick_walk(&mut args),
-            super::PlayerState::Shoot => self.tick_shoot(&mut args),
+            PlayerState::None => self.tick_none(&mut args),
+            PlayerState::Idle => self.tick_idle(&mut args),
+            PlayerState::Walk => self.tick_walk(&mut args),
+            PlayerState::Jump => self.tick_jump(&mut args),
+            PlayerState::Fall => self.tick_fall(&mut args),
+            PlayerState::Shoot => self.tick_shoot(&mut args),
+            PlayerState::Throw => self.tick_throw(&mut args),
         }
     }
 
@@ -60,18 +62,20 @@ impl Player {
         match old_state {
             PlayerState::None => (),
             PlayerState::Idle => self.leave_idle(args),
-            PlayerState::Fall => self.leave_fall(args),
-            PlayerState::Jump => self.leave_jump(args),
             PlayerState::Walk => self.leave_walk(args),
+            PlayerState::Jump => self.leave_jump(args),
+            PlayerState::Fall => self.leave_fall(args),
             PlayerState::Shoot => self.leave_shoot(args),
+            PlayerState::Throw => self.leave_throw(args),
         };
         match new_state {
             PlayerState::None => (),
             PlayerState::Idle => self.enter_idle(args),
-            PlayerState::Fall => self.enter_fall(args),
-            PlayerState::Jump => self.enter_jump(args),
             PlayerState::Walk => self.enter_walk(args),
+            PlayerState::Jump => self.enter_jump(args),
+            PlayerState::Fall => self.enter_fall(args),
             PlayerState::Shoot => self.enter_shoot(args),
+            PlayerState::Throw => self.enter_throw(args),
         };
     }
 
@@ -95,7 +99,7 @@ impl Player {
             self.set_state(PlayerState::Fall, args);
             return;
         }
-        if args.input.is_set(INPUT_UP) {
+        if self.can_jump(args) && args.input.is_set(INPUT_UP) {
             self.set_state(PlayerState::Jump, args);
             self.apply_jump(args);
             return;
@@ -104,8 +108,48 @@ impl Player {
             self.set_state(PlayerState::Walk, args);
             return;
         }
-        if self.shot_projectile(args) {
+        if self.can_shoot(args) && args.input.is_set(INPUT_SHOOT) {
             self.set_state(PlayerState::Shoot, args);
+            return;
+        }
+        if self.can_throw(args) && args.input.is_set(INPUT_THROW) {
+            self.set_state(PlayerState::Throw, args);
+            return;
+        }
+    }
+
+    fn tick_walk(&mut self, args: &mut PlayerArgs) {
+        self.apply_gravity(args);
+        self.apply_movement(
+            args,
+            FLOOR_MAX_SPEED,
+            FLOOR_ACCELERATION,
+            FLOOR_DECELERATION,
+        );
+        self.apply_velocity_direction(args);
+
+        if args.controller.is_on_wall() {
+            self.apply_wall_bump(args);
+        }
+        if !args.controller.is_on_floor() {
+            self.set_state(PlayerState::Fall, args);
+            return;
+        }
+        if args.controller.velocity.x == 0.0 && !self.only_dir(args) {
+            self.set_state(PlayerState::Idle, args);
+            return;
+        }
+        if self.can_jump(args) && args.input.is_set(INPUT_UP) {
+            self.set_state(PlayerState::Jump, args);
+            self.apply_jump(args);
+            return;
+        }
+        if self.can_shoot(args) && args.input.is_set(INPUT_SHOOT) {
+            self.set_state(PlayerState::Shoot, args);
+            return;
+        }
+        if self.can_throw(args) && args.input.is_set(INPUT_THROW) {
+            self.set_state(PlayerState::Throw, args);
             return;
         }
     }
@@ -162,39 +206,22 @@ impl Player {
         }
     }
 
-    fn tick_walk(&mut self, args: &mut PlayerArgs) {
+    fn tick_shoot(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
-        self.apply_movement(
-            args,
-            FLOOR_MAX_SPEED,
-            FLOOR_ACCELERATION,
-            FLOOR_DECELERATION,
-        );
-        self.apply_velocity_direction(args);
 
-        if args.controller.is_on_wall() {
-            self.apply_wall_bump(args);
-        }
-        if !args.controller.is_on_floor() {
+        if args.animator.is_finished() {
+            if args.controller.is_on_floor() {
+                self.set_state(PlayerState::Idle, args);
+            }
             self.set_state(PlayerState::Fall, args);
-            return;
         }
-        if args.input.is_set(INPUT_UP) {
-            self.set_state(PlayerState::Jump, args);
-            self.apply_jump(args);
-            return;
-        }
-        if self.shot_projectile(args) {
-            self.set_state(PlayerState::Shoot, args);
-            return;
-        }
-        if args.controller.velocity.x == 0.0 && !self.only_dir(args) {
-            self.set_state(PlayerState::Idle, args);
-            return;
+        match args.controller.is_on_floor() {
+            true => self.apply_deceleration(args, FLOOR_DECELERATION),
+            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
         }
     }
 
-    fn tick_shoot(&mut self, args: &mut PlayerArgs) {
+    fn tick_throw(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
 
         if args.animator.is_finished() {
@@ -217,11 +244,11 @@ impl Player {
     }
     fn leave_idle(&mut self, _: &mut PlayerArgs) {}
 
-    fn enter_fall(&mut self, args: &mut PlayerArgs) {
+    fn enter_walk(&mut self, args: &mut PlayerArgs) {
         args.animator
-            .set_animation(args.assets.player_fall_anim.clone());
+            .set_animation(args.assets.player_walk_anim.clone());
     }
-    fn leave_fall(&mut self, _: &mut PlayerArgs) {}
+    fn leave_walk(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_jump(&mut self, args: &mut PlayerArgs) {
         args.animator
@@ -229,17 +256,45 @@ impl Player {
     }
     fn leave_jump(&mut self, _: &mut PlayerArgs) {}
 
-    fn enter_walk(&mut self, args: &mut PlayerArgs) {
+    fn enter_fall(&mut self, args: &mut PlayerArgs) {
         args.animator
-            .set_animation(args.assets.player_walk_anim.clone());
+            .set_animation(args.assets.player_fall_anim.clone());
     }
-    fn leave_walk(&mut self, _: &mut PlayerArgs) {}
+    fn leave_fall(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_shoot(&mut self, args: &mut PlayerArgs) {
+        self.shoot_clock.reset();
         args.animator
             .set_animation(args.assets.player_shoot_anim.clone());
+        args.commands
+            .spawn_with_rollback(ProjectileBundle::new(
+                self,
+                args.assets,
+                args.translation,
+            ));
     }
     fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
+
+    fn enter_throw(&mut self, args: &mut PlayerArgs) {
+        self.throw_clock.reset();
+        args.animator
+            .set_animation(args.assets.player_throw_anim.clone());
+    }
+    fn leave_throw(&mut self, _: &mut PlayerArgs) {}
+
+    // Checks
+
+    fn can_jump(self, args: &mut PlayerArgs) -> bool {
+        args.controller.is_on_floor()
+    }
+
+    fn can_shoot(self, _: &mut PlayerArgs) -> bool {
+        self.shoot_clock.is_finished()
+    }
+
+    fn can_throw(self, _: &mut PlayerArgs) -> bool {
+        self.throw_clock.is_finished()
+    }
 
     // Input helpers
 
@@ -312,21 +367,5 @@ impl Player {
             Direction::Left => true,
             Direction::Right => false,
         };
-    }
-
-    // Miscellaneous helpers
-
-    fn shot_projectile(&mut self, args: &mut PlayerArgs) -> bool {
-        if args.input.is_set(INPUT_SHOOT) && self.shoot_clock.is_finished() {
-            args.commands
-                .spawn_with_rollback(ProjectileBundle::new(
-                    self,
-                    args.assets,
-                    args.translation,
-                ));
-            self.shoot_clock.reset();
-            return true;
-        }
-        false
     }
 }

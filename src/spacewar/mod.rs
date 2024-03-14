@@ -101,6 +101,8 @@ pub struct GameAssets {
     pub player_walk_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_shoot")]
     pub player_shoot_anim: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_throw")]
+    pub player_throw_anim: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_atlas_layout")]
     pub player_atlas_layout: Handle<TextureAtlasLayout>,
 }

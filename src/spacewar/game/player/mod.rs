@@ -47,6 +47,8 @@ pub struct Player {
     pub direction: Direction,
     #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
+    pub throw_clock: Clock,
 }
 
 #[derive(Hash, Copy, Clone, Default)]
@@ -54,10 +56,11 @@ pub enum PlayerState {
     #[default]
     None,
     Idle,
-    Fall,
-    Jump,
     Walk,
+    Jump,
+    Fall,
     Shoot,
+    Throw,
 }
 
 #[derive(Bundle)]
@@ -84,7 +87,8 @@ impl PlayerBundle {
             health: Health { hp: 1 },
             player: Player {
                 handle,
-                shoot_clock: Clock::from_secs_f32(1.0).with_finished(true),
+                shoot_clock: Clock::from_secs_f32(0.5).with_finished(true),
+                throw_clock: Clock::from_secs_f32(1.0).with_finished(true),
                 ..default()
             },
             //

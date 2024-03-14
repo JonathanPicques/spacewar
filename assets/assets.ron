@@ -53,8 +53,8 @@
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 speed: 0.1,
-                start: 13,
-                finish: 14,
+                start: 12,
+                finish: 12,
                 repeat: false,
             )
         )
@@ -79,12 +79,22 @@
             )
         )
     ),
-     "player_shoot": Asset (
+    "player_shoot": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                speed: 0.05,
+                speed: 0.065,
                 start: 4,
                 finish: 5,
+                repeat: false,
+            )
+        )
+    ),
+    "player_throw": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.065,
+                start: 40,
+                finish: 47,
                 repeat: false,
             )
         )
@@ -92,7 +102,7 @@
     "player_atlas_layout": Asset (
         TextureAtlasLayout (
             TextureAtlasLayoutAsset (
-                rows: 4,
+                rows: 8,
                 columns: 10,
                 //
                 offset_x: 0,
