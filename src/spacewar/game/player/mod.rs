@@ -87,7 +87,7 @@ impl PlayerBundle {
             health: Health { hp: 1 },
             player: Player {
                 handle,
-                shoot_clock: Clock::from_secs_f32(0.5).with_finished(true),
+                shoot_clock: Clock::from_secs_f32(0.0).with_finished(true),
                 throw_clock: Clock::from_secs_f32(1.0).with_finished(true),
                 ..default()
             },

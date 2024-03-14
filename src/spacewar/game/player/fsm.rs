@@ -210,8 +210,13 @@ impl Player {
         self.apply_gravity(args);
 
         if args.animator.is_finished() {
+            if self.can_shoot(args) && args.input.is_set(INPUT_SHOOT) {
+                self.set_state(PlayerState::Shoot, args);
+                return;
+            }
             if args.controller.is_on_floor() {
                 self.set_state(PlayerState::Idle, args);
+                return;
             }
             self.set_state(PlayerState::Fall, args);
         }

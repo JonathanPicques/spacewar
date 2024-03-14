@@ -49,13 +49,13 @@
             )
         )
     ),
-    "player_fall": Asset (
+    "player_walk": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 speed: 0.1,
-                start: 12,
-                finish: 12,
-                repeat: false,
+                start: 20,
+                finish: 29,
+                repeat: true,
             )
         )
     ),
@@ -69,12 +69,12 @@
             )
         )
     ),
-    "player_walk": Asset (
+    "player_fall": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 speed: 0.1,
-                start: 20,
-                finish: 29,
+                start: 12,
+                finish: 12,
                 repeat: true,
             )
         )
@@ -82,7 +82,7 @@
     "player_shoot": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                speed: 0.065,
+                speed: 0.04,
                 start: 4,
                 finish: 5,
                 repeat: false,
