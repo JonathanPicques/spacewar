@@ -188,7 +188,7 @@ impl Player {
             self.set_state(PlayerState::Shoot, args);
             return;
         }
-        if args.controller.velocity.x == 0.0 {
+        if args.controller.velocity.x == 0.0 && !self.only_dir(args) {
             self.set_state(PlayerState::Idle, args);
             return;
         }
@@ -242,6 +242,13 @@ impl Player {
     fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
 
     // Input helpers
+
+    fn only_dir(self, args: &mut PlayerArgs) -> bool {
+        match self.direction {
+            Direction::Left => self.only_left(args),
+            Direction::Right => self.only_right(args),
+        }
+    }
 
     fn only_left(self, args: &mut PlayerArgs) -> bool {
         args.input.is_set(INPUT_LEFT) && !args.input.is_set(INPUT_RIGHT)
