@@ -20,7 +20,7 @@ use crate::core::physics::collider::PhysicsColliderHandle;
 use crate::core::physics::controller::PhysicsCharacterController;
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::core::utilities::hash::f32_hasher;
-use crate::core::utilities::maths::*;
+use crate::core::utilities::maths::{Rotation, *};
 
 #[derive(Copy, Clone, Resource)]
 pub struct Scaler {
@@ -278,6 +278,7 @@ fn physics_sync_system(
 
     for (_, body_handle, mut transform) in query {
         if let Some(body) = physics.bodies.get(body_handle.handle()) {
+            transform.rotation = Rotation::Radians(body.rotation().angle()).into();
             transform.translation = (scaler.meters_to_pixels(body.position().to_bevy())).extend(transform.translation.z);
         }
     }

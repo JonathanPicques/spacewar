@@ -10,7 +10,8 @@ use crate::core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use crate::core::utilities::maths::move_towards;
 use crate::spacewar::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_THROW, INPUT_UP};
 use crate::spacewar::game::player::{Direction, Player, PlayerState};
-use crate::spacewar::game::projectile::ProjectileBundle;
+use crate::spacewar::game::projectile::bullet::BulletBundle;
+use crate::spacewar::game::projectile::grenade::GrenadeBundle;
 use crate::spacewar::GameAssets;
 
 const JUMP_STRENGTH: f32 = 7.5;
@@ -272,7 +273,7 @@ impl Player {
         args.animator
             .set_animation(args.assets.player_shoot_anim.clone());
         args.commands
-            .spawn_with_rollback(ProjectileBundle::new(
+            .spawn_with_rollback(BulletBundle::new(
                 self,
                 args.assets,
                 args.translation,
@@ -284,6 +285,12 @@ impl Player {
         self.throw_clock.reset();
         args.animator
             .set_animation(args.assets.player_throw_anim.clone());
+        args.commands
+            .spawn_with_rollback(GrenadeBundle::new(
+                self,
+                args.assets,
+                args.translation,
+            ));
     }
     fn leave_throw(&mut self, _: &mut PlayerArgs) {}
 

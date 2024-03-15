@@ -19,7 +19,8 @@ use crate::core::AddCoreAppExt;
 use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::level::LevelRectBundle;
 use crate::spacewar::game::player::{player_system, Health, Player, PlayerBundle, Stats};
-use crate::spacewar::game::projectile::{projectile_system, Projectile};
+use crate::spacewar::game::projectile::bullet::{bullet_system, Bullet};
+use crate::spacewar::game::projectile::grenade::{grenade_system, Grenade};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
 
@@ -34,15 +35,17 @@ impl AddGameAppExt for App {
             .checksum_component::<Transform>(transform_hasher)
             .checksum_component_with_hash::<Game>()
             .checksum_component_with_hash::<Stats>()
+            .checksum_component_with_hash::<Bullet>()
             .checksum_component_with_hash::<Health>()
             .checksum_component_with_hash::<Player>()
-            .checksum_component_with_hash::<Projectile>()
+            .checksum_component_with_hash::<Grenade>()
             //
             .rollback_component_with_copy::<Game>()
             .rollback_component_with_copy::<Stats>()
+            .rollback_component_with_copy::<Bullet>()
             .rollback_component_with_copy::<Health>()
             .rollback_component_with_copy::<Player>()
-            .rollback_component_with_copy::<Projectile>()
+            .rollback_component_with_copy::<Grenade>()
             .rollback_component_with_clone::<Transform>()
             //
             .add_systems(OnEnter(State::Game), setup)
@@ -54,7 +57,14 @@ impl AddGameAppExt for App {
             //
             .add_systems(
                 GgrsSchedule,
-                ((core_systems(), player_system, projectile_system).run_if(in_state(State::Game))).chain(),
+                ((
+                    core_systems(),
+                    player_system,
+                    bullet_system,
+                    grenade_system,
+                )
+                    .run_if(in_state(State::Game)))
+                .chain(),
             )
     }
 }

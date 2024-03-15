@@ -89,6 +89,9 @@ pub struct GameAssets {
     #[asset(key = "bullet_atlas_layout")]
     pub bullet_atlas_layout: Handle<TextureAtlasLayout>,
 
+    #[asset(key = "grenade")]
+    pub grenade: Handle<Image>,
+
     #[asset(key = "player")]
     pub player: Handle<Image>,
     #[asset(key = "player_idle")]
