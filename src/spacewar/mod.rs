@@ -95,17 +95,19 @@ pub struct GameAssets {
     #[asset(key = "player")]
     pub player: Handle<Image>,
     #[asset(key = "player_idle")]
-    pub player_idle_anim: Handle<SpriteSheetAnimation>,
+    pub player_idle: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_fall")]
-    pub player_fall_anim: Handle<SpriteSheetAnimation>,
+    pub player_fall: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_jump")]
-    pub player_jump_anim: Handle<SpriteSheetAnimation>,
+    pub player_jump: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_walk")]
-    pub player_walk_anim: Handle<SpriteSheetAnimation>,
+    pub player_walk: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_shoot")]
-    pub player_shoot_anim: Handle<SpriteSheetAnimation>,
+    pub player_shoot: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_throw")]
-    pub player_throw_anim: Handle<SpriteSheetAnimation>,
+    pub player_throw: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_throw_end")]
+    pub player_throw_end: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_atlas_layout")]
     pub player_atlas_layout: Handle<TextureAtlasLayout>,
 }

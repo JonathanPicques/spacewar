@@ -61,6 +61,7 @@ pub enum PlayerState {
     Fall,
     Shoot,
     Throw,
+    ThrowEnd,
 }
 
 #[derive(Bundle)]
@@ -125,7 +126,7 @@ impl PlayerBundle {
                 )),
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.player_idle_anim.clone()),
+            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.player_idle.clone()),
         }
     }
 }

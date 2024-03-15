@@ -59,8 +59,18 @@
     "player_throw": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
-                speed: 0.065,
+                speed: 0.075,
                 start: 40,
+                finish: 43,
+                repeat: false,
+            )
+        )
+    ),
+    "player_throw_end": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.075,
+                start: 44,
                 finish: 47,
                 repeat: false,
             )
