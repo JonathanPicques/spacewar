@@ -440,8 +440,8 @@ fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Ph
         if let Some(ball) = collider.shape().as_ball() {
             gizmos.circle_2d(
                 scaler.meters_to_pixels(collider.translation().to_bevy()),
-                ball.radius,
-                Color::Rgba { red: 1.0, green: 0.0, blue: 0.0, alpha: 0.1 },
+                scaler.meters_to_pixels(ball.radius),
+                Color::Rgba { red: 1.0, green: 0.0, blue: 1.0, alpha: 0.2 },
             );
         }
         if let Some(cuboid) = collider.shape().as_cuboid() {
@@ -449,7 +449,7 @@ fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Ph
                 scaler.meters_to_pixels(collider.translation().to_bevy()),
                 collider.rotation().angle(),
                 scaler.meters_to_pixels(cuboid.half_extents.to_bevy()) * 2.0,
-                Color::Rgba { red: 0.0, green: 1.0, blue: 0.0, alpha: 0.1 },
+                Color::Rgba { red: 0.0, green: 1.0, blue: 0.0, alpha: 0.2 },
             );
         }
     }
