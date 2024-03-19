@@ -5,14 +5,15 @@ use rapier2d::geometry::{Group, InteractionGroups};
 
 use crate::core::anim::SpriteSheetAnimator;
 use crate::core::clock::TimeToLive;
-use crate::core::physics::body::{PhysicsBody, PhysicsBodyVelocity};
+use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::utilities::cmp::cmp_rollack;
 use crate::spacewar::game::player::{Direction, Player};
 use crate::spacewar::game::Game;
 use crate::spacewar::{GameAssets, Layer};
 
-const GRENADE_IMPULSE: Vec2 = Vec2::new(150.0, 300.0);
+const LINEAR_IMPULSE: Vec2 = Vec2::new(150.0, 300.0);
+const ANGULAR_IMPULSE: f32 = 135.0;
 
 #[derive(Hash, Copy, Clone, Component)]
 pub struct Grenade {
@@ -26,7 +27,7 @@ pub struct GrenadeBundle {
     time_to_live: TimeToLive,
     //
     body: PhysicsBody,
-    // body_options: PhysicsBodyOptions,
+    body_options: PhysicsBodyOptions,
     body_velocity: PhysicsBodyVelocity,
     collider: PhysicsCollider,
     collider_options: PhysicsColliderOptions,
@@ -43,13 +44,21 @@ impl GrenadeBundle {
             time_to_live: TimeToLive::from_secs_f32(3.0),
             //
             body: PhysicsBody::Dynamic,
-            // body_options: PhysicsBodyOptions { ccd: true, ..default() },
+            body_options: PhysicsBodyOptions {
+                ccd: true,
+                linear_damping: 0.0,
+                angular_damping: 10.0,
+                ..default()
+            },
             body_velocity: PhysicsBodyVelocity {
                 linear_velocity: Some(match player.direction {
-                    Direction::Left => Vec2::new(-GRENADE_IMPULSE.x, GRENADE_IMPULSE.y),
-                    Direction::Right => Vec2::new(GRENADE_IMPULSE.x, GRENADE_IMPULSE.y),
+                    Direction::Left => Vec2::new(-LINEAR_IMPULSE.x, LINEAR_IMPULSE.y),
+                    Direction::Right => Vec2::new(LINEAR_IMPULSE.x, LINEAR_IMPULSE.y),
                 }),
-                ..default()
+                angular_velocity: Some(match player.direction {
+                    Direction::Left => ANGULAR_IMPULSE,
+                    Direction::Right => -ANGULAR_IMPULSE,
+                }),
             },
             //
             collider: PhysicsCollider::Circle { radius: 3.5 },

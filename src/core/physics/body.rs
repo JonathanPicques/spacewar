@@ -76,10 +76,7 @@ impl PhysicsBody {
             Some(false) => body.wake_up(false),
         }
         body.enable_ccd(options.ccd);
-        body.set_gravity_scale(
-            scaler.pixels_to_meters(options.gravity_scale),
-            wake_up,
-        );
+        body.set_gravity_scale(options.gravity_scale, wake_up);
         body.set_linear_damping(scaler.pixels_to_meters(options.linear_damping));
         body.set_angular_damping(options.angular_damping);
         body.set_additional_mass(
