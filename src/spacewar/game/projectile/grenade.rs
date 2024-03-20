@@ -1,10 +1,9 @@
 use bevy::prelude::*;
-use bevy_ggrs::{Rollback, RollbackOrdered};
+use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 use ggrs::PlayerHandle;
 use rapier2d::geometry::{Group, InteractionGroups};
 
-use crate::core::anim::SpriteSheetAnimator;
-use crate::core::clock::TimeToLive;
+use crate::core::clock::Clock;
 use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::utilities::cmp::cmp_rollack;
@@ -17,6 +16,7 @@ const ANGULAR_IMPULSE: f32 = 135.0;
 
 #[derive(Hash, Copy, Clone, Component)]
 pub struct Grenade {
+    fuse: Clock,
     owner: PlayerHandle,
 }
 
@@ -24,7 +24,6 @@ pub struct Grenade {
 pub struct GrenadeBundle {
     game: Game,
     grenade: Grenade,
-    time_to_live: TimeToLive,
     //
     body: PhysicsBody,
     body_options: PhysicsBodyOptions,
@@ -33,15 +32,16 @@ pub struct GrenadeBundle {
     collider_options: PhysicsColliderOptions,
     //
     sprite_bundle: SpriteBundle,
-    sprite_sheet_animator: SpriteSheetAnimator,
 }
 
 impl GrenadeBundle {
     pub fn new(player: &Player, game_assets: &GameAssets, translation: &Vec3) -> Self {
         Self {
             game: Game {},
-            grenade: Grenade { owner: player.handle },
-            time_to_live: TimeToLive::from_secs_f32(3.0),
+            grenade: Grenade {
+                fuse: Clock::from_secs_f32(2.5),
+                owner: player.handle,
+            },
             //
             body: PhysicsBody::Dynamic,
             body_options: PhysicsBodyOptions {
@@ -84,7 +84,6 @@ impl GrenadeBundle {
                 },
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.bullet_idle_anim.clone()),
         }
     }
 }
@@ -108,5 +107,24 @@ pub fn grenade_system(
 
     for (e, ..) in grenades {
         commands.entity(e).remove::<PhysicsBodyVelocity>();
+    }
+}
+
+pub fn grenade_fuse_system(
+    mut grenades: Query<(Entity, &Rollback, &mut Grenade)>,
+    mut commands: Commands,
+    //
+    time: Res<Time<GgrsTime>>,
+    order: Res<RollbackOrdered>,
+) {
+    let delta = time.delta();
+    let mut grenades = grenades.iter_mut().collect::<Vec<_>>();
+    grenades.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+
+    for (e, _, mut grenade) in grenades {
+        grenade.fuse.tick(delta);
+        if grenade.fuse.is_finished() {
+            commands.entity(e).despawn_recursive();
+        }
     }
 }

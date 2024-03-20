@@ -20,7 +20,7 @@ use crate::spacewar::game::input::input_system;
 use crate::spacewar::game::level::LevelRectBundle;
 use crate::spacewar::game::player::{player_system, Health, Player, PlayerBundle, Stats};
 use crate::spacewar::game::projectile::bullet::{bullet_system, Bullet};
-use crate::spacewar::game::projectile::grenade::{grenade_system, Grenade};
+use crate::spacewar::game::projectile::grenade::{grenade_fuse_system, grenade_system, Grenade};
 use crate::spacewar::menu::menu_main::goto_main_menu;
 use crate::spacewar::{GameArgs, GameAssets, GameConfig, State};
 
@@ -62,6 +62,7 @@ impl AddGameAppExt for App {
                     player_system,
                     bullet_system,
                     grenade_system,
+                    grenade_fuse_system,
                 )
                     .run_if(in_state(State::Game)))
                 .chain(),

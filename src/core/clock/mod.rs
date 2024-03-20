@@ -98,13 +98,12 @@ pub fn ttl_system(
     time: Res<Time<GgrsTime>>,
     order: Res<RollbackOrdered>,
 ) {
-    let delta = time.delta_seconds();
-    let delta_d = Duration::from_secs_f32(delta);
+    let delta = time.delta();
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
     for (e, _, mut ttl) in query {
-        if ttl.clock.tick(delta_d).is_finished() {
+        if ttl.clock.tick(delta).is_finished() {
             commands.entity(e).despawn_recursive();
         }
     }
