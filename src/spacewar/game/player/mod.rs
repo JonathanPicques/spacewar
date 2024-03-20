@@ -5,7 +5,6 @@ use bevy::sprite::Anchor;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
-use derivative::Derivative;
 use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 
@@ -39,15 +38,12 @@ pub struct Health {
     pub hp: u8,
 }
 
-#[derive(Copy, Clone, Default, Component, Derivative)]
-#[derivative(Hash)]
+#[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Player {
     pub state: PlayerState,
     pub handle: PlayerHandle,
     pub direction: Direction,
-    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub shoot_clock: Clock,
-    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     pub throw_clock: Clock,
 }
 

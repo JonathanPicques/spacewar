@@ -2,7 +2,6 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
-use derivative::Derivative;
 
 use crate::core::clock::Clock;
 use crate::core::utilities::cmp::cmp_rollack;
@@ -14,11 +13,9 @@ enum State {
     Finished,
 }
 
-#[derive(Clone, Component, Derivative)]
-#[derivative(Hash)]
+#[derive(Hash, Clone, Component)]
 pub struct SpriteSheetAnimator {
     state: State,
-    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     clock: Clock,
     animation: Handle<SpriteSheetAnimation>,
 }
@@ -69,7 +66,6 @@ pub fn sprite_sheet_animator_system(
             .expect("Animation not found");
 
         animator.clock.tick(time.delta());
-
         if animator.state == State::Changed {
             atlas.index = animation.start;
             animator

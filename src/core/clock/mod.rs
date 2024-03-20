@@ -6,17 +6,19 @@ use derivative::Derivative;
 
 use crate::core::utilities::cmp::cmp_rollack;
 
-#[derive(Hash, Copy, Clone)]
+#[derive(Copy, Clone, Derivative)]
+#[derivative(Hash)]
 pub struct Clock {
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     elapsed: Duration,
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     duration: Duration,
+    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     finished: bool,
 }
 
-#[derive(Copy, Clone, Component, Derivative)]
-#[derivative(Hash)]
+#[derive(Hash, Copy, Clone, Component)]
 pub struct TimeToLive {
-    #[cfg_attr(feature = "stable", derivative(Hash = "ignore"))]
     clock: Clock,
 }
 
