@@ -96,12 +96,14 @@ pub struct GameAssets {
     pub player: Handle<Image>,
     #[asset(key = "player_idle")]
     pub player_idle: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_walk")]
+    pub player_walk: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_fall")]
     pub player_fall: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_jump")]
     pub player_jump: Handle<SpriteSheetAnimation>,
-    #[asset(key = "player_walk")]
-    pub player_walk: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_hurt")]
+    pub player_hurt: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_shoot")]
     pub player_shoot: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_throw")]

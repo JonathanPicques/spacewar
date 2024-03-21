@@ -10,7 +10,7 @@ use crate::core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVel
 use crate::core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use crate::core::physics::Physics;
 use crate::core::utilities::cmp::cmp_rollack;
-use crate::spacewar::game::player::{Direction, Health, Player};
+use crate::spacewar::game::player::{Direction, Health, Player, PlayerState};
 use crate::spacewar::game::Game;
 use crate::spacewar::{GameAssets, Layer};
 
@@ -88,7 +88,12 @@ impl BulletBundle {
 
 pub fn bullet_system(
     bullets: Query<(Entity, &Rollback, &Bullet, &PhysicsColliderHandle)>,
-    mut healths: Query<(&Rollback, &mut Health, &PhysicsColliderHandle)>,
+    mut healths: Query<(
+        &Rollback,
+        &mut Health,
+        &mut Player,
+        &PhysicsColliderHandle,
+    )>,
     mut commands: Commands,
     //
     order: Res<RollbackOrdered>,
@@ -113,11 +118,12 @@ pub fn bullet_system(
             collider.shape(),
             QueryFilter::default().exclude_collider(collider_handle.handle()),
             |hit_handle| {
-                if let Some((_, target, ..)) = healths
+                if let Some((_, target, player, ..)) = healths
                     .iter_mut()
-                    .find(|(_, _, target_handle)| hit_handle == target_handle.handle())
+                    .find(|(_, _, _, target_handle)| hit_handle == target_handle.handle())
                 {
                     target.hp = target.hp.saturating_sub(1);
+                    player.force_state(PlayerState::Hurt);
                     commands.entity(e).despawn_recursive();
                     return true;
                 }

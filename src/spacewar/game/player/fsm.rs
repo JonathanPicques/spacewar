@@ -14,6 +14,9 @@ use crate::spacewar::game::projectile::bullet::BulletBundle;
 use crate::spacewar::game::projectile::grenade::GrenadeBundle;
 use crate::spacewar::GameAssets;
 
+const HURT_IMPULSE: Vec2 = Vec2::new(3.0, 6.0);
+const HURT_DURATION: f32 = 0.35;
+
 const JUMP_STRENGTH: f32 = 7.5;
 
 const FLOOR_MAX_SPEED: f32 = 2.4;
@@ -28,7 +31,7 @@ const GRAVITY_MAX_SPEED: f32 = -3.5;
 const GRAVITY_ACCELERATION: f32 = 0.75;
 
 pub struct PlayerArgs<'a, 'w, 's> {
-    pub delta: f32,
+    pub delta: Duration,
     pub input: &'a CoreInput,
     pub assets: &'a GameAssets,
     pub sprite: &'a mut Sprite,
@@ -41,16 +44,20 @@ pub struct PlayerArgs<'a, 'w, 's> {
 #[allow(clippy::needless_return)]
 impl Player {
     pub fn tick(&mut self, mut args: PlayerArgs) {
-        let delta = Duration::from_secs_f32(args.delta);
+        self.shoot_clock.tick(args.delta);
+        self.throw_clock.tick(args.delta);
 
-        self.shoot_clock.tick(delta);
-        self.throw_clock.tick(delta);
+        if let Some(next_state) = self.next_state {
+            self.set_state(next_state, &mut args);
+            self.next_state = None;
+        }
         match self.state {
             PlayerState::None => self.tick_none(&mut args),
             PlayerState::Idle => self.tick_idle(&mut args),
             PlayerState::Walk => self.tick_walk(&mut args),
             PlayerState::Jump => self.tick_jump(&mut args),
             PlayerState::Fall => self.tick_fall(&mut args),
+            PlayerState::Hurt => self.tick_hurt(&mut args),
             PlayerState::Shoot => self.tick_shoot(&mut args),
             PlayerState::Throw => self.tick_throw(&mut args),
             PlayerState::ThrowEnd => self.tick_throw_end(&mut args),
@@ -67,6 +74,7 @@ impl Player {
             PlayerState::Walk => self.leave_walk(args),
             PlayerState::Jump => self.leave_jump(args),
             PlayerState::Fall => self.leave_fall(args),
+            PlayerState::Hurt => self.leave_hurt(args),
             PlayerState::Shoot => self.leave_shoot(args),
             PlayerState::Throw => self.leave_throw(args),
             PlayerState::ThrowEnd => self.leave_throw_end(args),
@@ -77,10 +85,15 @@ impl Player {
             PlayerState::Walk => self.enter_walk(args),
             PlayerState::Jump => self.enter_jump(args),
             PlayerState::Fall => self.enter_fall(args),
+            PlayerState::Hurt => self.enter_hurt(args),
             PlayerState::Shoot => self.enter_shoot(args),
             PlayerState::Throw => self.enter_throw(args),
             PlayerState::ThrowEnd => self.enter_throw_end(args),
         };
+    }
+
+    pub fn force_state(&mut self, new_state: PlayerState) {
+        self.next_state = Some(new_state);
     }
 
     // States
@@ -210,6 +223,26 @@ impl Player {
         }
     }
 
+    fn tick_hurt(&mut self, args: &mut PlayerArgs) {
+        self.apply_gravity(args);
+        self.apply_movement(
+            args,
+            AIRBORNE_MAX_SPEED,
+            AIRBORNE_ACCELERATION,
+            AIRBORNE_DECELERATION,
+        );
+        self.hurt_clock.tick(args.delta);
+
+        if self.hurt_clock.is_finished() {
+            if args.controller.is_on_floor() {
+                self.set_state(PlayerState::Idle, args);
+                return;
+            }
+            self.set_state(PlayerState::Fall, args);
+            return;
+        }
+    }
+
     fn tick_shoot(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
 
@@ -285,8 +318,22 @@ impl Player {
     }
     fn leave_fall(&mut self, _: &mut PlayerArgs) {}
 
+    fn enter_hurt(&mut self, args: &mut PlayerArgs) {
+        args.animator
+            .set_animation(args.assets.player_hurt.clone());
+        args.controller.velocity = match self.direction {
+            Direction::Left => Vec2::new(HURT_IMPULSE.x, HURT_IMPULSE.y),
+            Direction::Right => Vec2::new(-HURT_IMPULSE.x, HURT_IMPULSE.y),
+        };
+        self.hurt_clock.reset();
+        self.hurt_clock
+            .set_duration(Duration::from_secs_f32(HURT_DURATION));
+    }
+    fn leave_hurt(&mut self, args: &mut PlayerArgs) {
+        args.controller.velocity = Vec2::ZERO;
+    }
+
     fn enter_shoot(&mut self, args: &mut PlayerArgs) {
-        self.shoot_clock.reset();
         args.animator
             .set_animation(args.assets.player_shoot.clone());
         args.commands
@@ -295,6 +342,7 @@ impl Player {
                 args.assets,
                 args.translation,
             ));
+        self.shoot_clock.reset();
     }
     fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
 

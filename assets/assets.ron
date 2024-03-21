@@ -46,6 +46,16 @@
             )
         )
     ),
+     "player_hurt": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.1,
+                start: 32,
+                finish: 32,
+                repeat: false,
+            )
+        )
+    ),
     "player_shoot": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (

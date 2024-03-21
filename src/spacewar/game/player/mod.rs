@@ -5,6 +5,7 @@ use bevy::sprite::Anchor;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
 use bytemuck::Zeroable;
+use derivative::Derivative;
 use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 
@@ -41,16 +42,21 @@ pub struct Health {
 #[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Player {
     pub state: PlayerState,
+    pub next_state: Option<PlayerState>,
+    //
     pub handle: PlayerHandle,
     pub direction: Direction,
+    pub hurt_clock: Clock,
     pub shoot_clock: Clock,
     pub throw_clock: Clock,
 }
 
-#[derive(Hash, Copy, Clone, Default)]
+#[derive(Copy, Clone, Default, Derivative)]
+#[derivative(Hash)]
 pub enum PlayerState {
     #[default]
     None,
+    Hurt,
     Idle,
     Walk,
     Jump,
@@ -147,8 +153,7 @@ pub fn player_system(
     inputs: Res<PlayerInputs<GameConfig>>,
     game_assets: Res<GameAssets>,
 ) {
-    let delta = time.delta_seconds();
-
+    let delta = time.delta();
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
