@@ -96,7 +96,7 @@ impl Player {
         self.next_state = Some(new_state);
     }
 
-    // States
+    // State ticks
 
     fn tick_none(&mut self, args: &mut PlayerArgs) {
         if args.controller.is_on_floor() {
@@ -225,51 +225,33 @@ impl Player {
 
     fn tick_hurt(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
-        self.apply_movement(
-            args,
-            AIRBORNE_MAX_SPEED,
-            AIRBORNE_ACCELERATION,
-            AIRBORNE_DECELERATION,
-        );
-        self.hurt_clock.tick(args.delta);
+        self.apply_smart_movement(args);
 
+        self.hurt_clock.tick(args.delta);
         if self.hurt_clock.is_finished() {
-            if args.controller.is_on_floor() {
-                self.set_state(PlayerState::Idle, args);
-                return;
-            }
-            self.set_state(PlayerState::Fall, args);
+            self.return_to_idle(args);
             return;
         }
     }
 
     fn tick_shoot(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
+        self.apply_smart_deceleration(args);
 
-        match args.controller.is_on_floor() {
-            true => self.apply_deceleration(args, FLOOR_DECELERATION),
-            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
-        }
         if args.animator.is_finished() {
             if self.can_shoot(args) && args.input.is_set(INPUT_SHOOT) {
                 self.set_state(PlayerState::Shoot, args);
                 return;
             }
-            if args.controller.is_on_floor() {
-                self.set_state(PlayerState::Idle, args);
-                return;
-            }
-            self.set_state(PlayerState::Fall, args);
+            self.return_to_idle(args);
+            return;
         }
     }
 
     fn tick_throw(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
+        self.apply_smart_deceleration(args);
 
-        match args.controller.is_on_floor() {
-            true => self.apply_deceleration(args, FLOOR_DECELERATION),
-            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
-        }
         if args.animator.is_finished() {
             self.set_state(PlayerState::ThrowEnd, args);
             return;
@@ -278,21 +260,15 @@ impl Player {
 
     fn tick_throw_end(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
+        self.apply_smart_deceleration(args);
 
-        match args.controller.is_on_floor() {
-            true => self.apply_deceleration(args, FLOOR_DECELERATION),
-            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
-        }
         if args.animator.is_finished() {
-            if args.controller.is_on_floor() {
-                self.set_state(PlayerState::Idle, args);
-                return;
-            }
-            self.set_state(PlayerState::Fall, args);
+            self.return_to_idle(args);
+            return;
         }
     }
 
-    // Transitions
+    // State transitions
 
     fn enter_idle(&mut self, args: &mut PlayerArgs) {
         args.animator
@@ -367,52 +343,52 @@ impl Player {
 
     // Checks
 
-    fn can_jump(self, args: &mut PlayerArgs) -> bool {
+    fn can_jump(&self, args: &mut PlayerArgs) -> bool {
         args.controller.is_on_floor()
     }
 
-    fn can_shoot(self, _: &mut PlayerArgs) -> bool {
+    fn can_shoot(&self, _: &mut PlayerArgs) -> bool {
         self.shoot_clock.is_finished()
     }
 
-    fn can_throw(self, _: &mut PlayerArgs) -> bool {
+    fn can_throw(&self, _: &mut PlayerArgs) -> bool {
         self.throw_clock.is_finished()
     }
 
     // Input helpers
 
-    fn only_dir(self, args: &mut PlayerArgs) -> bool {
+    fn only_dir(&self, args: &mut PlayerArgs) -> bool {
         match self.direction {
             Direction::Left => self.only_left(args),
             Direction::Right => self.only_right(args),
         }
     }
 
-    fn only_left(self, args: &mut PlayerArgs) -> bool {
+    fn only_left(&self, args: &mut PlayerArgs) -> bool {
         args.input.is_set(INPUT_LEFT) && !args.input.is_set(INPUT_RIGHT)
     }
 
-    fn only_right(self, args: &mut PlayerArgs) -> bool {
+    fn only_right(&self, args: &mut PlayerArgs) -> bool {
         args.input.is_set(INPUT_RIGHT) && !args.input.is_set(INPUT_LEFT)
     }
 
     // Instant helpers
 
-    fn apply_jump(self, args: &mut PlayerArgs) {
+    fn apply_jump(&self, args: &mut PlayerArgs) {
         args.controller.velocity.y = JUMP_STRENGTH;
     }
 
-    fn apply_wall_bump(self, args: &mut PlayerArgs) {
+    fn apply_wall_bump(&self, args: &mut PlayerArgs) {
         args.controller.velocity.x = 0.0;
     }
 
-    fn apply_ceiling_bump(self, args: &mut PlayerArgs) {
+    fn apply_ceiling_bump(&self, args: &mut PlayerArgs) {
         args.controller.velocity.y = 0.0;
     }
 
     // Movement helpers
 
-    fn apply_gravity(self, args: &mut PlayerArgs) {
+    fn apply_gravity(&self, args: &mut PlayerArgs) {
         args.controller.velocity.y = move_towards(
             args.controller.velocity.y,
             GRAVITY_MAX_SPEED,
@@ -420,7 +396,7 @@ impl Player {
         );
     }
 
-    fn apply_movement(self, args: &mut PlayerArgs, max_speed: f32, acceleration: f32, deceleration: f32) {
+    fn apply_movement(&self, args: &mut PlayerArgs, max_speed: f32, acceleration: f32, deceleration: f32) {
         let left = self.only_left(args);
         let right = self.only_right(args);
         let velocity = &mut args.controller.velocity;
@@ -434,10 +410,32 @@ impl Player {
         }
     }
 
-    fn apply_deceleration(self, args: &mut PlayerArgs, deceleration: f32) {
-        let velocity = &mut args.controller.velocity;
+    fn apply_deceleration(&self, args: &mut PlayerArgs, deceleration: f32) {
+        args.controller.velocity.x = move_towards(args.controller.velocity.x, 0.0, deceleration);
+    }
 
-        velocity.x = move_towards(velocity.x, 0.0, deceleration);
+    fn apply_smart_movement(&self, args: &mut PlayerArgs) {
+        match args.controller.is_on_floor() {
+            true => self.apply_movement(
+                args,
+                FLOOR_MAX_SPEED,
+                FLOOR_ACCELERATION,
+                FLOOR_DECELERATION,
+            ),
+            false => self.apply_movement(
+                args,
+                AIRBORNE_MAX_SPEED,
+                AIRBORNE_ACCELERATION,
+                AIRBORNE_DECELERATION,
+            ),
+        }
+    }
+
+    fn apply_smart_deceleration(&self, args: &mut PlayerArgs) {
+        match args.controller.is_on_floor() {
+            true => self.apply_deceleration(args, FLOOR_DECELERATION),
+            false => self.apply_deceleration(args, AIRBORNE_DECELERATION),
+        }
     }
 
     fn apply_velocity_direction(&mut self, args: &mut PlayerArgs) {
@@ -450,5 +448,16 @@ impl Player {
             Direction::Left => true,
             Direction::Right => false,
         };
+    }
+
+    // Transition helpers
+
+    fn return_to_idle(&mut self, args: &mut PlayerArgs) {
+        if args.controller.is_on_floor() {
+            self.set_state(PlayerState::Idle, args);
+            return;
+        }
+        self.set_state(PlayerState::Fall, args);
+        return;
     }
 }

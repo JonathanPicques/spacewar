@@ -18,12 +18,12 @@ impl CoreInput {
     }
 
     #[inline(always)]
-    pub fn is_set(self, bit: u8) -> bool {
+    pub fn is_set(&self, bit: u8) -> bool {
         self.input & bit != 0
     }
 
     #[inline(always)]
-    pub fn is_empty(self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.input == 0
     }
 }
