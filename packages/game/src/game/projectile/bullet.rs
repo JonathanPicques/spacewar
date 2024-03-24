@@ -4,11 +4,12 @@ use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 use rapier2d::pipeline::QueryFilter;
 
-use crate::game::player::{Direction, Health, Player, PlayerState};
+use crate::game::player::{DamageEvent, Direction, Health, Player};
 use crate::game::Game;
 use crate::{GameAssets, Layer};
 use core::anim::SpriteSheetAnimator;
 use core::clock::TimeToLive;
+use core::event::events::RollbackEvents;
 use core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use core::physics::Physics;
@@ -88,24 +89,21 @@ impl BulletBundle {
 
 pub fn bullet_system(
     bullets: Query<(Entity, &Rollback, &Bullet, &PhysicsColliderHandle)>,
-    mut healths: Query<(
-        &Rollback,
-        &mut Health,
-        &mut Player,
-        &PhysicsColliderHandle,
-    )>,
+    healths: Query<(Entity, &Rollback, &Health, &PhysicsColliderHandle)>,
     mut commands: Commands,
     //
     order: Res<RollbackOrdered>,
     physics: Res<Physics>,
+    //
+    mut damage_events: ResMut<RollbackEvents<DamageEvent>>,
 ) {
     let mut bullets = bullets.iter().collect::<Vec<_>>();
     bullets.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    let mut healths = healths.iter_mut().collect::<Vec<_>>();
-    healths.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    let mut healths = healths.iter().collect::<Vec<_>>();
+    healths.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (e, _, _, collider_handle) in bullets {
+    for (e, _, bullet, collider_handle) in bullets {
         let collider = physics
             .colliders
             .get(collider_handle.handle())
@@ -118,13 +116,16 @@ pub fn bullet_system(
             collider.shape(),
             QueryFilter::default().exclude_collider(collider_handle.handle()),
             |hit_handle| {
-                if let Some((_, target, player, ..)) = healths
-                    .iter_mut()
+                if let Some((target, ..)) = healths
+                    .iter()
                     .find(|(_, _, _, target_handle)| hit_handle == target_handle.handle())
                 {
-                    target.hp = target.hp.saturating_sub(1);
-                    player.force_state(PlayerState::Hurt);
                     commands.entity(e).despawn_recursive();
+                    damage_events.push(DamageEvent {
+                        amount: 1,
+                        target: *target,
+                        instigator: bullet.owner,
+                    });
                     return true;
                 }
                 false

@@ -1,5 +1,6 @@
 pub mod anim;
 pub mod clock;
+pub mod event;
 pub mod input;
 pub mod loader;
 pub mod physics;

@@ -14,6 +14,7 @@ use crate::game::Game;
 use crate::{GameArgs, GameAssets, GameConfig, Layer};
 use core::anim::SpriteSheetAnimator;
 use core::clock::Clock;
+use core::event::events::{RollbackEvent, RollbackEvents};
 use core::input::CoreInput;
 use core::physics::body::PhysicsBody;
 use core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
@@ -38,6 +39,14 @@ pub struct Stats {
 pub struct Health {
     pub hp: u8,
 }
+
+#[derive(Hash, Clone)]
+pub struct DamageEvent {
+    pub amount: u8,
+    pub target: Entity,
+    pub instigator: PlayerHandle,
+}
+impl RollbackEvent for DamageEvent {}
 
 #[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Player {
@@ -137,6 +146,7 @@ impl PlayerBundle {
 pub fn player_system(
     mut query: Query<
         (
+            Entity,
             &Rollback,
             &Transform,
             &mut Player,
@@ -152,18 +162,25 @@ pub fn player_system(
     order: Res<RollbackOrdered>,
     inputs: Res<PlayerInputs<GameConfig>>,
     game_assets: Res<GameAssets>,
+    //
+    mut damage_events: ResMut<RollbackEvents<DamageEvent>>,
 ) {
     let delta = time.delta();
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
 
-    for (_, transform, mut player, mut sprite, mut animator, mut controller) in query {
+    for (entity, _, transform, mut player, mut sprite, mut animator, mut controller) in query {
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
 
+        for damage in damage_events.iter() {
+            if damage.target == entity {
+                player.force_state(PlayerState::Hurt);
+            }
+        }
         player.tick(PlayerArgs {
             delta,
             input: &input,
@@ -175,4 +192,5 @@ pub fn player_system(
             translation: &transform.translation,
         });
     }
+    damage_events.clear();
 }
