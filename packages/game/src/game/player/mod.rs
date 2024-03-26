@@ -9,18 +9,20 @@ use derivative::Derivative;
 use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 
-use crate::game::player::fsm::PlayerArgs;
-use crate::game::Game;
-use crate::{GameArgs, GameAssets, GameConfig, Layer};
 use core::anim::SpriteSheetAnimator;
 use core::clock::Clock;
-use core::event::events::{RollbackEvent, RollbackEvents};
+use core::derive::RollbackEvent;
+use core::event::events::RollbackEvents;
 use core::input::CoreInput;
 use core::physics::body::PhysicsBody;
 use core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
 use core::physics::controller::PhysicsCharacterController;
 use core::utilities::cmp::cmp_rollack;
 use core::utilities::maths::*;
+
+use crate::game::player::fsm::PlayerArgs;
+use crate::game::Game;
+use crate::{GameArgs, GameAssets, GameConfig, Layer};
 
 #[derive(Eq, Hash, Copy, Clone, Default, PartialEq)]
 pub enum Direction {
@@ -40,13 +42,12 @@ pub struct Health {
     pub hp: u8,
 }
 
-#[derive(Hash, Clone)]
+#[derive(Hash, Clone, RollbackEvent)]
 pub struct DamageEvent {
     pub amount: u8,
     pub target: Entity,
     pub instigator: PlayerHandle,
 }
-impl RollbackEvent for DamageEvent {}
 
 #[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Player {

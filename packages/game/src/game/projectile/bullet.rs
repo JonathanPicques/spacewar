@@ -4,9 +4,6 @@ use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
 use rapier2d::pipeline::QueryFilter;
 
-use crate::game::player::{DamageEvent, Direction, Health, Player};
-use crate::game::Game;
-use crate::{GameAssets, Layer};
 use core::anim::SpriteSheetAnimator;
 use core::clock::TimeToLive;
 use core::event::events::RollbackEvents;
@@ -14,6 +11,10 @@ use core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use core::physics::Physics;
 use core::utilities::cmp::cmp_rollack;
+
+use crate::game::player::{DamageEvent, Direction, Health, Player};
+use crate::game::Game;
+use crate::{GameAssets, Layer};
 
 const BULLET_SPEED: f32 = 250.0;
 

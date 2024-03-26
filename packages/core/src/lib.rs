@@ -6,6 +6,10 @@ pub mod loader;
 pub mod physics;
 pub mod utilities;
 
+pub mod derive {
+    pub use core_derive::RollbackEvent;
+}
+
 use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
 use bevy_ggrs::ggrs::Config;

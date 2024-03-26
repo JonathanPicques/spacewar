@@ -3,16 +3,17 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
-use crate::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_THROW, INPUT_UP};
-use crate::game::player::{Direction, Player, PlayerState};
-use crate::game::projectile::bullet::BulletBundle;
-use crate::game::projectile::grenade::GrenadeBundle;
-use crate::GameAssets;
 use core::anim::SpriteSheetAnimator;
 use core::input::CoreInput;
 use core::physics::controller::PhysicsCharacterController;
 use core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use core::utilities::maths::move_towards;
+
+use crate::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_THROW, INPUT_UP};
+use crate::game::player::{Direction, Player, PlayerState};
+use crate::game::projectile::bullet::BulletBundle;
+use crate::game::projectile::grenade::GrenadeBundle;
+use crate::GameAssets;
 
 const HURT_IMPULSE: Vec2 = Vec2::new(3.0, 6.0);
 const HURT_DURATION: f32 = 0.35;

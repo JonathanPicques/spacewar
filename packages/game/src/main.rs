@@ -11,13 +11,14 @@ use bevy_matchbox::matchbox_socket::PeerId;
 use clap::Parser;
 use rapier2d::geometry::Group;
 
+use core::anim::SpriteSheetAnimation;
+use core::input::CoreInput;
+use core::loader::CoreDynamicAssetCollection;
+
 use crate::game::AddGameAppExt;
 use crate::menu::menu_local::AddLocalMenuAppExt;
 use crate::menu::menu_main::AddMainMenuAppExt;
 use crate::menu::menu_online::AddOnlineMenuAppExt;
-use core::anim::SpriteSheetAnimation;
-use core::input::CoreInput;
-use core::loader::CoreDynamicAssetCollection;
 
 type DynamicAssetPlugin = RonAssetPlugin<CoreDynamicAssetCollection>;
 

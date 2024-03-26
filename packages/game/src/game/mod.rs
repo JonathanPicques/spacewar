@@ -9,13 +9,6 @@ use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::{prelude::*, LocalPlayers, RollbackFrameCount};
 use rapier2d::dynamics::IntegrationParameters;
 
-use crate::game::input::input_system;
-use crate::game::level::LevelRectBundle;
-use crate::game::player::{player_system, DamageEvent, Health, Player, PlayerBundle, Stats};
-use crate::game::projectile::bullet::{bullet_system, Bullet};
-use crate::game::projectile::grenade::{grenade_fuse_system, grenade_system, Grenade};
-use crate::menu::menu_main::goto_main_menu;
-use crate::{GameArgs, GameAssets, GameConfig, State};
 use core::core_systems;
 use core::event::RollbackEventAppExt;
 use core::physics::collider::PhysicsCollider;
@@ -24,6 +17,14 @@ use core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use core::utilities::hash::transform_hasher;
 use core::utilities::maths::*;
 use core::AddCoreAppExt;
+
+use crate::game::input::input_system;
+use crate::game::level::LevelRectBundle;
+use crate::game::player::{player_system, DamageEvent, Health, Player, PlayerBundle, Stats};
+use crate::game::projectile::bullet::{bullet_system, Bullet};
+use crate::game::projectile::grenade::{grenade_fuse_system, grenade_system, Grenade};
+use crate::menu::menu_main::goto_main_menu;
+use crate::{GameArgs, GameAssets, GameConfig, State};
 
 pub trait AddGameAppExt {
     fn add_game(&mut self, fps: usize) -> &mut Self;

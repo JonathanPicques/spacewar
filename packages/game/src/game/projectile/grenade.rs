@@ -3,13 +3,14 @@ use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 use ggrs::PlayerHandle;
 use rapier2d::geometry::{Group, InteractionGroups};
 
-use crate::game::player::{Direction, Player};
-use crate::game::Game;
-use crate::{GameAssets, Layer};
 use core::clock::Clock;
 use core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use core::utilities::cmp::cmp_rollack;
+
+use crate::game::player::{Direction, Player};
+use crate::game::Game;
+use crate::{GameAssets, Layer};
 
 const LINEAR_IMPULSE: Vec2 = Vec2::new(150.0, 300.0);
 const ANGULAR_IMPULSE: f32 = 135.0;

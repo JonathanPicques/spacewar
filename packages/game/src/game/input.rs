@@ -2,8 +2,9 @@ use bevy::{prelude::*, utils::HashMap};
 use bevy_ggrs::{LocalInputs, LocalPlayers};
 use rand::prelude::*;
 
-use crate::{GameArgs, GameConfig};
 use core::input::CoreInput;
+
+use crate::{GameArgs, GameConfig};
 
 pub const INPUT_UP: u8 = 1 << 1;
 pub const INPUT_DOWN: u8 = 1 << 2;

@@ -1,11 +1,12 @@
 use bevy::prelude::*;
 use rapier2d::geometry::InteractionGroups;
 
-use crate::game::Game;
-use crate::Layer;
 use core::physics::body::PhysicsBody;
 use core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
 use core::utilities::maths::Rotation;
+
+use crate::game::Game;
+use crate::Layer;
 
 #[derive(Bundle)]
 pub struct LevelRectBundle {

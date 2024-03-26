@@ -8,6 +8,7 @@ default = ["stable"]
 stable = []
 
 [dependencies]
+core_derive = { path = "../core_derive" }
 ggrs = { version = "0.10.1" }
 anyhow = { version = "1.0.81" }
 bevy = { version = "0.13" }
