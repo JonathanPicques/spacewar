@@ -26,8 +26,9 @@
     "rust-analyzer.check.command": "clippy",
     "rust-analyzer.imports.prefix": "crate",
     "rust-analyzer.imports.granularity.group": "module",
+    "rust-analyzer.procMacro.attributes.enable": true,
     "rust-analyzer.inlayHints.typeHints.enable": false,
     "rust-analyzer.inlayHints.chainingHints.enable": false,
-    "rust-analyzer.inlayHints.parameterHints.enable": false
+    "rust-analyzer.inlayHints.parameterHints.enable": false,
   }
 }

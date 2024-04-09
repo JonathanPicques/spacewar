@@ -9,7 +9,7 @@ use bevy::ecs::schedule::SystemConfigs;
 use bevy::prelude::*;
 use bevy_ggrs::{Rollback, RollbackOrdered};
 use rapier2d::math::Real;
-use rapier2d::prelude::*;
+use rapier2d::{crossbeam, prelude::*};
 
 use crate::body::{PhysicsBodyOptions, PhysicsBodyVelocity};
 use crate::collider::PhysicsColliderOptions;
@@ -67,8 +67,8 @@ impl Scaler {
 impl Physics {
     #[allow(clippy::let_unit_value)]
     pub fn step(&mut self) {
-        let event_handler = ();
-        let physics_hooks = ();
+        let (collision_event_sender, _) = crossbeam::channel::unbounded();
+        let (contact_force_event_sender, _) = crossbeam::channel::unbounded();
 
         PhysicsPipeline::new().step(
             &self.gravity,
@@ -82,8 +82,8 @@ impl Physics {
             &mut self.multibody_joints,
             &mut self.ccd_solver,
             Some(&mut self.query_pipeline),
-            &physics_hooks,
-            &event_handler,
+            &(),
+            &ChannelEventCollector::new(collision_event_sender, contact_force_event_sender),
         );
     }
 

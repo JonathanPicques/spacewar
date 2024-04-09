@@ -26,6 +26,8 @@ pub struct PhysicsColliderOptions {
     pub friction: f32,
     #[derivative(Hash = "ignore")]
     pub restitution: f32,
+    #[derivative(Hash = "ignore")]
+    pub active_events: ActiveEvents,
     pub collision_groups: InteractionGroups,
     pub active_collision_types: ActiveCollisionTypes,
 }
@@ -48,6 +50,7 @@ impl PhysicsCollider {
     pub(crate) fn apply_options(&self, _scaler: &Scaler, collider: &mut Collider, options: &PhysicsColliderOptions) {
         collider.set_friction(options.friction);
         collider.set_restitution(options.restitution);
+        collider.set_active_events(options.active_events);
         collider.set_collision_groups(options.collision_groups);
         collider.set_active_collision_types(options.active_collision_types);
     }
@@ -79,6 +82,7 @@ impl Default for PhysicsColliderOptions {
         Self {
             friction: 1.0,
             restitution: 0.1,
+            active_events: default(),
             collision_groups: default(),
             active_collision_types: default(),
         }
