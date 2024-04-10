@@ -10,10 +10,13 @@ use core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use core::utilities::maths::move_towards;
 
 use crate::game::input::{INPUT_LEFT, INPUT_RIGHT, INPUT_SHOOT, INPUT_THROW, INPUT_UP};
-use crate::game::player::{Direction, Player, PlayerState};
+use crate::game::player::{Direction, Player, PlayerFsm, PlayerState};
 use crate::game::projectile::bullet::BulletBundle;
 use crate::game::projectile::grenade::GrenadeBundle;
 use crate::GameAssets;
+
+const DEAD_BOUNCE: f32 = 4.5;
+const DEAD_IMPULSE: Vec2 = Vec2::new(3.0, 7.0);
 
 const HURT_IMPULSE: Vec2 = Vec2::new(3.0, 6.0);
 const HURT_DURATION: f32 = 0.35;
@@ -59,6 +62,7 @@ impl Player {
             PlayerState::Jump => self.tick_jump(&mut args),
             PlayerState::Fall => self.tick_fall(&mut args),
             PlayerState::Hurt => self.tick_hurt(&mut args),
+            PlayerState::Dead => self.tick_dead(&mut args),
             PlayerState::Shoot => self.tick_shoot(&mut args),
             PlayerState::Throw => self.tick_throw(&mut args),
             PlayerState::ThrowEnd => self.tick_throw_end(&mut args),
@@ -76,6 +80,7 @@ impl Player {
             PlayerState::Jump => self.leave_jump(args),
             PlayerState::Fall => self.leave_fall(args),
             PlayerState::Hurt => self.leave_hurt(args),
+            PlayerState::Dead => self.leave_dead(args),
             PlayerState::Shoot => self.leave_shoot(args),
             PlayerState::Throw => self.leave_throw(args),
             PlayerState::ThrowEnd => self.leave_throw_end(args),
@@ -87,6 +92,7 @@ impl Player {
             PlayerState::Jump => self.enter_jump(args),
             PlayerState::Fall => self.enter_fall(args),
             PlayerState::Hurt => self.enter_hurt(args),
+            PlayerState::Dead => self.enter_dead(args),
             PlayerState::Shoot => self.enter_shoot(args),
             PlayerState::Throw => self.enter_throw(args),
             PlayerState::ThrowEnd => self.enter_throw_end(args),
@@ -119,7 +125,7 @@ impl Player {
         }
         if self.can_jump(args) && args.input.is_set(INPUT_UP) {
             self.set_state(PlayerState::Jump, args);
-            self.apply_jump(args);
+            self.apply_jump(args, JUMP_STRENGTH);
             return;
         }
         if self.only_left(args) || self.only_right(args) {
@@ -159,7 +165,7 @@ impl Player {
         }
         if self.can_jump(args) && args.input.is_set(INPUT_UP) {
             self.set_state(PlayerState::Jump, args);
-            self.apply_jump(args);
+            self.apply_jump(args, JUMP_STRENGTH);
             return;
         }
         if self.can_shoot(args) && args.input.is_set(INPUT_SHOOT) {
@@ -235,6 +241,33 @@ impl Player {
         }
     }
 
+    fn tick_dead(&mut self, args: &mut PlayerArgs) {
+        self.apply_gravity(args);
+        self.apply_deceleration(args, FLOOR_DECELERATION);
+
+        match self.fsm {
+            PlayerFsm::DeadOnFloor => {
+                if args.animator.is_finished() {
+                    self.fsm = PlayerFsm::None;
+                    self.apply_jump(args, DEAD_BOUNCE);
+
+                    args.animator
+                        .set_animation(args.assets.player_dead_bounce.clone());
+                }
+            }
+            PlayerFsm::DeadAirborne => {
+                if args.controller.is_on_floor() {
+                    self.fsm = PlayerFsm::None;
+                    self.apply_jump(args, DEAD_BOUNCE);
+
+                    args.animator
+                        .set_animation(args.assets.player_dead_bounce.clone());
+                }
+            }
+            _ => (),
+        }
+    }
+
     fn tick_shoot(&mut self, args: &mut PlayerArgs) {
         self.apply_gravity(args);
         self.apply_smart_deceleration(args);
@@ -296,21 +329,44 @@ impl Player {
     fn leave_fall(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_hurt(&mut self, args: &mut PlayerArgs) {
+        self.hurt_clock.reset();
+        self.hurt_clock
+            .set_duration(Duration::from_secs_f32(HURT_DURATION));
+
         args.animator
             .set_animation(args.assets.player_hurt.clone());
         args.controller.velocity = match self.direction {
             Direction::Left => Vec2::new(HURT_IMPULSE.x, HURT_IMPULSE.y),
             Direction::Right => Vec2::new(-HURT_IMPULSE.x, HURT_IMPULSE.y),
         };
-        self.hurt_clock.reset();
-        self.hurt_clock
-            .set_duration(Duration::from_secs_f32(HURT_DURATION));
     }
     fn leave_hurt(&mut self, args: &mut PlayerArgs) {
         args.controller.velocity = Vec2::ZERO;
     }
 
+    fn enter_dead(&mut self, args: &mut PlayerArgs) {
+        self.fsm = {
+            if args.controller.is_on_floor() {
+                PlayerFsm::DeadOnFloor
+            } else {
+                PlayerFsm::DeadAirborne
+            }
+        };
+
+        args.animator
+            .set_animation(args.assets.player_dead_start.clone());
+        args.controller.velocity = match self.direction {
+            Direction::Left => Vec2::new(DEAD_IMPULSE.x, DEAD_IMPULSE.y),
+            Direction::Right => Vec2::new(-DEAD_IMPULSE.x, DEAD_IMPULSE.y),
+        };
+    }
+    fn leave_dead(&mut self, _: &mut PlayerArgs) {
+        self.fsm = PlayerFsm::None;
+    }
+
     fn enter_shoot(&mut self, args: &mut PlayerArgs) {
+        self.shoot_clock.reset();
+
         args.animator
             .set_animation(args.assets.player_shoot.clone());
         args.commands
@@ -319,12 +375,12 @@ impl Player {
                 args.assets,
                 args.translation,
             ));
-        self.shoot_clock.reset();
     }
     fn leave_shoot(&mut self, _: &mut PlayerArgs) {}
 
     fn enter_throw(&mut self, args: &mut PlayerArgs) {
         self.throw_clock.reset();
+
         args.animator
             .set_animation(args.assets.player_throw.clone());
     }
@@ -375,8 +431,8 @@ impl Player {
 
     // Instant helpers
 
-    fn apply_jump(&self, args: &mut PlayerArgs) {
-        args.controller.velocity.y = JUMP_STRENGTH;
+    fn apply_jump(&self, args: &mut PlayerArgs, strength: f32) {
+        args.controller.velocity.y = strength;
     }
 
     fn apply_wall_bump(&self, args: &mut PlayerArgs) {

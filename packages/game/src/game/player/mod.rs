@@ -51,21 +51,31 @@ pub struct DamageEvent {
 
 #[derive(Hash, Copy, Clone, Default, Component)]
 pub struct Player {
+    pub handle: PlayerHandle,
+    //
+    pub fsm: PlayerFsm,
     pub state: PlayerState,
     pub next_state: Option<PlayerState>,
     //
-    pub handle: PlayerHandle,
     pub direction: Direction,
     pub hurt_clock: Clock,
     pub shoot_clock: Clock,
     pub throw_clock: Clock,
 }
 
-#[derive(Copy, Clone, Default, Derivative)]
-#[derivative(Hash)]
+#[derive(Hash, Copy, Clone, Default, Derivative)]
+pub enum PlayerFsm {
+    #[default]
+    None,
+    DeadOnFloor,
+    DeadAirborne,
+}
+
+#[derive(Hash, Copy, Clone, Default)]
 pub enum PlayerState {
     #[default]
     None,
+    Dead,
     Hurt,
     Idle,
     Walk,
@@ -179,7 +189,7 @@ pub fn player_system(
 
         for damage in damage_events.iter() {
             if damage.target == entity {
-                player.force_state(PlayerState::Hurt);
+                player.force_state(PlayerState::Dead);
             }
         }
         player.tick(PlayerArgs {

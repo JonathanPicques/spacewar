@@ -86,6 +86,26 @@
             )
         )
     ),
+    "player_dead_start": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.07,
+                start: 30,
+                finish: 33,
+                repeat: false,
+            )
+        )
+    ),
+    "player_dead_bounce": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.07,
+                start: 33,
+                finish: 39,
+                repeat: false,
+            )
+        )
+    ),
     "player_atlas_layout": Asset (
         TextureAtlasLayout (
             TextureAtlasLayoutAsset (

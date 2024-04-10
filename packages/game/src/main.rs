@@ -111,6 +111,10 @@ pub struct GameAssets {
     pub player_throw: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_throw_end")]
     pub player_throw_end: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_dead_start")]
+    pub player_dead_start: Handle<SpriteSheetAnimation>,
+    #[asset(key = "player_dead_bounce")]
+    pub player_dead_bounce: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_atlas_layout")]
     pub player_atlas_layout: Handle<TextureAtlasLayout>,
 }
