@@ -517,4 +517,10 @@ impl Player {
         self.set_state(PlayerState::Fall, args);
         return;
     }
+
+    pub fn transition_to_dead(&mut self) {
+        if self.state != PlayerState::Dead && self.next_state != Some(PlayerState::Dead) {
+            self.force_state(PlayerState::Dead);
+        }
+    }
 }

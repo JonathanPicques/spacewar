@@ -71,7 +71,7 @@ pub enum PlayerFsm {
     DeadAirborne,
 }
 
-#[derive(Hash, Copy, Clone, Default)]
+#[derive(Hash, Copy, Clone, Default, PartialEq)]
 pub enum PlayerState {
     #[default]
     None,
@@ -187,10 +187,8 @@ pub fn player_system(
             (_, InputStatus::Disconnected) => CoreInput::zeroed(),
         };
 
-        for damage in damage_events.iter() {
-            if damage.target == entity {
-                player.force_state(PlayerState::Dead);
-            }
+        if damage_events.iter().any(|d| d.target == entity) {
+            player.transition_to_dead();
         }
         player.tick(PlayerArgs {
             delta,

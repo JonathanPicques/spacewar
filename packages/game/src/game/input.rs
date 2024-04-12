@@ -42,7 +42,7 @@ pub fn input_system(
             if keyboard_input.pressed(KeyCode::ArrowRight) {
                 input.set(INPUT_RIGHT);
             }
-            if keyboard_input.pressed(KeyCode::Numpad0) | keyboard_input.pressed(KeyCode::ControlRight) {
+            if keyboard_input.pressed(KeyCode::Numpad0) | keyboard_input.pressed(KeyCode::ControlRight) || keyboard_input.pressed(KeyCode::SuperRight) {
                 input.set(INPUT_SHOOT);
             }
             if keyboard_input.pressed(KeyCode::Numpad1) | keyboard_input.pressed(KeyCode::ShiftRight) {
