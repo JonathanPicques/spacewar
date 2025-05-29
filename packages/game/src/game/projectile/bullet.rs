@@ -35,8 +35,9 @@ pub struct BulletBundle {
     collider: PhysicsCollider,
     collider_options: PhysicsColliderOptions,
     //
-    sprite_sheet_bundle: SpriteSheetBundle,
-    sprite_sheet_animator: SpriteSheetAnimator,
+    sprite: Sprite,
+    animator: SpriteSheetAnimator,
+    transform: Transform,
 }
 
 impl BulletBundle {
@@ -67,23 +68,20 @@ impl BulletBundle {
                 ..default()
             },
             //
-            sprite_sheet_bundle: SpriteSheetBundle {
-                atlas: TextureAtlas {
+            sprite: Sprite {
+                image: game_assets.bullet.clone(),
+                flip_x: player.direction == Direction::Left,
+                texture_atlas: Some(TextureAtlas {
                     index: 0,
                     layout: game_assets.bullet_atlas_layout.clone(),
-                },
-                sprite: Sprite {
-                    flip_x: player.direction == Direction::Left,
-                    ..default()
-                },
-                texture: game_assets.bullet.clone(),
-                transform: match player.direction {
-                    Direction::Left => Transform::from_translation(*translation + Vec3::new(-17.0, 7.0, 0.0)),
-                    Direction::Right => Transform::from_translation(*translation + Vec3::new(17.0, 7.0, 0.0)),
-                },
+                }),
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.bullet_idle_anim.clone()),
+            animator: SpriteSheetAnimator::new(game_assets.bullet_idle_anim.clone()),
+            transform: match player.direction {
+                Direction::Left => Transform::from_translation(*translation + Vec3::new(-17.0, 7.0, 0.0)),
+                Direction::Right => Transform::from_translation(*translation + Vec3::new(17.0, 7.0, 0.0)),
+            },
         }
     }
 }
@@ -121,7 +119,7 @@ pub fn bullet_system(
                     .iter()
                     .find(|(_, _, _, target_handle)| hit_handle == target_handle.handle())
                 {
-                    commands.entity(e).despawn_recursive();
+                    commands.entity(e).despawn();
                     damage_events.push(DamageEvent {
                         amount: 1,
                         target: *target,

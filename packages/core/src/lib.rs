@@ -10,7 +10,8 @@ pub mod derive {
     pub use core_derive::RollbackEvent;
 }
 
-use bevy::ecs::schedule::SystemConfigs;
+use bevy::ecs::schedule::ScheduleConfigs;
+use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::*;
 use bevy_ggrs::ggrs::Config;
 use bevy_ggrs::prelude::*;
@@ -23,13 +24,13 @@ use crate::controller::PhysicsCharacterController;
 use crate::physics::*;
 
 pub trait AddCoreAppExt {
-    fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoSystemConfigs<M>) -> &mut Self
+    fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoScheduleConfigs<ScheduleSystem, M>) -> &mut Self
     where
         T: Config;
 }
 
 impl AddCoreAppExt for App {
-    fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoSystemConfigs<M>) -> &mut Self
+    fn add_core<T, M>(&mut self, fps: usize, input_system: impl IntoScheduleConfigs<ScheduleSystem, M>) -> &mut Self
     where
         T: Config,
     {
@@ -59,14 +60,14 @@ impl AddCoreAppExt for App {
             .rollback_component_with_copy::<PhysicsColliderHandle>()
             .rollback_component_with_copy::<PhysicsColliderOptions>()
             .rollback_component_with_copy::<PhysicsCharacterController>()
-            .rollback_component_with_clone::<TextureAtlas>()
+            .rollback_component_with_clone::<Sprite>()
             .rollback_component_with_clone::<SpriteSheetAnimator>();
 
         self
     }
 }
 
-pub fn core_systems() -> SystemConfigs {
+pub fn core_systems() -> ScheduleConfigs<ScheduleSystem> {
     (
         ttl_system,
         physics_systems(),

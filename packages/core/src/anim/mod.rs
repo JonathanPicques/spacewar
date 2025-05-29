@@ -47,11 +47,7 @@ impl SpriteSheetAnimator {
 }
 
 pub fn sprite_sheet_animator_system(
-    mut query: Query<(
-        &Rollback,
-        &mut TextureAtlas,
-        &mut SpriteSheetAnimator,
-    )>,
+    mut query: Query<(&Rollback, &mut Sprite, &mut SpriteSheetAnimator)>,
     //
     time: Res<Time<GgrsTime>>,
     order: Res<RollbackOrdered>,
@@ -60,14 +56,17 @@ pub fn sprite_sheet_animator_system(
     let mut query = query.iter_mut().collect::<Vec<_>>();
     query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
-    for (_, mut atlas, mut animator) in query {
+    for (_, mut sprite, mut animator) in query {
         let animation = animations
             .get(animator.animation.id())
             .expect("Animation not found");
 
         animator.clock.tick(time.delta());
         if animator.state == State::Changed {
-            atlas.index = animation.start;
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                atlas.index = animation.start
+            }
+
             animator
                 .clock
                 .set_duration(Duration::from_secs_f32(animation.speed));
@@ -77,22 +76,24 @@ pub fn sprite_sheet_animator_system(
         if animator.clock.is_finished() {
             animator.clock.reset();
 
-            match animation.repeat {
-                true => {
-                    if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
-                        atlas.index = animation.start;
-                    } else {
-                        atlas.index += 1;
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                match animation.repeat {
+                    true => {
+                        if (atlas.index < animation.start) || (atlas.index >= animation.finish) {
+                            atlas.index = animation.start;
+                        } else {
+                            atlas.index += 1;
+                        }
                     }
-                }
-                false => {
-                    if atlas.index < animation.finish {
-                        atlas.index += 1;
-                    } else {
-                        animator.state = State::Finished;
+                    false => {
+                        if atlas.index < animation.finish {
+                            atlas.index += 1;
+                        } else {
+                            animator.state = State::Finished;
+                        }
                     }
-                }
-            };
+                };
+            }
         }
     }
 }

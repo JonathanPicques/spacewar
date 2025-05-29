@@ -1,6 +1,7 @@
+use bevy::ecs::system::SystemState;
+use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
-use bevy::utils::HashMap;
 use bevy_asset_loader::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -20,15 +21,15 @@ struct ImageAsset {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct TextureAtlasLayoutAsset {
-    rows: usize,
-    columns: usize,
-    tile_size_x: f32,
-    tile_size_y: f32,
+    rows: u32,
+    columns: u32,
+    tile_size_x: u32,
+    tile_size_y: u32,
     //
-    offset_x: f32,
-    offset_y: f32,
-    padding_x: f32,
-    padding_y: f32,
+    offset_x: u32,
+    offset_y: u32,
+    padding_x: u32,
+    padding_y: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -50,7 +51,7 @@ impl DynamicAsset for CoreDynamicAsset {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
             Asset::TextureAtlasLayout(TextureAtlasLayoutAsset { .. }) => asset_server
-                .add(TextureAtlasLayout::new_empty(Vec2::ONE))
+                .add(TextureAtlasLayout::new_empty(UVec2::ONE))
                 .untyped(),
             Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { speed, start, finish, repeat }) => asset_server
                 .add(SpriteSheetAnimation { speed, start, finish, repeat })
@@ -67,13 +68,11 @@ impl DynamicAsset for CoreDynamicAsset {
     }
 
     fn build(&self, world: &mut World) -> Result<DynamicAssetType, anyhow::Error> {
-        let cell = world.cell();
-        let asset_server = cell
-            .get_resource::<AssetServer>()
-            .expect("AssetServer not found");
-        let mut texture_atlas_layouts = cell
-            .get_resource_mut::<Assets<TextureAtlasLayout>>()
-            .expect("Assets<TextureAtlasLayout> not found");
+        let (asset_server, mut texture_atlas_layouts) = SystemState::<(
+            Res<AssetServer>,
+            ResMut<Assets<TextureAtlasLayout>>,
+        )>::new(world)
+        .get_mut(world);
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),
@@ -88,11 +87,11 @@ impl DynamicAsset for CoreDynamicAsset {
                 tile_size_y,
             }) => texture_atlas_layouts
                 .add(TextureAtlasLayout::from_grid(
-                    Vec2::new(tile_size_x, tile_size_y),
+                    UVec2::new(tile_size_x, tile_size_y),
                     columns,
                     rows,
-                    Some(Vec2::new(padding_x, padding_y)),
-                    Some(Vec2::new(offset_x, offset_y)),
+                    Some(UVec2::new(padding_x, padding_y)),
+                    Some(UVec2::new(offset_x, offset_y)),
                 ))
                 .untyped(),
             Asset::SpriteSheetAnimation(SpriteSheetAnimationAsset { speed, start, finish, repeat }) => asset_server

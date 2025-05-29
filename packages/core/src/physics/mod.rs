@@ -5,7 +5,8 @@ pub mod controller;
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 
-use bevy::ecs::schedule::SystemConfigs;
+use bevy::ecs::schedule::ScheduleConfigs;
+use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::*;
 use bevy_ggrs::{Rollback, RollbackOrdered};
 use rapier2d::math::Real;
@@ -20,7 +21,7 @@ use crate::physics::collider::PhysicsColliderHandle;
 use crate::physics::controller::PhysicsCharacterController;
 use crate::utilities::cmp::cmp_rollback;
 use crate::utilities::hash::f32_hasher;
-use crate::utilities::maths::{Rotation, *};
+use crate::utilities::maths::*;
 
 #[derive(Copy, Clone, Resource)]
 pub struct Scaler {
@@ -34,7 +35,7 @@ pub struct Physics {
     pub bodies: RigidBodySet,
     pub colliders: ColliderSet,
     pub ccd_solver: CCDSolver,
-    pub broad_phase: BroadPhase,
+    pub broad_phase: DefaultBroadPhase,
     pub narrow_phase: NarrowPhase,
     pub query_pipeline: QueryPipeline,
     pub island_manager: IslandManager,
@@ -278,7 +279,7 @@ fn physics_sync_system(
 
     for (_, body_handle, mut transform) in query {
         if let Some(body) = physics.bodies.get(body_handle.handle()) {
-            transform.rotation = Rotation::Radians(body.rotation().angle()).into();
+            transform.rotation = ToBevyQuatExt::to_bevy(body.rotation());
             transform.translation = (scaler.meters_to_pixels(body.position().to_bevy())).extend(transform.translation.z);
         }
     }
@@ -439,17 +440,22 @@ fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Ph
     for (_, collider) in physics.colliders.iter() {
         if let Some(ball) = collider.shape().as_ball() {
             gizmos.circle_2d(
-                scaler.meters_to_pixels(collider.translation().to_bevy()),
+                Isometry2d {
+                    translation: scaler.meters_to_pixels(collider.translation().to_bevy()),
+                    ..Default::default()
+                },
                 scaler.meters_to_pixels(ball.radius),
-                Color::Rgba { red: 1.0, green: 0.0, blue: 1.0, alpha: 0.2 },
+                Color::linear_rgba(1.0, 0.0, 1.0, 0.2),
             );
         }
         if let Some(cuboid) = collider.shape().as_cuboid() {
             gizmos.rect_2d(
-                scaler.meters_to_pixels(collider.translation().to_bevy()),
-                collider.rotation().angle(),
+                Isometry2d {
+                    rotation: ToBevyRot2Ext::to_bevy(collider.rotation()),
+                    translation: scaler.meters_to_pixels(collider.translation().to_bevy()),
+                },
                 scaler.meters_to_pixels(cuboid.half_extents.to_bevy()) * 2.0,
-                Color::Rgba { red: 0.0, green: 1.0, blue: 0.0, alpha: 0.2 },
+                Color::linear_rgba(0.0, 1.0, 0.0, 0.2),
             );
         }
     }
@@ -457,7 +463,7 @@ fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Ph
 
 //
 
-pub fn physics_systems() -> SystemConfigs {
+pub fn physics_systems() -> ScheduleConfigs<ScheduleSystem> {
     (
         physics_create_handles_system,
         physics_remove_handles_system,
@@ -469,6 +475,6 @@ pub fn physics_systems() -> SystemConfigs {
         .into_configs()
 }
 
-pub fn physics_debug_systems() -> SystemConfigs {
+pub fn physics_debug_systems() -> ScheduleConfigs<ScheduleSystem> {
     physics_debug_system.into_configs()
 }

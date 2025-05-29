@@ -74,12 +74,12 @@ impl PhysicsCharacterController {
         self.ceiling.on = false;
 
         for collision in collisions.iter() {
-            match collision.toi.status {
-                rapier2d::parry::query::TOIStatus::Failed
-                | rapier2d::parry::query::TOIStatus::Converged
-                | rapier2d::parry::query::TOIStatus::OutOfIterations => {
-                    let normal = collision.toi.normal1.to_bevy();
-                    let up_angle = normal.angle_between(self.up);
+            match collision.hit.status {
+                rapier2d::parry::query::ShapeCastStatus::Failed
+                | rapier2d::parry::query::ShapeCastStatus::Converged
+                | rapier2d::parry::query::ShapeCastStatus::OutOfIterations => {
+                    let normal = collision.hit.normal1.to_bevy();
+                    let up_angle = normal.angle_to(self.up);
 
                     if self.up.dot(normal) < 0.0 {
                         self.ceiling.on = true;

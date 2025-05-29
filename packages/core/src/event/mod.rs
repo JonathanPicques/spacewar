@@ -1,7 +1,7 @@
 pub mod events;
 
 use bevy::prelude::*;
-use bevy_ggrs::GgrsApp;
+use bevy_ggrs::RollbackApp;
 
 use crate::event::events::{RollbackEvent, RollbackEvents};
 

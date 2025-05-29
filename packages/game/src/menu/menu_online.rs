@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 use bevy_ggrs::ggrs::{PlayerType, SessionBuilder};
 use bevy_ggrs::{LocalPlayers, Session};
-use bevy_matchbox::matchbox_socket::{PeerState, SingleChannel};
+use bevy_matchbox::matchbox_socket::PeerState;
 use bevy_matchbox::MatchboxSocket;
 use ggrs::DesyncDetection;
 
@@ -28,7 +28,7 @@ fn setup(mut commands: Commands, game_args: Res<GameArgs>) {
         game_args.matchbox_address, game_args.num_players
     );
 
-    commands.insert_resource(MatchboxSocket::new_ggrs(room_url));
+    commands.insert_resource(MatchboxSocket::new_unreliable(room_url));
 }
 
 fn update(
@@ -36,7 +36,7 @@ fn update(
     mut contexts: EguiContexts,
     //
     game_args: Res<GameArgs>,
-    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    mut socket: ResMut<MatchboxSocket>,
     mut next_state: ResMut<NextState<State>>,
 ) {
     for (peer, new_state) in socket.update_peers() {
@@ -73,7 +73,6 @@ fn update(
             .with_fps(game_args.fps)
             .expect("Invalid FPS")
             .with_max_prediction_window(game_args.max_prediction)
-            .expect("Invalid max prediction window")
             .with_num_players(game_args.num_players)
             .with_input_delay(game_args.input_delay)
             .with_desync_detection_mode(match game_args.desync_detection_interval {
@@ -109,7 +108,7 @@ fn update(
 
 fn cleanup(/*mut commands: Commands*/) {
     // FIXME
-    // commands.remove_resource::<MatchboxSocket<SingleChannel>>();
+    // commands.remove_resource::<MatchboxSocket>();
 }
 
 pub fn goto_online_menu(next_state: &mut NextState<State>) {

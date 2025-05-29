@@ -1,6 +1,6 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::platform::collections::HashMap;
+use bevy::prelude::*;
 use bevy_ggrs::{LocalInputs, LocalPlayers};
-use rand::prelude::*;
 
 use core::input::CoreInput;
 
@@ -28,7 +28,7 @@ pub fn input_system(
         let mut input = CoreInput::default();
 
         if game_args.randomize_input {
-            input.set(random());
+            input.set(rand::random());
         } else if !local || *handle == 0 {
             if keyboard_input.pressed(KeyCode::ArrowUp) {
                 input.set(INPUT_UP);

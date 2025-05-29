@@ -9,22 +9,22 @@ stable = []
 
 [dependencies]
 core_derive = { path = "../core_derive" }
-ggrs = { version = "0.10.1" }
-anyhow = { version = "1.0.82" }
-bevy = { version = "0.13" }
-bevy_asset_loader = { version = "0.20.1", features = [
+ggrs = { version = "0.11.1" }
+anyhow = { version = "1.0.98" }
+bevy = { version = "0.16" }
+bevy_asset_loader = { version = "0.23.0", features = [
     "standard_dynamic_assets",
 ] }
-bevy_common_assets = { version = "0.10.0", features = ["ron"] }
-bevy_egui = { version = "0.26.0" }
-bevy_ggrs = { version = "0.15.0" }
-bevy_matchbox = { version = "0.9.0", features = ["ggrs"] }
-bytemuck = { version = "1.15.0" }
-clap = { version = "4.5.4", features = ["derive"] }
-rapier2d = { version = "0.18.0", features = ["enhanced-determinism"] }
-serde = { version = "1.0.197" }
+bevy_common_assets = { version = "0.13.0", features = ["ron"] }
+bevy_egui = { version = "0.34.1" }
+bevy_ggrs = { version = "0.18.0" }
+bevy_matchbox = { version = "0.12.0", features = ["ggrs"] }
+bytemuck = { version = "1.23.0" }
+clap = { version = "4.5.39", features = ["derive"] }
+rapier2d = { version = "0.26.1", features = ["enhanced-determinism"] }
+serde = { version = "1.0.219" }
 derivative = "2.2.0"
-rand = "0.8.5"
+rand = "0.9.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-bevy_ggrs = { version = "0.15.0", features = ["wasm-bindgen"] }
+bevy_ggrs = { version = "0.18.0", features = ["wasm-bindgen"] }

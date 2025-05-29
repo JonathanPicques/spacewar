@@ -133,39 +133,38 @@ fn main() {
     let args = GameArgs::parse();
     let args_fps = args.fps;
 
-    app.init_state::<State>()
-        .add_plugins(
-            DefaultPlugins
-                .set(ImagePlugin::default_nearest())
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        present_mode: PresentMode::AutoVsync,
-                        prevent_default_event_handling: false,
-                        ..default()
-                    }),
+    app.add_plugins(
+        DefaultPlugins
+            .set(ImagePlugin::default_nearest())
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    present_mode: PresentMode::AutoVsync,
+                    prevent_default_event_handling: false,
                     ..default()
                 }),
-        )
-        .insert_resource(Msaa::Off)
-        //
-        .add_plugins(EguiPlugin)
-        .add_plugins(DynamicAssetPlugin::new(&["ron"]))
-        .init_asset::<SpriteSheetAnimation>()
-        //
-        .insert_resource(args)
-        //
-        .add_game(args_fps)
-        .add_main_menu()
-        .add_local_menu()
-        .add_online_menu()
-        .add_loading_state(
-            LoadingState::new(State::Load)
-                .continue_to_state(State::MenuMain)
-                .with_dynamic_assets_file::<CoreDynamicAssetCollection>("assets.ron")
-                .register_dynamic_asset_collection::<CoreDynamicAssetCollection>()
-                //
-                .load_collection::<GameAssets>(),
-        )
-        //
-        .run();
+                ..default()
+            }),
+    )
+    .init_state::<State>()
+    //
+    .add_plugins(EguiPlugin { enable_multipass_for_primary_context: false })
+    .add_plugins(DynamicAssetPlugin::new(&["ron"]))
+    .init_asset::<SpriteSheetAnimation>()
+    //
+    .insert_resource(args)
+    //
+    .add_game(args_fps)
+    .add_main_menu()
+    .add_local_menu()
+    .add_online_menu()
+    .add_loading_state(
+        LoadingState::new(State::Load)
+            .continue_to_state(State::MenuMain)
+            .with_dynamic_assets_file::<CoreDynamicAssetCollection>("assets.ron")
+            .register_dynamic_asset_collection::<CoreDynamicAssetCollection>()
+            //
+            .load_collection::<GameAssets>(),
+    )
+    //
+    .run();
 }

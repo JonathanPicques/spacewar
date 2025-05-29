@@ -1,7 +1,6 @@
-use bytemuck::{Pod, Zeroable};
+use serde::{Deserialize, Serialize};
 
-#[repr(C)]
-#[derive(Eq, Pod, Copy, Clone, Default, Zeroable, PartialEq)]
+#[derive(Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct CoreInput {
     input: u8,
 }

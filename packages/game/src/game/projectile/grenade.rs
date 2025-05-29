@@ -32,7 +32,8 @@ pub struct GrenadeBundle {
     collider: PhysicsCollider,
     collider_options: PhysicsColliderOptions,
     //
-    sprite_bundle: SpriteBundle,
+    sprite: Sprite,
+    transform: Transform,
 }
 
 impl GrenadeBundle {
@@ -73,17 +74,14 @@ impl GrenadeBundle {
                 ..default()
             },
             //
-            sprite_bundle: SpriteBundle {
-                sprite: Sprite {
-                    flip_x: player.direction == Direction::Left,
-                    ..default()
-                },
-                texture: game_assets.grenade.clone(),
-                transform: match player.direction {
-                    Direction::Left => Transform::from_translation(*translation + Vec3::new(0.0, 15.0, 0.0)),
-                    Direction::Right => Transform::from_translation(*translation + Vec3::new(0.0, 15.0, 0.0)),
-                },
+            sprite: Sprite {
+                image: game_assets.grenade.clone(),
+                flip_x: player.direction == Direction::Left,
                 ..default()
+            },
+            transform: match player.direction {
+                Direction::Left => Transform::from_translation(*translation + Vec3::new(0.0, 15.0, 0.0)),
+                Direction::Right => Transform::from_translation(*translation + Vec3::new(0.0, 15.0, 0.0)),
             },
         }
     }
@@ -125,7 +123,7 @@ pub fn grenade_fuse_system(
     for (e, _, mut grenade) in grenades {
         grenade.fuse.tick(delta);
         if grenade.fuse.is_finished() {
-            commands.entity(e).despawn_recursive();
+            commands.entity(e).despawn();
         }
     }
 }

@@ -1,5 +1,8 @@
-use bevy::math::{Quat, Vec2, Vec3};
-use rapier2d::prelude::*;
+pub mod quat;
+pub mod vector;
+
+pub use quat::*;
+pub use vector::*;
 
 /// Returns the absolute value of a floating point number.
 #[inline(always)]
@@ -51,74 +54,5 @@ pub fn move_towards(from: f32, to: f32, delta: f32) -> f32 {
         to
     } else {
         from + (sign(to - from)) * delta
-    }
-}
-
-/*
- * Vectors
- */
-
-pub trait ToBevyVecExt {
-    fn to_bevy(&self) -> Vec2;
-}
-pub trait ToPhysicsVecExt {
-    fn to_physics(&self) -> Vector<Real>;
-}
-
-impl ToBevyVecExt for Vector<Real> {
-    /// Creates a [`Vec2`] from this [`Vector`].
-    #[inline(always)]
-    fn to_bevy(&self) -> Vec2 {
-        Vec2::new(self.x, self.y)
-    }
-}
-impl ToBevyVecExt for Isometry<Real> {
-    /// Creates a [`Vec2`] from this [`Translation`].
-    #[inline(always)]
-    fn to_bevy(&self) -> Vec2 {
-        Vec2::new(self.translation.x, self.translation.y)
-    }
-}
-impl ToBevyVecExt for Translation<Real> {
-    /// Creates a [`Vec2`] from this [`Translation`].
-    #[inline(always)]
-    fn to_bevy(&self) -> Vec2 {
-        Vec2::new(self.x, self.y)
-    }
-}
-
-impl ToPhysicsVecExt for Vec2 {
-    /// Creates a [`Vector`] from this [`Vec2`].
-    #[inline(always)]
-    fn to_physics(&self) -> Vector<Real> {
-        vector![self.x, self.y]
-    }
-}
-
-impl ToPhysicsVecExt for Vec3 {
-    /// Creates a [`Vector`] from this [`Vec3`].
-    #[inline(always)]
-    fn to_physics(&self) -> Vector<Real> {
-        vector![self.x, self.y]
-    }
-}
-
-/*
- * Quaternions
- */
-
-pub enum Rotation {
-    Radians(f32),
-    Degrees(f32),
-}
-
-impl From<Rotation> for Quat {
-    /// Creates a [`Quat`] from this [`Rotation`].
-    #[inline(always)]
-    fn from(value: Rotation) -> Self {
-        Quat::from_rotation_z(match value {
-            Rotation::Radians(radians) => radians,
-            Rotation::Degrees(degrees) => degrees.to_radians(),
-        })
     }
 }

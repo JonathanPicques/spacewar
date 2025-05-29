@@ -4,7 +4,6 @@ use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use bevy_ggrs::ggrs::InputStatus;
 use bevy_ggrs::{PlayerInputs, Rollback, RollbackOrdered};
-use bytemuck::Zeroable;
 use derivative::Derivative;
 use ggrs::PlayerHandle;
 use rapier2d::geometry::InteractionGroups;
@@ -98,8 +97,9 @@ pub struct PlayerBundle {
     collider_options: PhysicsColliderOptions,
     character_controller: PhysicsCharacterController,
     //
-    sprite_sheet_bundle: SpriteSheetBundle,
-    sprite_sheet_animator: SpriteSheetAnimator,
+    sprite: Sprite,
+    animator: SpriteSheetAnimator,
+    transform: Transform,
 }
 
 impl PlayerBundle {
@@ -123,32 +123,29 @@ impl PlayerBundle {
             }),
             character_controller: default(),
             //
-            sprite_sheet_bundle: SpriteSheetBundle {
-                atlas: TextureAtlas {
+            sprite: Sprite {
+                image: game_assets.player.clone(),
+                anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
+                texture_atlas: Some(TextureAtlas {
                     index: 0,
                     layout: game_assets.player_atlas_layout.clone(),
-                },
-                sprite: Sprite {
-                    anchor: Anchor::Custom(Vec2::new(0.0, -0.25)),
-                    ..default()
-                },
-                texture: game_assets.player.clone(),
-                transform: Transform::from_translation(Vec3::new(
-                    lerp(
-                        -68.0,
-                        68.0,
-                        if game_args.num_players == 1 {
-                            0.0
-                        } else {
-                            handle as f32 / ((game_args.num_players - 1) as f32)
-                        },
-                    ),
-                    -28.0,
-                    5.0,
-                )),
+                }),
                 ..default()
             },
-            sprite_sheet_animator: SpriteSheetAnimator::new(game_assets.player_idle.clone()),
+            animator: SpriteSheetAnimator::new(game_assets.player_idle.clone()),
+            transform: Transform::from_translation(Vec3::new(
+                lerp(
+                    -68.0,
+                    68.0,
+                    if game_args.num_players == 1 {
+                        0.0
+                    } else {
+                        handle as f32 / ((game_args.num_players - 1) as f32)
+                    },
+                ),
+                -28.0,
+                5.0,
+            )),
         }
     }
 }
@@ -184,7 +181,7 @@ pub fn player_system(
         let input = match inputs[player.handle] {
             (i, InputStatus::Confirmed) => i,
             (i, InputStatus::Predicted) => i,
-            (_, InputStatus::Disconnected) => CoreInput::zeroed(),
+            (_, InputStatus::Disconnected) => CoreInput::default(),
         };
 
         if damage_events.iter().any(|d| d.target == entity) {

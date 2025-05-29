@@ -85,32 +85,30 @@ fn setup(
 ) {
     commands.spawn((
         Game {},
-        Camera2dBundle {
-            transform: Transform::from_scale(Vec3::splat(0.5)),
-            ..default()
-        },
+        Camera2d {},
+        Transform::from_scale(Vec3::splat(0.5)),
     ));
 
     // Level
     {
         commands.spawn_with_rollback(LevelRectBundle::new(
             PhysicsCollider::Rectangle { width: 160.0, height: 10.0 },
-            Rotation::Degrees(0.0),
+            RotationAngle::Degrees(0.0),
             Vec3::new(0.0, 50.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
             PhysicsCollider::Rectangle { width: 160.0, height: 10.0 },
-            Rotation::Degrees(0.0),
+            RotationAngle::Degrees(0.0),
             Vec3::new(0.0, -50.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
             PhysicsCollider::Rectangle { width: 10.0, height: 90.0 },
-            Rotation::Degrees(0.0),
+            RotationAngle::Degrees(0.0),
             Vec3::new(80.0, 0.0, 0.0),
         ));
         commands.spawn_with_rollback(LevelRectBundle::new(
             PhysicsCollider::Rectangle { width: 10.0, height: 90.0 },
-            Rotation::Degrees(0.0),
+            RotationAngle::Degrees(0.0),
             Vec3::new(-80.0, 0.0, 0.0),
         ));
     }
@@ -164,7 +162,7 @@ fn cleanup(
     commands.insert_resource(Time::new_with(GgrsTime));
 
     for e in query.iter() {
-        commands.entity(e).despawn_recursive();
+        commands.entity(e).despawn();
     }
 }
 

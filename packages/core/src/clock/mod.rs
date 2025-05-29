@@ -104,7 +104,7 @@ pub fn ttl_system(
 
     for (e, _, mut ttl) in query {
         if ttl.clock.tick(delta).is_finished() {
-            commands.entity(e).despawn_recursive();
+            commands.entity(e).despawn();
         }
     }
 }

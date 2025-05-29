@@ -30,7 +30,6 @@ fn update(
         .with_fps(game_args.fps)
         .expect("Invalid FPS")
         .with_max_prediction_window(game_args.max_prediction)
-        .expect("Invalid prediction window")
         .with_num_players(game_args.num_players)
         .with_input_delay(game_args.input_delay)
         .with_check_distance(game_args.check_distance);

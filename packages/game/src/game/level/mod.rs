@@ -3,7 +3,7 @@ use rapier2d::geometry::InteractionGroups;
 
 use core::physics::body::PhysicsBody;
 use core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
-use core::utilities::maths::Rotation;
+use core::utilities::maths::{RotationAngle, ToBevyQuatExt};
 
 use crate::game::Game;
 use crate::Layer;
@@ -19,11 +19,11 @@ pub struct LevelRectBundle {
 }
 
 impl LevelRectBundle {
-    pub fn new(collider: PhysicsCollider, rotation: Rotation, translation: Vec3) -> Self {
+    pub fn new(collider: PhysicsCollider, rotation: RotationAngle, translation: Vec3) -> Self {
         Self {
             game: Game {},
             transform: Transform::default()
-                .with_rotation(rotation.into())
+                .with_rotation(rotation.to_bevy())
                 .with_translation(translation),
             //
             body: PhysicsBody::Fixed,
