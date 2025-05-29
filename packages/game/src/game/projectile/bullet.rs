@@ -10,7 +10,7 @@ use core::event::events::RollbackEvents;
 use core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
 use core::physics::Physics;
-use core::utilities::cmp::cmp_rollack;
+use core::utilities::cmp::cmp_rollback;
 
 use crate::game::player::{DamageEvent, Direction, Health, Player};
 use crate::game::Game;
@@ -99,10 +99,10 @@ pub fn bullet_system(
     mut damage_events: ResMut<RollbackEvents<DamageEvent>>,
 ) {
     let mut bullets = bullets.iter().collect::<Vec<_>>();
-    bullets.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    bullets.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     let mut healths = healths.iter().collect::<Vec<_>>();
-    healths.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    healths.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (e, _, bullet, collider_handle) in bullets {
         let collider = physics

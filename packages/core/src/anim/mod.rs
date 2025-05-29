@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 
 use crate::clock::Clock;
-use crate::utilities::cmp::cmp_rollack;
+use crate::utilities::cmp::cmp_rollback;
 
 #[derive(Hash, Clone, PartialEq)]
 enum State {
@@ -58,7 +58,7 @@ pub fn sprite_sheet_animator_system(
     animations: Res<Assets<SpriteSheetAnimation>>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (_, mut atlas, mut animator) in query {
         let animation = animations

@@ -54,7 +54,7 @@ pub fn move_towards(from: f32, to: f32, delta: f32) -> f32 {
     }
 }
 
-/**
+/*
  * Vectors
  */
 
@@ -103,7 +103,7 @@ impl ToPhysicsVecExt for Vec3 {
     }
 }
 
-/**
+/*
  * Quaternions
  */
 

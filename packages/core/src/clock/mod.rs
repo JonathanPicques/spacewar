@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_ggrs::{GgrsTime, Rollback, RollbackOrdered};
 use derivative::Derivative;
 
-use crate::utilities::cmp::cmp_rollack;
+use crate::utilities::cmp::cmp_rollback;
 
 #[derive(Copy, Clone, Derivative)]
 #[derivative(Hash)]
@@ -100,7 +100,7 @@ pub fn ttl_system(
 ) {
     let delta = time.delta();
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (e, _, mut ttl) in query {
         if ttl.clock.tick(delta).is_finished() {

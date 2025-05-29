@@ -17,7 +17,7 @@ use core::input::CoreInput;
 use core::physics::body::PhysicsBody;
 use core::physics::collider::{PhysicsCollider, PhysicsColliderOptions};
 use core::physics::controller::PhysicsCharacterController;
-use core::utilities::cmp::cmp_rollack;
+use core::utilities::cmp::cmp_rollback;
 use core::utilities::maths::*;
 
 use crate::game::player::fsm::PlayerArgs;
@@ -178,7 +178,7 @@ pub fn player_system(
 ) {
     let delta = time.delta();
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (entity, _, transform, mut player, mut sprite, mut animator, mut controller) in query {
         let input = match inputs[player.handle] {

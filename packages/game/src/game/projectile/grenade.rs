@@ -6,7 +6,7 @@ use rapier2d::geometry::{Group, InteractionGroups};
 use core::clock::Clock;
 use core::physics::body::{PhysicsBody, PhysicsBodyOptions, PhysicsBodyVelocity};
 use core::physics::collider::{PhysicsCollider, PhysicsColliderHandle, PhysicsColliderOptions};
-use core::utilities::cmp::cmp_rollack;
+use core::utilities::cmp::cmp_rollback;
 
 use crate::game::player::{Direction, Player};
 use crate::game::Game;
@@ -104,7 +104,7 @@ pub fn grenade_system(
     order: Res<RollbackOrdered>,
 ) {
     let mut grenades = grenades.iter().collect::<Vec<_>>();
-    grenades.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    grenades.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (e, ..) in grenades {
         commands.entity(e).remove::<PhysicsBodyVelocity>();
@@ -120,7 +120,7 @@ pub fn grenade_fuse_system(
 ) {
     let delta = time.delta();
     let mut grenades = grenades.iter_mut().collect::<Vec<_>>();
-    grenades.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    grenades.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (e, _, mut grenade) in grenades {
         grenade.fuse.tick(delta);

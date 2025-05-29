@@ -18,7 +18,7 @@ use crate::physics::body::PhysicsBodyHandle;
 use crate::physics::collider::PhysicsCollider;
 use crate::physics::collider::PhysicsColliderHandle;
 use crate::physics::controller::PhysicsCharacterController;
-use crate::utilities::cmp::cmp_rollack;
+use crate::utilities::cmp::cmp_rollback;
 use crate::utilities::hash::f32_hasher;
 use crate::utilities::maths::{Rotation, *};
 
@@ -251,7 +251,7 @@ fn physics_system(
     mut physics: ResMut<Physics>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (_, body_handle, collider_handle, collider_options, mut character_controller) in query {
         physics.move_controller(
@@ -274,7 +274,7 @@ fn physics_sync_system(
     physics: Res<Physics>,
 ) {
     let mut query = query.iter_mut().collect::<Vec<_>>();
-    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (_, body_handle, mut transform) in query {
         if let Some(body) = physics.bodies.get(body_handle.handle()) {
@@ -313,9 +313,9 @@ fn physics_update_system(
     let mut collider_query = collider_query.iter().collect::<Vec<_>>();
     let mut velocity_query = velocity_query.iter().collect::<Vec<_>>();
 
-    body_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
-    collider_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
-    velocity_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    body_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
+    collider_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
+    velocity_query.sort_by(|(rollback_a, ..), (rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (_, body, body_handle, body_options) in body_query {
         body.apply_options(
@@ -371,7 +371,7 @@ fn physics_create_handles_system(
     mut physics: ResMut<Physics>,
 ) {
     let mut query = query.iter().collect::<Vec<_>>();
-    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollack(&order, rollback_a, rollback_b));
+    query.sort_by(|(_, rollback_a, ..), (_, rollback_b, ..)| cmp_rollback(&order, rollback_a, rollback_b));
 
     for (e, _, transform, body, collider) in query {
         let body = body.build(&scaler, transform);
