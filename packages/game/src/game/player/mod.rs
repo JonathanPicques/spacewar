@@ -106,7 +106,7 @@ impl PlayerBundle {
     pub fn new(handle: usize, game_args: &GameArgs, game_assets: &GameAssets) -> Self {
         Self {
             game: default(),
-            stats: Stats::default(),
+            stats: default(),
             health: Health { hp: 1 },
             player: Player {
                 handle,

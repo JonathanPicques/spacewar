@@ -442,7 +442,7 @@ fn physics_debug_system(mut gizmos: Gizmos, scaler: Res<Scaler>, physics: Res<Ph
             gizmos.circle_2d(
                 Isometry2d {
                     translation: scaler.meters_to_pixels(collider.translation().to_bevy()),
-                    ..Default::default()
+                    ..default()
                 },
                 scaler.meters_to_pixels(ball.radius),
                 Color::linear_rgba(1.0, 0.0, 1.0, 0.2),

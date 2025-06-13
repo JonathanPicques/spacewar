@@ -3,6 +3,7 @@ pub mod level;
 pub mod player;
 pub mod projectile;
 
+use bevy::audio::{PlaybackMode, Volume};
 use bevy::prelude::*;
 use bevy_egui::egui::CollapsingHeader;
 use bevy_egui::{egui, EguiContexts};
@@ -87,6 +88,12 @@ fn setup(
         Game {},
         Camera2d {},
         Transform::from_scale(Vec3::splat(0.5)),
+        AudioPlayer::new(game_assets.background_music.clone()),
+        PlaybackSettings {
+            mode: PlaybackMode::Loop,
+            volume: Volume::Linear(0.5),
+            ..default()
+        },
     ));
 
     // Level

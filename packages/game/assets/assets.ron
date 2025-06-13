@@ -1,4 +1,45 @@
 ({
+    "bullet": Asset (
+        Image (
+            ImageAsset (
+                path: "sprites/bullet.png",
+            )
+        ),
+    ),
+    "bullet_idle": Asset (
+        SpriteSheetAnimation (
+            SpriteSheetAnimationAsset (
+                speed: 0.1,
+                start: 0,
+                finish: 1,
+                repeat: true,
+            )
+        )
+    ),
+    "bullet_atlas_layout": Asset (
+        TextureAtlasLayout (
+            TextureAtlasLayoutAsset (
+                rows: 1,
+                columns: 2,
+                //
+                offset_x: 0,
+                offset_y: 0,
+                padding_x: 0,
+                padding_y: 0,
+                tile_size_x: 11,
+                tile_size_y: 4
+            )
+        )
+    ),
+    //
+    "grenade": Asset (
+        Image (
+            ImageAsset (
+                path: "sprites/grenade.png",
+            )
+        ),
+    ),
+    //
     "player": Asset (
         Image (
             ImageAsset (
@@ -46,7 +87,7 @@
             )
         )
     ),
-     "player_hurt": Asset (
+    "player_hurt": Asset (
         SpriteSheetAnimation (
             SpriteSheetAnimationAsset (
                 speed: 0.1,
@@ -122,44 +163,12 @@
         )
     ),
     //
-    "bullet": Asset (
-        Image (
-            ImageAsset (
-                path: "sprites/bullet.png",
-            )
-        ),
-    ),
-    "bullet_idle": Asset (
-        SpriteSheetAnimation (
-            SpriteSheetAnimationAsset (
-                speed: 0.1,
-                start: 0,
-                finish: 1,
-                repeat: true,
+    "background_music": Asset (
+        Sound (
+            SoundAsset (
+                path: "musics/background_music.ogg",
+                loop: true,
             )
         )
-    ),
-    "bullet_atlas_layout": Asset (
-        TextureAtlasLayout (
-            TextureAtlasLayoutAsset (
-                rows: 1,
-                columns: 2,
-                //
-                offset_x: 0,
-                offset_y: 0,
-                padding_x: 0,
-                padding_y: 0,
-                tile_size_x: 11,
-                tile_size_y: 4
-            )
-        )
-    ),
-    //
-    "grenade": Asset (
-        Image (
-            ImageAsset (
-                path: "sprites/grenade.png",
-            )
-        ),
     ),
 })

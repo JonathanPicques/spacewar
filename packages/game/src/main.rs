@@ -117,6 +117,9 @@ pub struct GameAssets {
     pub player_dead_bounce: Handle<SpriteSheetAnimation>,
     #[asset(key = "player_atlas_layout")]
     pub player_atlas_layout: Handle<TextureAtlasLayout>,
+
+    #[asset(key = "background_music")]
+    pub background_music: Handle<AudioSource>,
 }
 
 #[derive(Debug)]

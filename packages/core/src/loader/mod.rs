@@ -10,12 +10,18 @@ use crate::anim::SpriteSheetAnimation;
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum Asset {
     Image(ImageAsset),
+    Sound(SoundAsset),
     TextureAtlasLayout(TextureAtlasLayoutAsset),
     SpriteSheetAnimation(SpriteSheetAnimationAsset),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct ImageAsset {
+    path: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct SoundAsset {
     path: String,
 }
 
@@ -50,6 +56,7 @@ impl DynamicAsset for CoreDynamicAsset {
     fn load(&self, asset_server: &AssetServer) -> Vec<UntypedHandle> {
         let load_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path, .. }) => asset_server.load::<Image>(path).untyped(),
+            Asset::Sound(SoundAsset { path, .. }) => asset_server.load::<AudioSource>(path).untyped(),
             Asset::TextureAtlasLayout(TextureAtlasLayoutAsset { .. }) => asset_server
                 .add(TextureAtlasLayout::new_empty(UVec2::ONE))
                 .untyped(),
@@ -76,6 +83,7 @@ impl DynamicAsset for CoreDynamicAsset {
 
         let mut build_asset = |asset: Asset| match asset {
             Asset::Image(ImageAsset { path }) => asset_server.load::<Image>(path).untyped(),
+            Asset::Sound(SoundAsset { path }) => asset_server.load::<AudioSource>(path).untyped(),
             Asset::TextureAtlasLayout(TextureAtlasLayoutAsset {
                 rows,
                 columns,
