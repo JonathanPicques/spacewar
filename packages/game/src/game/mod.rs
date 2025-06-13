@@ -16,14 +16,15 @@ use core::physics::collider::PhysicsCollider;
 use core::physics::*;
 use core::utilities::ggrs::SpawnWithRollbackCommandsExt;
 use core::utilities::hash::transform_hasher;
-use core::utilities::maths::*;
+use core::utilities::maths::RotationAngle;
+use core::utilities::sound::StopSoundInBackgroundAppExt;
 use core::AddCoreAppExt;
 
 use crate::game::input::input_system;
 use crate::game::level::LevelRectBundle;
-use crate::game::player::{player_system, DamageEvent, Health, Player, PlayerBundle, Stats};
-use crate::game::projectile::bullet::{bullet_system, Bullet};
-use crate::game::projectile::grenade::{grenade_fuse_system, grenade_system, Grenade};
+use crate::game::player::*;
+use crate::game::projectile::bullet::*;
+use crate::game::projectile::grenade::*;
 use crate::menu::menu_main::goto_main_menu;
 use crate::{GameArgs, GameAssets, GameConfig, State};
 
@@ -34,6 +35,7 @@ pub trait AddGameAppExt {
 impl AddGameAppExt for App {
     fn add_game(&mut self, fps: usize) -> &mut Self {
         self.add_core::<GameConfig, _>(fps, input_system)
+            .stop_sounds_in_background()
             //
             .rollback_events::<DamageEvent>()
             //
